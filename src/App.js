@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import AuthenticatorWrapper from './components/auth/AuthenticatorWrapper';
-import Dashboard from './pages/Dashboard';
-import Events from './pages/Events';
-import Chat from './pages/Chats';
-import Groups from './pages/Groups';
-import Files from './pages/Files';
-import Home from './pages/Home';
+import Dashboard from './pages/Dashboard/Dashboard';
+import Events from './pages/Events/Events';
+import Chat from './pages/Chats/Chats';
+import Groups from './pages/Groups/Groups';
+import Files from './pages/Files/Files';
+import Home from './pages/Home/Home';
 import routes from './routes';
 import './App.css';
 
