@@ -1,12 +1,13 @@
 import React from 'react';
+import './Home.css';
 
 const Home = () => {
-    return (
-        <div>
-            <h1>Welcome to the Home Page</h1>
-            <p>This is the home page of your application.</p>
-        </div>
-    );
+  return (
+    <div className="home-container">
+      <h1>Welcome to ConnectNest</h1>
+      <p>Your all-in-one campus engagement platform.</p>
+    </div>
+  );
 };
 
 export default Home;

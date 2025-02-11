@@ -1,7 +1,17 @@
+/* General Styling */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+}
+
+/* Main App Container */
 .App {
   text-align: center;
 }
 
+/* Logo Animation */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -13,6 +23,7 @@
   }
 }
 
+/* App Header */
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -24,10 +35,105 @@
   color: white;
 }
 
+/* Links */
 .App-link {
   color: #61dafb;
+  text-decoration: none;
 }
 
+/* Navbar Styling */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #007bff;
+  color: #fff;
+}
+
+.navbar a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.navbar .logo {
+  text-decoration: none;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.navbar .button {
+  margin-left: 15px;
+  padding: 8px 15px;
+  border-radius: 5px;
+  border: none;
+  background-color: red;
+  color: white;
+  cursor: pointer;
+}
+
+.navbar .button:hover {
+  background-color: darkred;
+}
+
+/* Authentication Wrapper */
+.auth-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.auth-container h2 {
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.auth-container button {
+  margin-top: 20px;
+  padding: 10px 15px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.auth-container button:hover {
+  background-color: #0056b3;
+}
+
+/* Home Page */
+.home-container {
+  text-align: center;
+  padding: 50px;
+}
+
+.home-container h1 {
+  font-size: 2.5rem;
+  color: #333;
+}
+
+.home-container p {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* Buttons */
+button {
+  padding: 10px 15px;
+  border: none;
+  background-color: #28a745;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+/* Keyframes */
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
