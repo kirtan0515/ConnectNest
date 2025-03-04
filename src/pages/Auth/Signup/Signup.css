@@ -1,58 +1,58 @@
 .signup-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f5f5f5;
-  }
-  
-  .signup-box {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 350px;
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f2ef;
+  padding: 0 10%;
+}
+
+.signup-left {
+  flex: 1;
+  text-align: left;
+  padding-right: 50px;
+}
+
+.signup-logo {
+  width: 180px; /* Adjusted logo size */
+  margin-bottom: 20px;
+}
+
+.signup-left h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.signup-left p {
+  font-size: 1rem;
+  color: #555;
+}
+
+.signup-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Make it responsive */
+@media (max-width: 900px) {
+  .signup-container {
+    flex-direction: column;
     text-align: center;
   }
-  
-  .signup-box h2 {
-    margin-bottom: 1rem;
-    color: #333;
+
+  .signup-left {
+    padding-right: 0;
+    margin-bottom: 20px;
   }
-  
-  .signup-input {
+
+  .signup-right {
     width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
   }
-  
-  .signup-button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .signup-button:hover {
-    background-color: #218838;
-  }
-  
-  .auth-links {
-    margin-top: 10px;
-  }
-  
-  .auth-links a {
-    color: #007bff;
-    text-decoration: none;
-  }
-  
-  .auth-links a:hover {
-    text-decoration: underline;
-  }
-  
+}

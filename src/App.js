@@ -1,24 +1,26 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import '@aws-amplify/ui-react/styles.css';
-import Navbar from './components/layout/Navbar';
-import AuthenticatorWrapper from './components/auth/AuthenticatorWrapper';
-import Dashboard from './pages/Dashboard/Dashboard';
-import Events from './pages/Events/Events';
-import Chat from './pages/Chats/Chats';
-import Groups from './pages/Groups/Groups';
-import Files from './pages/Files/Files';
-import Home from './pages/Home/Home';
-import Login from './pages/Auth/Login/Login';
-import Signup from './pages/Auth/Signup/Signup';
-import routes from './routes';
-import './App.css';
+import React, { Suspense } from "react";
+import { Route, Routes, Navigate } from "react-router-dom";
+import "@aws-amplify/ui-react/styles.css";
+import routes from "./routes";
+import "./App.css";
+import LoadingSpinner from "./components/layout/LoadingSpinner";
+import AuthenticatorWrapper from "./components/auth/AuthenticatorWrapper";
+
+// Lazy-loaded pages
+const Home = React.lazy(() => import("./pages/Home/Home"));
+const Dashboard = React.lazy(() => import("./pages/Dashboard/Dashboard"));
+const Events = React.lazy(() => import("./pages/Events/Events"));
+const Chat = React.lazy(() => import("./pages/Chats/Chats"));
+const Groups = React.lazy(() => import("./pages/Groups/Groups"));
+const Files = React.lazy(() => import("./pages/Files/Files"));
+const Login = React.lazy(() => import("./pages/Auth/Login/Login"));
+const Signup = React.lazy(() => import("./pages/Auth/Signup/Signup"));
+
+
 
 function App() {
   return (
-    <Router>
-      <Navbar />
-
+    <Suspense fallback={<LoadingSpinner />}>
       <Routes>
         {/* Public Routes */}
         <Route path={routes.home} element={<Home />} />
@@ -66,8 +68,11 @@ function App() {
             </AuthenticatorWrapper>
           }
         />
+
+        {/* Fallback: Redirect unknown routes to home */}
+        <Route path="*" element={<Navigate to={routes.home} />} />
       </Routes>
-    </Router>
+    </Suspense>
   );
 }
 

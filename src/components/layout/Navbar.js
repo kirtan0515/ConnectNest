@@ -1,21 +1,28 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import routes from '../../routes';
-import './Navbar.css';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { NavBarHeader2 } from "../../ui-components"; // Import Amplify UI Navbar
+import logo from "../../assets/connectnest-logo.png"; // Import Logo
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
   return (
-    <nav className="navbar">
-      <div className="logo">
-        <Link to={routes.home}>ConnectNest</Link>
-      </div>
-      <ul className="nav-links">
-        <li><Link to={routes.home}>Home</Link></li>
-        <li><Link to={routes.login}>Login</Link></li>
-        <li><Link to={routes.signup}>Sign Up</Link></li>
-        <li><Link to={routes.dashboard}>Dashboard</Link></li>
-      </ul>
-    </nav>
+    <NavBarHeader2
+      overrides={{
+        "connectnest-logo": {
+          src: logo,
+          alt: "ConnectNest Logo",
+          onClick: () => navigate("/"),
+          style: { cursor: "pointer" },
+        },
+        Home: { onClick: () => navigate("/") },
+        About: { onClick: () => navigate("/about") },
+        Features: { onClick: () => navigate("/features") },
+        Contact: { onClick: () => navigate("/contact") },
+        Button39493466: { onClick: () => navigate("/login") }, // Log in button
+        Button39493467: { onClick: () => navigate("/signup") }, // Sign up button
+      }}
+    />
   );
 };
 
