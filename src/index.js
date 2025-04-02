@@ -4,24 +4,20 @@ import { BrowserRouter } from "react-router-dom";
 import { Amplify } from "aws-amplify";
 import awsExports from "./aws-exports";
 import "@aws-amplify/ui-react/styles.css";
-import "./index.css"; // Your global styles
+import "./index.css";
 import App from "./App";
 import { Authenticator } from "@aws-amplify/ui-react";
 
-// Configure Amplify once at the root
+// Configure Amplify
 Amplify.configure(awsExports);
-
-// Import Authenticator
-
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      {/* Provide the Authenticator context for the entire app */}
-      <Authenticator.Provider>
+    <Authenticator.Provider> {/* ✅ Wrap everything */}
+      <BrowserRouter>
         <App />
-      </Authenticator.Provider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </Authenticator.Provider>
   </React.StrictMode>
 );

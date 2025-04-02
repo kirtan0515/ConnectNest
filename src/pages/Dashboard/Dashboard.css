@@ -1,252 +1,79 @@
-/* Dashboard.css */
+.dashboard {
+  display: flex;
+  background-color: #f5f5f5;
+  padding-top: 20px;
+  min-height: 100vh;
+}
 
-/* Root variables for colors (optional) */
-:root {
-    --bg-color: #f3f3f3;
-    --navbar-bg: #fff;
-    --sidebar-bg: #fff;
-    --main-bg: #fff;
-    --brand-color: #0073b1; /* LinkedIn-like brand color */
-  }
-  
-  /* Overall container */
-  .dashboard-container {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-color);
-  }
-  
-  /* Top Navbar */
-  .dashboard-navbar {
-    background: var(--navbar-bg);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 1rem;
-  }
-  
-  .navbar-left {
-    display: flex;
-    align-items: center;
-  }
-  
-  .brand {
-    color: var(--brand-color);
-    font-size: 1.25rem;
-    font-weight: bold;
-  }
-  
-  .navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .welcome {
-    font-size: 0.9rem;
-    color: #555;
-  }
-  
-  .username {
-    font-weight: bold;
-  }
-  
-  .signout-button {
-    background: var(--brand-color);
-    color: #fff;
-    border: none;
-    padding: 0.4rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .signout-button:hover {
-    background: #005b8f;
-  }
-  
-  /* 3-Column Layout */
-  .dashboard-layout {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 250px 1fr 250px;
-    gap: 1rem;
-    padding: 1rem;
-  }
-  
-  /* Left Sidebar */
-  .sidebar-left {
-    background: var(--sidebar-bg);
-    padding: 1rem;
-    border-radius: 8px;
-    height: fit-content;
-  }
-  
-  .cover-photo img {
-    width: 100%;
-    border-radius: 4px;
-  }
-  
-  .profile-section {
-    text-align: center;
-    margin-top: -2rem;
-  }
-  
-  .profile-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    border: 3px solid #fff;
-    object-fit: cover;
-  }
-  
-  .profile-subtitle {
-    color: #777;
-    font-size: 0.9rem;
-  }
-  
-  .shortcut-list h4 {
-    margin-bottom: 0.5rem;
-  }
-  
-  .shortcut-list ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .shortcut-list li {
-    margin: 0.5rem 0;
-    color: var(--brand-color);
-    cursor: pointer;
-  }
-  
-  .shortcut-list li:hover {
-    text-decoration: underline;
-  }
-  
-  /* Center Column (Main Content) */
-  .main-content {
-    background: var(--main-bg);
-    padding: 1rem;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  /* Post Composer */
-  .post-composer {
-    background: #fff;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  
-  .composer-top {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .composer-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-  }
-  
-  .composer-top input {
-    flex: 1;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .composer-bottom {
-    text-align: right;
-    margin-top: 0.5rem;
-  }
-  
-  .composer-bottom button {
-    background: var(--brand-color);
-    color: #fff;
-    border: none;
-    padding: 0.4rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .composer-bottom button:hover {
-    background: #005b8f;
-  }
-  
-  /* Feed Section */
-  .feed-section {
-    background: #fff;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  
-  .feed-section h2 {
-    margin-bottom: 1rem;
-  }
-  
-  /* Right Sidebar */
-  .sidebar-right {
-    background: var(--sidebar-bg);
-    padding: 1rem;
-    border-radius: 8px;
-    height: fit-content;
-  }
-  
-  .sidebar-right h2,
-  .sidebar-right h3 {
-    margin-bottom: 0.5rem;
-  }
-  
-  .events-list {
-    max-height: 200px;
-    overflow-y: auto;
-    margin-bottom: 1rem;
-  }
-  
-  .event-item {
-    background: #fafafa;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    border-radius: 4px;
-    border: 1px solid #eee;
-  }
-  
-  .event-item h3 {
-    margin: 0;
-    font-size: 1rem;
-  }
-  
-  .event-item p {
-    margin: 0;
-    color: #777;
-    font-size: 0.85rem;
-  }
-  
-  /* Responsive Adjustments */
-  @media (max-width: 992px) {
-    .sidebar-left {
-      display: none; /* Hide left sidebar on medium screens */
-    }
-    .dashboard-layout {
-      grid-template-columns: 1fr 250px; /* Main content + right sidebar */
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .sidebar-right {
-      display: none; /* Hide right sidebar on smaller screens, optional */
-    }
-    .dashboard-layout {
-      grid-template-columns: 1fr; /* Only main content is visible */
-    }
-  }
-  
+.sidebar-left,
+.sidebar-right {
+  flex: 1;
+  padding: 20px;
+}
+
+.main-feed {
+  flex: 2;
+  padding: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.sidebar-right {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.dashboard {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  gap: 20px;
+}
+
+/* Left Sidebar */
+.sidebar-left {
+  flex: 1;
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Center Feed */
+.main-feed {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Right Sidebar */
+.sidebar-right {
+  flex: 1;
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+ul li {
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.posts,
+.share,
+.stories {
+  background-color: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}

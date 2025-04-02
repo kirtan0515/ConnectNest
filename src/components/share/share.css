@@ -1,0 +1,28 @@
+.share .container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    background-color: #f6f3f3;
+    border-radius: 10px;
+  }
+  
+  .share input[type="text"] {
+    padding: 10px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+  }
+  
+  .share input[type="file"] {
+    margin-top: 5px;
+  }
+  
+  .share button {
+    background-color: #1da1f2;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  

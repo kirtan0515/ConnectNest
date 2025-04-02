@@ -1,12 +1,11 @@
 import React, { Suspense } from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import "@aws-amplify/ui-react/styles.css";
-import routes from "./routes";
-import "./App.css";
 import LoadingSpinner from "./components/layout/LoadingSpinner";
 import AuthenticatorWrapper from "./components/auth/AuthenticatorWrapper";
+import routes from "./routes"; // your route paths
 
-// Lazy-loaded pages
+// Lazy imports
 const Home = React.lazy(() => import("./pages/Home/Home"));
 const Dashboard = React.lazy(() => import("./pages/Dashboard/Dashboard"));
 const Events = React.lazy(() => import("./pages/Events/Events"));
@@ -15,24 +14,38 @@ const Groups = React.lazy(() => import("./pages/Groups/Groups"));
 const Files = React.lazy(() => import("./pages/Files/Files"));
 const Login = React.lazy(() => import("./pages/Auth/Login/Login"));
 const Signup = React.lazy(() => import("./pages/Auth/Signup/Signup"));
+const Navbar = React.lazy(() => import("./components/layout/Navbar"));
+const Sidebar = React.lazy(() => import("./components/layout/Sidebar"));
 
-
+function MainLayout({ children }) {
+  return (
+    <>
+      <Navbar />
+      <div className="layout">
+        <Sidebar />
+        <div className="main-view">{children}</div>
+      </div>
+    </>
+  );
+}
 
 function App() {
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Routes>
-        {/* Public Routes */}
+        {/* Public */}
         <Route path={routes.home} element={<Home />} />
         <Route path={routes.login} element={<Login />} />
         <Route path={routes.signup} element={<Signup />} />
 
-        {/* Protected Routes */}
+        {/* Protected */}
         <Route
           path={routes.dashboard}
           element={
             <AuthenticatorWrapper>
-              <Dashboard />
+              <MainLayout>
+                <Dashboard />
+              </MainLayout>
             </AuthenticatorWrapper>
           }
         />
@@ -40,7 +53,9 @@ function App() {
           path={routes.events}
           element={
             <AuthenticatorWrapper>
-              <Events />
+              <MainLayout>
+                <Events />
+              </MainLayout>
             </AuthenticatorWrapper>
           }
         />
@@ -48,7 +63,9 @@ function App() {
           path={routes.chat}
           element={
             <AuthenticatorWrapper>
-              <Chat />
+              <MainLayout>
+                <Chat />
+              </MainLayout>
             </AuthenticatorWrapper>
           }
         />
@@ -56,7 +73,9 @@ function App() {
           path={routes.groups}
           element={
             <AuthenticatorWrapper>
-              <Groups />
+              <MainLayout>
+                <Groups />
+              </MainLayout>
             </AuthenticatorWrapper>
           }
         />
@@ -64,12 +83,14 @@ function App() {
           path={routes.files}
           element={
             <AuthenticatorWrapper>
-              <Files />
+              <MainLayout>
+                <Files />
+              </MainLayout>
             </AuthenticatorWrapper>
           }
         />
 
-        {/* Fallback: Redirect unknown routes to home */}
+        {/* Fallback */}
         <Route path="*" element={<Navigate to={routes.home} />} />
       </Routes>
     </Suspense>

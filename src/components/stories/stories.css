@@ -1,0 +1,79 @@
+.stories {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+  }
+  
+  .story {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    min-width: 60px;
+    position: relative;
+  }
+  
+  .story img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #e1306c;
+    padding: 2px;
+    background-color: white;
+  }
+  
+  .story span {
+    font-size: 0.8rem;
+    color: #262626;
+    max-width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .story .add-story-btn {
+    position: absolute;
+    bottom: 25px;
+    right: -5px;
+    background-color: #0095f6;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .story .add-story-btn:hover {
+    background-color: #0074c2;
+  }
+  
+  .stories::-webkit-scrollbar {
+    height: 8px;
+  }
+  
+  .stories::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  .stories::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  .stories::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
