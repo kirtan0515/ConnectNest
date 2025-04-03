@@ -39,8 +39,8 @@ export default function NavBarHeader2(props) {
         {...getOverrideProps(overrides, "Frame 5")}
       >
         <Image
-          width="194px"
-          height="23.96px"
+          width="226px"
+          height="27.91px"
           display="block"
           gap="unset"
           alignItems="unset"

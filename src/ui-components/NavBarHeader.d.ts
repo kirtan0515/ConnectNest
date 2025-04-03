@@ -5,8 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { LogoWithTextProps } from "./LogoWithText";
-import { FlexProps, ImageProps, TextProps } from "@aws-amplify/ui-react";
+import { FlexProps, IconProps, ImageProps, TextProps, ViewProps } from "@aws-amplify/ui-react";
 import { MyIconProps } from "./MyIcon";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
@@ -21,13 +20,17 @@ export declare type Variant = {
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type NavBarHeaderOverridesProps = {
     NavBarHeader?: PrimitiveOverrideProps<FlexProps>;
-    LogoWithText?: LogoWithTextProps;
-    "Frame 32129767076"?: PrimitiveOverrideProps<FlexProps>;
-    Dashboard?: PrimitiveOverrideProps<TextProps>;
-    Jobs?: PrimitiveOverrideProps<TextProps>;
-    Applicants?: PrimitiveOverrideProps<TextProps>;
-    Company?: PrimitiveOverrideProps<TextProps>;
-    "Frame 32129767081"?: PrimitiveOverrideProps<FlexProps>;
+    "Frame 437"?: PrimitiveOverrideProps<ViewProps>;
+    "connectnest-logo"?: PrimitiveOverrideProps<ImageProps>;
+    Navigation?: PrimitiveOverrideProps<FlexProps>;
+    Home?: PrimitiveOverrideProps<TextProps>;
+    Groups?: PrimitiveOverrideProps<TextProps>;
+    Events?: PrimitiveOverrideProps<TextProps>;
+    Files?: PrimitiveOverrideProps<TextProps>;
+    SearchbarContainer?: PrimitiveOverrideProps<ViewProps>;
+    Vector?: PrimitiveOverrideProps<IconProps>;
+    "Search Text"?: PrimitiveOverrideProps<TextProps>;
+    Container?: PrimitiveOverrideProps<FlexProps>;
     MyIcon?: MyIconProps;
     image?: PrimitiveOverrideProps<ImageProps>;
 } & EscapeHatchProps;

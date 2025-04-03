@@ -13,6 +13,7 @@ export { default as CheckoutPayment } from "./CheckoutPayment";
 export { default as CommentCard } from "./CommentCard";
 export { default as CommentCreateForm } from "./CommentCreateForm";
 export { default as CommentUpdateForm } from "./CommentUpdateForm";
+export { default as Component } from "./Component";
 export { default as ContactUs } from "./ContactUs";
 export { default as DataRow } from "./DataRow";
 export { default as EditProfile } from "./EditProfile";
