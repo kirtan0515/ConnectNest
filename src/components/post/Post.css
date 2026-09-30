@@ -1,63 +1,191 @@
-.post {
-  box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-  border-radius: 20px;
-  background-color: white;
-  color: #000;
-  margin-bottom: 20px;
-}
-
-.post .container {
-  padding: 20px;
-}
-
-.post .user {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-}
-
-.post .userInfo {
-  display: flex;
-  gap: 20px;
-}
-
-.post .userInfo img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.post .details {
+.posts {
   display: flex;
   flex-direction: column;
+  gap: 12px;
 }
 
-.post .details .name {
-  font-weight: 500;
+.posts__empty {
+  padding: 32px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
 }
 
-.post .details .date {
-  font-size: 12px;
-  color: #555;
+/* Post card */
+.post {
+  overflow: hidden;
 }
 
-.post .content {
-  margin: 20px 0px;
-}
-
-.post .content img {
-  width: 100%;
-  max-height: 400px;
-  object-fit: cover;
-  margin-top: 10px;
-}
-
-.post .info {
+.post__header {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
+  padding: 16px 16px 12px;
+}
+
+.post__avatar {
+  width: 44px;
+  height: 44px;
+}
+
+.post__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.post__author {
+  font-weight: 600;
   font-size: 14px;
-  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.post__time {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.post__body {
+  padding: 0 16px 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+}
+
+.post__image-wrap {
+  width: 100%;
+  background: var(--surface-2);
+  max-height: 480px;
+  overflow: hidden;
+}
+
+.post__image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: opacity 0.3s;
+}
+
+.post__stats {
+  padding: 8px 16px 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Actions */
+.post__actions {
+  display: flex;
+  gap: 4px;
+  padding: 4px 8px;
+}
+
+.post__action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 8px 4px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: background var(--transition), color var(--transition);
+}
+.post__action-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.post__action-btn:hover {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+.post__action-btn.liked {
+  color: var(--brand);
+}
+.post__action-btn:disabled { opacity: 0.6; cursor: default; }
+
+/* Comments */
+.post__comments {
+  padding: 12px 16px;
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.post__comment-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.post__comment-input input {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 8px 14px;
+  font-size: 13px;
+  background: var(--surface);
+  outline: none;
+  transition: border-color var(--transition);
+}
+.post__comment-input input:focus { border-color: var(--brand); }
+
+.post__comment-input button {
+  background: var(--brand);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+.post__comment-input button svg {
+  width: 16px;
+  height: 16px;
+  fill: #fff;
+}
+.post__comment-input button:hover { background: var(--brand-hover); }
+.post__comment-input button:disabled { opacity: 0.5; cursor: default; }
+
+.post__no-comments {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 8px 0;
+}
+
+.post__comment {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.post__comment-bubble {
+  background: var(--surface);
+  border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: calc(100% - 44px);
+}
+
+.post__comment-author {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.post__comment-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  word-break: break-word;
 }

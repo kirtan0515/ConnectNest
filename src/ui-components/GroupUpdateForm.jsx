@@ -194,12 +194,14 @@ export default function GroupUpdateForm(props) {
     name: "",
     description: "",
     members: [],
+    createdBy: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [description, setDescription] = React.useState(
     initialValues.description
   );
   const [members, setMembers] = React.useState(initialValues.members);
+  const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = groupRecord
@@ -209,6 +211,7 @@ export default function GroupUpdateForm(props) {
     setDescription(cleanValues.description);
     setMembers(cleanValues.members ?? []);
     setCurrentMembersValue("");
+    setCreatedBy(cleanValues.createdBy);
     setErrors({});
   };
   const [groupRecord, setGroupRecord] = React.useState(groupModelProp);
@@ -233,6 +236,7 @@ export default function GroupUpdateForm(props) {
     name: [{ type: "Required" }],
     description: [],
     members: [],
+    createdBy: [{ type: "Required" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -263,6 +267,7 @@ export default function GroupUpdateForm(props) {
           name,
           description: description ?? null,
           members: members ?? null,
+          createdBy,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -326,6 +331,7 @@ export default function GroupUpdateForm(props) {
               name: value,
               description,
               members,
+              createdBy,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -352,6 +358,7 @@ export default function GroupUpdateForm(props) {
               name,
               description: value,
               members,
+              createdBy,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -374,6 +381,7 @@ export default function GroupUpdateForm(props) {
               name,
               description,
               members: values,
+              createdBy,
             };
             const result = onChange(modelFields);
             values = result?.members ?? values;
@@ -413,6 +421,33 @@ export default function GroupUpdateForm(props) {
           {...getOverrideProps(overrides, "members")}
         ></TextField>
       </ArrayField>
+      <TextField
+        label="Created by"
+        isRequired={true}
+        isReadOnly={false}
+        value={createdBy}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              description,
+              members,
+              createdBy: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.createdBy ?? value;
+          }
+          if (errors.createdBy?.hasError) {
+            runValidationTasks("createdBy", value);
+          }
+          setCreatedBy(value);
+        }}
+        onBlur={() => runValidationTasks("createdBy", createdBy)}
+        errorMessage={errors.createdBy?.errorMessage}
+        hasError={errors.createdBy?.hasError}
+        {...getOverrideProps(overrides, "createdBy")}
+      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

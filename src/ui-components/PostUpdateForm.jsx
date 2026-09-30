@@ -6,7 +6,13 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Grid,
+  SwitchField,
+  TextField,
+} from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
 import { getPost } from "../graphql/queries";
@@ -28,14 +34,16 @@ export default function PostUpdateForm(props) {
     content: "",
     image: "",
     createdAt: "",
+    updatedAt: "",
     createdBy: "",
-    likes: "",
+    isPublic: false,
   };
   const [content, setContent] = React.useState(initialValues.content);
   const [image, setImage] = React.useState(initialValues.image);
   const [createdAt, setCreatedAt] = React.useState(initialValues.createdAt);
+  const [updatedAt, setUpdatedAt] = React.useState(initialValues.updatedAt);
   const [createdBy, setCreatedBy] = React.useState(initialValues.createdBy);
-  const [likes, setLikes] = React.useState(initialValues.likes);
+  const [isPublic, setIsPublic] = React.useState(initialValues.isPublic);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = postRecord
@@ -44,8 +52,9 @@ export default function PostUpdateForm(props) {
     setContent(cleanValues.content);
     setImage(cleanValues.image);
     setCreatedAt(cleanValues.createdAt);
+    setUpdatedAt(cleanValues.updatedAt);
     setCreatedBy(cleanValues.createdBy);
-    setLikes(cleanValues.likes);
+    setIsPublic(cleanValues.isPublic);
     setErrors({});
   };
   const [postRecord, setPostRecord] = React.useState(postModelProp);
@@ -67,9 +76,10 @@ export default function PostUpdateForm(props) {
   const validations = {
     content: [{ type: "Required" }],
     image: [],
-    createdAt: [],
+    createdAt: [{ type: "Required" }],
+    updatedAt: [],
     createdBy: [{ type: "Required" }],
-    likes: [],
+    isPublic: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -116,9 +126,10 @@ export default function PostUpdateForm(props) {
         let modelFields = {
           content,
           image: image ?? null,
-          createdAt: createdAt ?? null,
+          createdAt,
+          updatedAt: updatedAt ?? null,
           createdBy,
-          likes: likes ?? null,
+          isPublic: isPublic ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -182,8 +193,9 @@ export default function PostUpdateForm(props) {
               content: value,
               image,
               createdAt,
+              updatedAt,
               createdBy,
-              likes,
+              isPublic,
             };
             const result = onChange(modelFields);
             value = result?.content ?? value;
@@ -210,8 +222,9 @@ export default function PostUpdateForm(props) {
               content,
               image: value,
               createdAt,
+              updatedAt,
               createdBy,
-              likes,
+              isPublic,
             };
             const result = onChange(modelFields);
             value = result?.image ?? value;
@@ -228,7 +241,7 @@ export default function PostUpdateForm(props) {
       ></TextField>
       <TextField
         label="Created at"
-        isRequired={false}
+        isRequired={true}
         isReadOnly={false}
         type="datetime-local"
         value={createdAt && convertToLocal(new Date(createdAt))}
@@ -240,8 +253,9 @@ export default function PostUpdateForm(props) {
               content,
               image,
               createdAt: value,
+              updatedAt,
               createdBy,
-              likes,
+              isPublic,
             };
             const result = onChange(modelFields);
             value = result?.createdAt ?? value;
@@ -257,6 +271,37 @@ export default function PostUpdateForm(props) {
         {...getOverrideProps(overrides, "createdAt")}
       ></TextField>
       <TextField
+        label="Updated at"
+        isRequired={false}
+        isReadOnly={false}
+        type="datetime-local"
+        value={updatedAt && convertToLocal(new Date(updatedAt))}
+        onChange={(e) => {
+          let value =
+            e.target.value === "" ? "" : new Date(e.target.value).toISOString();
+          if (onChange) {
+            const modelFields = {
+              content,
+              image,
+              createdAt,
+              updatedAt: value,
+              createdBy,
+              isPublic,
+            };
+            const result = onChange(modelFields);
+            value = result?.updatedAt ?? value;
+          }
+          if (errors.updatedAt?.hasError) {
+            runValidationTasks("updatedAt", value);
+          }
+          setUpdatedAt(value);
+        }}
+        onBlur={() => runValidationTasks("updatedAt", updatedAt)}
+        errorMessage={errors.updatedAt?.errorMessage}
+        hasError={errors.updatedAt?.hasError}
+        {...getOverrideProps(overrides, "updatedAt")}
+      ></TextField>
+      <TextField
         label="Created by"
         isRequired={true}
         isReadOnly={false}
@@ -268,8 +313,9 @@ export default function PostUpdateForm(props) {
               content,
               image,
               createdAt,
+              updatedAt,
               createdBy: value,
-              likes,
+              isPublic,
             };
             const result = onChange(modelFields);
             value = result?.createdBy ?? value;
@@ -284,38 +330,35 @@ export default function PostUpdateForm(props) {
         hasError={errors.createdBy?.hasError}
         {...getOverrideProps(overrides, "createdBy")}
       ></TextField>
-      <TextField
-        label="Likes"
-        isRequired={false}
-        isReadOnly={false}
-        type="number"
-        step="any"
-        value={likes}
+      <SwitchField
+        label="Is public"
+        defaultChecked={false}
+        isDisabled={false}
+        isChecked={isPublic}
         onChange={(e) => {
-          let value = isNaN(parseInt(e.target.value))
-            ? e.target.value
-            : parseInt(e.target.value);
+          let value = e.target.checked;
           if (onChange) {
             const modelFields = {
               content,
               image,
               createdAt,
+              updatedAt,
               createdBy,
-              likes: value,
+              isPublic: value,
             };
             const result = onChange(modelFields);
-            value = result?.likes ?? value;
+            value = result?.isPublic ?? value;
           }
-          if (errors.likes?.hasError) {
-            runValidationTasks("likes", value);
+          if (errors.isPublic?.hasError) {
+            runValidationTasks("isPublic", value);
           }
-          setLikes(value);
+          setIsPublic(value);
         }}
-        onBlur={() => runValidationTasks("likes", likes)}
-        errorMessage={errors.likes?.errorMessage}
-        hasError={errors.likes?.hasError}
-        {...getOverrideProps(overrides, "likes")}
-      ></TextField>
+        onBlur={() => runValidationTasks("isPublic", isPublic)}
+        errorMessage={errors.isPublic?.errorMessage}
+        hasError={errors.isPublic?.hasError}
+        {...getOverrideProps(overrides, "isPublic")}
+      ></SwitchField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

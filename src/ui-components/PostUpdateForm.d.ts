@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SwitchFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -25,15 +25,17 @@ export declare type PostUpdateFormInputValues = {
     content?: string;
     image?: string;
     createdAt?: string;
+    updatedAt?: string;
     createdBy?: string;
-    likes?: number;
+    isPublic?: boolean;
 };
 export declare type PostUpdateFormValidationValues = {
     content?: ValidationFunction<string>;
     image?: ValidationFunction<string>;
     createdAt?: ValidationFunction<string>;
+    updatedAt?: ValidationFunction<string>;
     createdBy?: ValidationFunction<string>;
-    likes?: ValidationFunction<number>;
+    isPublic?: ValidationFunction<boolean>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type PostUpdateFormOverridesProps = {
@@ -41,8 +43,9 @@ export declare type PostUpdateFormOverridesProps = {
     content?: PrimitiveOverrideProps<TextFieldProps>;
     image?: PrimitiveOverrideProps<TextFieldProps>;
     createdAt?: PrimitiveOverrideProps<TextFieldProps>;
+    updatedAt?: PrimitiveOverrideProps<TextFieldProps>;
     createdBy?: PrimitiveOverrideProps<TextFieldProps>;
-    likes?: PrimitiveOverrideProps<TextFieldProps>;
+    isPublic?: PrimitiveOverrideProps<SwitchFieldProps>;
 } & EscapeHatchProps;
 export declare type PostUpdateFormProps = React.PropsWithChildren<{
     overrides?: PostUpdateFormOverridesProps | undefined | null;

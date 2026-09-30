@@ -25,11 +25,13 @@ export declare type GroupUpdateFormInputValues = {
     name?: string;
     description?: string;
     members?: string[];
+    createdBy?: string;
 };
 export declare type GroupUpdateFormValidationValues = {
     name?: ValidationFunction<string>;
     description?: ValidationFunction<string>;
     members?: ValidationFunction<string>;
+    createdBy?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type GroupUpdateFormOverridesProps = {
@@ -37,6 +39,7 @@ export declare type GroupUpdateFormOverridesProps = {
     name?: PrimitiveOverrideProps<TextFieldProps>;
     description?: PrimitiveOverrideProps<TextFieldProps>;
     members?: PrimitiveOverrideProps<TextFieldProps>;
+    createdBy?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type GroupUpdateFormProps = React.PropsWithChildren<{
     overrides?: GroupUpdateFormOverridesProps | undefined | null;

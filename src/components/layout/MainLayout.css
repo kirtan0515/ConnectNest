@@ -1,0 +1,12 @@
+.main-layout {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.main-layout__content {
+  padding-top: var(--navbar-h);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}

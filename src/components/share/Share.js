@@ -1,69 +1,134 @@
-import "./share.css";
-import { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { generateClient } from "aws-amplify/api";
+import { uploadData } from "aws-amplify/storage";
 import { createPost } from "../../graphql/mutations";
-import { uploadData, getUrl } from "aws-amplify/storage";
+import "./share.css";
 
 const client = generateClient();
 
-const Share = () => {
+export default function Share() {
   const { user } = useAuthenticator();
   const [content, setContent] = useState("");
   const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const fileRef = useRef();
+
+  const attrs = user?.attributes || {};
+  const displayName =
+    attrs.name ||
+    attrs.preferred_username ||
+    (attrs.email ? attrs.email.split("@")[0] : null) ||
+    "User";
+  const initials = displayName.slice(0, 2).toUpperCase();
+  const pictureUrl = attrs.picture || "";
+
+  const handleFileChange = (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    setFile(f);
+    setPreview(URL.createObjectURL(f));
+  };
+
+  const removeFile = () => {
+    setFile(null);
+    setPreview(null);
+    if (fileRef.current) fileRef.current.value = "";
+  };
 
   const handlePost = async () => {
-    if (!content.trim() && !file) return;
-
-    let imageUrl = null;
+    if (busy || (!content.trim() && !file)) return;
+    setBusy(true);
+    let key = null;
 
     if (file) {
-      const fileName = `${Date.now()}_${file.name}`;
+      key = `posts/${Date.now()}_${file.name}`;
       try {
-        await uploadData({ key: fileName, data: file }).result;
-        const url = await getUrl({ key: fileName });
-        imageUrl = url.url;
+        await uploadData({ key, data: file }).result;
       } catch (err) {
-        console.error("Image upload failed:", err);
+        console.error("Upload failed:", err);
+        setFeedback("Upload error. Try again.");
+        setBusy(false);
+        return;
       }
     }
-
-    const input = {
-      content,
-      createdBy: user.username,
-      createdAt: new Date().toISOString(),
-      likes: 0,
-      image: imageUrl,
-    };
 
     try {
       await client.graphql({
         query: createPost,
-        variables: { input },
-        authMode: "userPool", // ✅ correct value as string
+        variables: {
+          input: {
+            content,
+            image: key,
+            createdBy: displayName,
+            createdAt: new Date().toISOString(),
+          },
+        },
+        authMode: "userPool",
       });
-
       setContent("");
-      setFile(null);
+      removeFile();
+      setFeedback("Posted!");
+      setTimeout(() => setFeedback(""), 3000);
     } catch (err) {
-      console.error("Failed to create post:", err);
+      console.error("createPost failed:", err);
+      setFeedback("Error posting. Try again.");
+    } finally {
+      setBusy(false);
     }
   };
 
   return (
-    <div className="share">
-      <div className="container">
+    <div className="share card">
+      <div className="share__top">
+        {pictureUrl
+          ? <img src={pictureUrl} alt={displayName} className="avatar share__avatar" />
+          : <div className="share__initials">{initials}</div>
+        }
         <input
+          className="share__input"
           type="text"
-          placeholder={`What's on your mind, ${user.username}?`}
+          placeholder={`What's on your mind, ${displayName.split(" ")[0]}?`}
           value={content}
           onChange={(e) => setContent(e.target.value)}
+          disabled={busy}
+          onKeyDown={(e) => e.key === "Enter" && handlePost()}
         />
-        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-        <button onClick={handlePost}>Share</button>
       </div>
+
+      {preview && (
+        <div className="share__preview">
+          <img src={preview} alt="preview" />
+          <button className="share__remove-img" onClick={removeFile} title="Remove">✕</button>
+        </div>
+      )}
+
+      <div className="divider" />
+
+      <div className="share__actions">
+        <button className="share__action-btn" onClick={() => fileRef.current?.click()} disabled={busy}>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          Photo
+        </button>
+        <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFileChange} />
+
+        <button className="share__action-btn" disabled>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+          Video
+        </button>
+
+        <button
+          className="share__post-btn btn-primary"
+          onClick={handlePost}
+          disabled={busy || (!content.trim() && !file)}
+        >
+          {busy ? "Posting…" : "Post"}
+        </button>
+      </div>
+
+      {feedback && <div className="share__feedback">{feedback}</div>}
     </div>
   );
-};
-
-export default Share;
+}

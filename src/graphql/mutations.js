@@ -1,6 +1,177 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const createPost = /* GraphQL */ `
+  mutation CreatePost(
+    $input: CreatePostInput!
+    $condition: ModelPostConditionInput
+  ) {
+    createPost(input: $input, condition: $condition) {
+      id
+      content
+      image
+      createdAt
+      updatedAt
+      createdBy
+      isPublic
+      groupId
+      likes {
+        nextToken
+        __typename
+      }
+      comments {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const updatePost = /* GraphQL */ `
+  mutation UpdatePost(
+    $input: UpdatePostInput!
+    $condition: ModelPostConditionInput
+  ) {
+    updatePost(input: $input, condition: $condition) {
+      id
+      content
+      image
+      createdAt
+      updatedAt
+      createdBy
+      isPublic
+      groupId
+      likes {
+        nextToken
+        __typename
+      }
+      comments {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const deletePost = /* GraphQL */ `
+  mutation DeletePost(
+    $input: DeletePostInput!
+    $condition: ModelPostConditionInput
+  ) {
+    deletePost(input: $input, condition: $condition) {
+      id
+      content
+      image
+      createdAt
+      updatedAt
+      createdBy
+      isPublic
+      groupId
+      likes {
+        nextToken
+        __typename
+      }
+      comments {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const createComment = /* GraphQL */ `
+  mutation CreateComment(
+    $input: CreateCommentInput!
+    $condition: ModelCommentConditionInput
+  ) {
+    createComment(input: $input, condition: $condition) {
+      id
+      postId
+      content
+      createdBy
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateComment = /* GraphQL */ `
+  mutation UpdateComment(
+    $input: UpdateCommentInput!
+    $condition: ModelCommentConditionInput
+  ) {
+    updateComment(input: $input, condition: $condition) {
+      id
+      postId
+      content
+      createdBy
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteComment = /* GraphQL */ `
+  mutation DeleteComment(
+    $input: DeleteCommentInput!
+    $condition: ModelCommentConditionInput
+  ) {
+    deleteComment(input: $input, condition: $condition) {
+      id
+      postId
+      content
+      createdBy
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createPostLike = /* GraphQL */ `
+  mutation CreatePostLike(
+    $input: CreatePostLikeInput!
+    $condition: ModelPostLikeConditionInput
+  ) {
+    createPostLike(input: $input, condition: $condition) {
+      id
+      postId
+      userId
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updatePostLike = /* GraphQL */ `
+  mutation UpdatePostLike(
+    $input: UpdatePostLikeInput!
+    $condition: ModelPostLikeConditionInput
+  ) {
+    updatePostLike(input: $input, condition: $condition) {
+      id
+      postId
+      userId
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deletePostLike = /* GraphQL */ `
+  mutation DeletePostLike(
+    $input: DeletePostLikeInput!
+    $condition: ModelPostLikeConditionInput
+  ) {
+    deletePostLike(input: $input, condition: $condition) {
+      id
+      postId
+      userId
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createEvent = /* GraphQL */ `
   mutation CreateEvent(
     $input: CreateEventInput!
@@ -61,6 +232,51 @@ export const deleteEvent = /* GraphQL */ `
     }
   }
 `;
+export const createRSVP = /* GraphQL */ `
+  mutation CreateRSVP(
+    $input: CreateRSVPInput!
+    $condition: ModelRSVPConditionInput
+  ) {
+    createRSVP(input: $input, condition: $condition) {
+      id
+      eventId
+      userId
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateRSVP = /* GraphQL */ `
+  mutation UpdateRSVP(
+    $input: UpdateRSVPInput!
+    $condition: ModelRSVPConditionInput
+  ) {
+    updateRSVP(input: $input, condition: $condition) {
+      id
+      eventId
+      userId
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteRSVP = /* GraphQL */ `
+  mutation DeleteRSVP(
+    $input: DeleteRSVPInput!
+    $condition: ModelRSVPConditionInput
+  ) {
+    deleteRSVP(input: $input, condition: $condition) {
+      id
+      eventId
+      userId
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const createChatMessage = /* GraphQL */ `
   mutation CreateChatMessage(
     $input: CreateChatMessageInput!
@@ -68,13 +284,12 @@ export const createChatMessage = /* GraphQL */ `
   ) {
     createChatMessage(input: $input, condition: $condition) {
       id
-      sender
       content
-      timestamp
+      sender
       chatroomID
+      timestamp
       createdAt
       updatedAt
-      owner
       __typename
     }
   }
@@ -86,13 +301,12 @@ export const updateChatMessage = /* GraphQL */ `
   ) {
     updateChatMessage(input: $input, condition: $condition) {
       id
-      sender
       content
-      timestamp
+      sender
       chatroomID
+      timestamp
       createdAt
       updatedAt
-      owner
       __typename
     }
   }
@@ -104,13 +318,12 @@ export const deleteChatMessage = /* GraphQL */ `
   ) {
     deleteChatMessage(input: $input, condition: $condition) {
       id
-      sender
       content
-      timestamp
+      sender
       chatroomID
+      timestamp
       createdAt
       updatedAt
-      owner
       __typename
     }
   }
@@ -125,13 +338,13 @@ export const createGroup = /* GraphQL */ `
       name
       description
       members
+      createdBy
       posts {
         nextToken
         __typename
       }
       createdAt
       updatedAt
-      owner
       __typename
     }
   }
@@ -146,13 +359,13 @@ export const updateGroup = /* GraphQL */ `
       name
       description
       members
+      createdBy
       posts {
         nextToken
         __typename
       }
       createdAt
       updatedAt
-      owner
       __typename
     }
   }
@@ -167,136 +380,13 @@ export const deleteGroup = /* GraphQL */ `
       name
       description
       members
+      createdBy
       posts {
         nextToken
         __typename
       }
       createdAt
       updatedAt
-      owner
-      __typename
-    }
-  }
-`;
-export const createPost = /* GraphQL */ `
-  mutation CreatePost(
-    $input: CreatePostInput!
-    $condition: ModelPostConditionInput
-  ) {
-    createPost(input: $input, condition: $condition) {
-      id
-      content
-      image
-      createdAt
-      createdBy
-      likes
-      comments {
-        nextToken
-        __typename
-      }
-      updatedAt
-      groupPostsId
-      owner
-      __typename
-    }
-  }
-`;
-export const updatePost = /* GraphQL */ `
-  mutation UpdatePost(
-    $input: UpdatePostInput!
-    $condition: ModelPostConditionInput
-  ) {
-    updatePost(input: $input, condition: $condition) {
-      id
-      content
-      image
-      createdAt
-      createdBy
-      likes
-      comments {
-        nextToken
-        __typename
-      }
-      updatedAt
-      groupPostsId
-      owner
-      __typename
-    }
-  }
-`;
-export const deletePost = /* GraphQL */ `
-  mutation DeletePost(
-    $input: DeletePostInput!
-    $condition: ModelPostConditionInput
-  ) {
-    deletePost(input: $input, condition: $condition) {
-      id
-      content
-      image
-      createdAt
-      createdBy
-      likes
-      comments {
-        nextToken
-        __typename
-      }
-      updatedAt
-      groupPostsId
-      owner
-      __typename
-    }
-  }
-`;
-export const createComment = /* GraphQL */ `
-  mutation CreateComment(
-    $input: CreateCommentInput!
-    $condition: ModelCommentConditionInput
-  ) {
-    createComment(input: $input, condition: $condition) {
-      id
-      postId
-      content
-      createdBy
-      createdAt
-      updatedAt
-      postCommentsId
-      owner
-      __typename
-    }
-  }
-`;
-export const updateComment = /* GraphQL */ `
-  mutation UpdateComment(
-    $input: UpdateCommentInput!
-    $condition: ModelCommentConditionInput
-  ) {
-    updateComment(input: $input, condition: $condition) {
-      id
-      postId
-      content
-      createdBy
-      createdAt
-      updatedAt
-      postCommentsId
-      owner
-      __typename
-    }
-  }
-`;
-export const deleteComment = /* GraphQL */ `
-  mutation DeleteComment(
-    $input: DeleteCommentInput!
-    $condition: ModelCommentConditionInput
-  ) {
-    deleteComment(input: $input, condition: $condition) {
-      id
-      postId
-      content
-      createdBy
-      createdAt
-      updatedAt
-      postCommentsId
-      owner
       __typename
     }
   }

@@ -1,14 +1,14 @@
 {
   "version": "1",
   "cognitoConfig": {
-    "identityPoolName": "connectnestd74f160d_identitypool_d74f160d",
+    "identityPoolName": "connectnestc6d6b49e_identitypool_c6d6b49e",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "connecd74f160d",
-    "userPoolName": "connectnestd74f160d_userpool_d74f160d",
+    "resourceNameTruncated": "connecc6d6b49e",
+    "userPoolName": "connectnestc6d6b49e_userpool_c6d6b49e",
     "autoVerifiedAttributes": [
       "email"
     ],
-    "mfaConfiguration": "OPTIONAL",
+    "mfaConfiguration": "OFF",
     "mfaTypes": [
       "SMS Text Message"
     ],
@@ -31,42 +31,19 @@
     "userpoolClientReadAttributes": [
       "email"
     ],
-    "userpoolClientLambdaRole": "connecd74f160d_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "connecc6d6b49e_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "d74f160d",
-    "resourceName": "connectnestd74f160d",
+    "sharedId": "c6d6b49e",
+    "resourceName": "connectnestc6d6b49e",
     "authSelections": "identityPoolAndUserPool",
-    "useDefault": "manual",
+    "useDefault": "default",
     "usernameAttributes": [
       "email"
     ],
+    "triggers": {},
     "userPoolGroupList": [],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,
-    "useEnabledMfas": true,
-    "authRoleArn": {
-      "Fn::GetAtt": [
-        "AuthRole",
-        "Arn"
-      ]
-    },
-    "unauthRoleArn": {
-      "Fn::GetAtt": [
-        "UnauthRole",
-        "Arn"
-      ]
-    },
-    "breakCircularDependency": true,
-    "dependsOn": [],
-    "thirdPartyAuth": false,
-    "userPoolGroups": false,
-    "adminQueries": false,
-    "triggers": {},
-    "hostedUI": false,
-    "authProviders": [],
-    "parentStack": {
-      "Ref": "AWS::StackId"
-    },
-    "permissions": []
+    "useEnabledMfas": true
   }
 }

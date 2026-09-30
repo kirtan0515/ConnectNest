@@ -7,24 +7,26 @@
             "UserPoolId"
           ],
           "category": "auth",
-          "resourceName": "connectnestd74f160d"
+          "resourceName": "connectnestc6d6b49e"
         }
       ],
       "output": {
         "authConfig": {
           "additionalAuthenticationProviders": [
             {
-              "authenticationType": "AMAZON_COGNITO_USER_POOLS",
-              "userPoolConfig": {
-                "userPoolId": "authconnectnestd74f160d"
-              }
+              "apiKeyConfig": {
+                "apiKeyExpirationDate": "2025-06-15T16:54:43.724Z",
+                "apiKeyExpirationDays": 60,
+                "description": ""
+              },
+              "authenticationType": "API_KEY"
             }
           ],
           "defaultAuthentication": {
-            "apiKeyConfig": {
-              "apiKeyExpirationDays": 7
-            },
-            "authenticationType": "API_KEY"
+            "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+            "userPoolConfig": {
+              "userPoolId": "authconnectnestc6d6b49e"
+            }
           }
         }
       },
@@ -33,11 +35,11 @@
     }
   },
   "auth": {
-    "connectnestd74f160d": {
+    "connectnestc6d6b49e": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
-        "mfaConfiguration": "OPTIONAL",
+        "mfaConfiguration": "OFF",
         "mfaTypes": [
           "SMS"
         ],
@@ -61,7 +63,7 @@
     }
   },
   "storage": {
-    "s3connectneststorage001bda98": {
+    "connectneststorage": {
       "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "S3"

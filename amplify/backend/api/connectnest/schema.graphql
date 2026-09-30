@@ -1,7 +1,51 @@
+# === POSTS ===
+type Post @model
+  @auth(rules: [
+    { allow: owner, ownerField: "createdBy", operations: [create, update, delete, read] },
+    { allow: public, operations: [read] }
+  ]) {
+  id: ID!
+  content: String!
+  image: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime
+  createdBy: String!
+  isPublic: Boolean @default(value: "true")
+  groupId: ID @index(name: "byGroup")
+  likes: [PostLike] @hasMany(indexName: "byPost", fields: ["id"])
+  comments: [Comment] @hasMany(indexName: "byPost", fields: ["id"])
+}
+
+
+type Comment @model
+  @auth(rules: [
+    { allow: owner, ownerField: "createdBy", operations: [create, update, delete] },
+    { allow: private, operations: [read] }
+  ]) {
+  id: ID!
+  postId: ID! @index(name: "byPost", sortKeyFields: ["createdAt"])
+  content: String!
+  createdBy: String!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime
+}
+
+type PostLike @model
+  @auth(rules: [
+    { allow: owner, ownerField: "userId", operations: [create, delete] },
+    { allow: private, operations: [read] }
+  ]) {
+  id: ID! @primaryKey
+  postId: ID! @index(name: "byPost")
+  userId: String! @index(name: "byUser")
+  createdAt: AWSDateTime!
+}
+
+# === EVENTS ===
 type Event @model
   @auth(rules: [
-    { allow: owner },
-    { allow: private, operations: [read] }
+    { allow: owner, operations: [create, update, delete, read] },
+    { allow: public, operations: [read] }
   ]) {
   id: ID!
   title: String!
@@ -10,51 +54,42 @@ type Event @model
   location: String
   organizer: String!
   attendees: [String]
+  createdAt: AWSDateTime!
 }
 
+type RSVP @model
+  @auth(rules: [
+    { allow: owner, ownerField: "userId", operations: [create, delete] },
+    { allow: private, operations: [read] }
+  ]) {
+  id: ID! @primaryKey
+  eventId: ID! @index(name: "byEvent")
+  userId: String! @index(name: "byUser")
+  createdAt: AWSDateTime!
+}
+
+# === CHAT ===
 type ChatMessage @model
   @auth(rules: [
-    { allow: owner }
+    { allow: owner, ownerField: "sender", operations: [create, read] }
   ]) {
   id: ID!
-  sender: String!
   content: String!
-  timestamp: AWSDateTime
+  sender: String!
   chatroomID: ID!
+  timestamp: AWSDateTime!
 }
 
+# === GROUPS ===
 type Group @model
   @auth(rules: [
-    { allow: owner }
+    { allow: owner, ownerField: "createdBy", operations: [create, update, delete, read] },
+    { allow: private, operations: [read] }
   ]) {
   id: ID!
   name: String!
   description: String
   members: [String]
-  posts: [Post] @hasMany
-}
-
-type Post @model
-  @auth(rules: [
-    { allow: owner },
-    { allow: private, operations: [read] }
-  ]) {
-  id: ID!
-  content: String!
-  image: String
-  createdAt: AWSDateTime
   createdBy: String!
-  likes: Int @default(value: "0")
-  comments: [Comment] @hasMany
-}
-
-type Comment @model
-  @auth(rules: [
-    { allow: owner }
-  ]) {
-  id: ID!
-  postId: ID!
-  content: String!
-  createdBy: String!
-  createdAt: AWSDateTime
+  posts: [Post] @hasMany(indexName: "byGroup", fields: ["id"])
 }

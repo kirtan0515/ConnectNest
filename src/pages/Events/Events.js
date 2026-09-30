@@ -1,18 +1,29 @@
-import React from 'react';
-import { EventUpdateForm } from "../../ui-components"; // Import from Amplify UI
+import React from "react";
+import CreateEvent from "../../components/events/CreateEvent";
+import EventFeed from "./EventFeed";
+import "./Events.css";
 
 const Events = () => {
-    return (
-        <div className="p-4">
-            <h1 className="text-2xl font-bold">Events</h1>
-            <p className="mt-2 text-gray-600">
-                Welcome to the events page. Here you can find all the upcoming events.
-            </p>
-            <div className="mt-4">
-                <EventUpdateForm /> {/* Use Figma-designed event update form */}
-            </div>
+  return (
+    <div className="events-page">
+      <div className="events-page__header">
+        <h1>Events</h1>
+        <p>Discover and create campus events</p>
+      </div>
+
+      <div className="events-page__grid">
+        <div className="events-page__create">
+          <CreateEvent />
         </div>
-    );
+        <div className="events-page__feed">
+          <div className="card" style={{ padding: 20 }}>
+            <h2 className="section-title">📡 Upcoming Events</h2>
+            <EventFeed />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Events;

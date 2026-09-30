@@ -7,6 +7,7 @@ const routes = {
   chat: "/chat",
   groups: "/groups",
   files: "/files",
+  profile: "/profile", // ✅ Add this line
 };
 
 export default routes;

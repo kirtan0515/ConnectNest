@@ -2,14 +2,14 @@ export type AmplifyDependentResourcesAttributes = {
   "api": {
     "connectnest": {
       "GraphQLAPIEndpointOutput": "string",
-      "GraphQLAPIIdOutput": "string"
+      "GraphQLAPIIdOutput": "string",
+      "GraphQLAPIKeyOutput": "string"
     }
   },
   "auth": {
-    "connectnestd74f160d": {
+    "connectnestc6d6b49e": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",
-      "CreatedSNSRole": "string",
       "IdentityPoolId": "string",
       "IdentityPoolName": "string",
       "UserPoolArn": "string",
@@ -18,7 +18,7 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "storage": {
-    "s3connectneststorage001bda98": {
+    "connectneststorage": {
       "BucketName": "string",
       "Region": "string"
     }
