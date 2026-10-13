@@ -8,6 +8,7 @@ import {
   cancelRsvp,
   listAttendees,
 } from "../../services/eventServices";
+import AuthImage from "../../components/common/AuthImage";
 import "./EventDetail.css";
 
 const EventDetail = () => {
@@ -77,6 +78,13 @@ const EventDetail = () => {
       <button className="ed-back" onClick={() => navigate("/events")}>← Back to events</button>
 
       <div className="ed-card card">
+        {event.imageKey && (
+          <AuthImage
+            imageKey={event.imageKey}
+            alt={event.title}
+            className="ed-image"
+          />
+        )}
         <div className="ed-header">
           {date && (
             <div className="ed-date">

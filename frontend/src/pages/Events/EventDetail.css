@@ -20,6 +20,13 @@
 
 .ed-card { padding: 28px; display: flex; flex-direction: column; gap: 18px; }
 
+.ed-image {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
 .ed-header { display: flex; gap: 18px; align-items: flex-start; }
 .ed-date {
   flex-shrink: 0;

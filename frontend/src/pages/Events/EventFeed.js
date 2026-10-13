@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../api/client";
+import AuthImage from "../../components/common/AuthImage";
 import "./EventFeed.css";
 
 const EventFeed = ({ compact = false }) => {
@@ -42,6 +43,13 @@ const EventFeed = ({ compact = false }) => {
           onClick={() => navigate(`/events/${event.eventId}`)}
           onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && navigate(`/events/${event.eventId}`)}
         >
+          {event.imageKey && (
+            <AuthImage
+              imageKey={event.imageKey}
+              alt={event.title}
+              className="ef-card__image"
+            />
+          )}
           <div className="ef-card__date-badge">
             <span className="ef-card__month">
               {event.startsAt

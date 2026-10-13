@@ -3,6 +3,7 @@ import moment from "moment";
 import { useAuth } from "../../auth/AuthContext";
 import { api } from "../../api/client";
 import { toggleLike } from "./postLikeUtils";
+import AuthImage from "../common/AuthImage";
 import "./Post.css";
 
 // posts prop: if provided, skip fetching (used by Profile page)
@@ -118,6 +119,13 @@ function PostItem({ post }) {
 
       {/* Body */}
       <div className="post__body">{post.content}</div>
+
+      {/* Image */}
+      {post.imageKey && (
+        <div className="post__image-wrap">
+          <AuthImage imageKey={post.imageKey} alt="" className="post__image" />
+        </div>
+      )}
 
       {/* Stats row */}
       {likeCount > 0 && (

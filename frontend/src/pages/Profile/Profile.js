@@ -4,6 +4,7 @@ import { useAuth } from "../../auth/AuthContext";
 import { api, uploadFile } from "../../api/client";
 import { listMyRsvps } from "../../services/eventServices";
 import Posts from "../../components/post/Post";
+import AuthImage from "../../components/common/AuthImage";
 import "./Profile.css";
 
 const Profile = () => {
@@ -85,7 +86,15 @@ const Profile = () => {
         <div className="profile-cover__banner" />
         <div className="profile-cover__body">
           <div className="profile-cover__avatar-wrap">
-            <div className="profile-cover__initials">{initials}</div>
+            {profile?.avatarKey ? (
+              <AuthImage
+                imageKey={profile.avatarKey}
+                alt={displayName}
+                className="profile-cover__avatar"
+              />
+            ) : (
+              <div className="profile-cover__initials">{initials}</div>
+            )}
             <button
               className="profile-cover__avatar-edit"
               onClick={() => fileRef.current?.click()}

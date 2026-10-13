@@ -22,6 +22,14 @@
   padding: 14px 16px;
 }
 
+.ef-card__image {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
 .ef-card__date-badge {
   display: flex;
   flex-direction: column;

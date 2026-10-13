@@ -283,6 +283,11 @@ export class ApiStack extends Stack {
       "handlers/files/getUploadUrl.ts",
       { UPLOADS_BUCKET: uploadsBucket.bucketName }
     );
+    const getDownloadUrl = makeFn(
+      "GetDownloadUrlFn",
+      "handlers/files/getDownloadUrl.ts",
+      { UPLOADS_BUCKET: uploadsBucket.bucketName }
+    );
 
     // ---- IAM: least privilege per handler ----
     tables.profiles.grantReadData(getProfile);
@@ -342,6 +347,8 @@ export class ApiStack extends Stack {
 
     uploadsBucket.grantPut(getUploadUrl);
     uploadsBucket.grantRead(getUploadUrl);
+    // Download handler only needs to read objects for presigned GETs.
+    uploadsBucket.grantRead(getDownloadUrl);
 
     // ---- Image moderation: S3 ObjectCreated -> Rekognition -> delete if unsafe ----
     const moderateImage = makeFn(
@@ -419,6 +426,7 @@ export class ApiStack extends Stack {
 
     // Uploads
     route(HttpMethod.POST, "/uploads/presign", getUploadUrl);
+    route(HttpMethod.GET, "/uploads/url", getDownloadUrl);
 
     // ---- AWS WAF ----
     // WAF protects the app at the CloudFront edge (see HostingStack:
