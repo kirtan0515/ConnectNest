@@ -98,6 +98,10 @@ export class AuthStack extends Stack {
       email: UserPoolEmail.withSES({
         fromEmail: "no-reply@connectnestapp.com",
         fromName: "ConnectNest",
+        // Replies to the automated no-reply address are routed here. Set up a
+        // free Namecheap email forwarder (support@connectnestapp.com -> your
+        // inbox) so user replies with questions actually reach you.
+        replyTo: "support@connectnestapp.com",
         sesVerifiedDomain: "connectnestapp.com",
         sesRegion: "us-east-1",
       }),
