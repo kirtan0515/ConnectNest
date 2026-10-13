@@ -6,6 +6,7 @@ import {
   CfnOutput,
   SecretValue,
 } from "aws-cdk-lib";
+import * as path from "path";
 import { Construct } from "constructs";
 import {
   UserPool,
@@ -18,8 +19,25 @@ import {
   AccountRecovery,
   OAuthScope,
   Mfa,
+  UserPoolEmail,
+  UserPoolOperation,
 } from "aws-cdk-lib/aws-cognito";
+import { Runtime, Architecture } from "aws-cdk-lib/aws-lambda";
+import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
+
+/** Repo root — handlers live in ../backend, outside infra/. */
+const REPO_ROOT = path.join(__dirname, "..", "..");
+const BACKEND_DIR = path.join(REPO_ROOT, "backend");
+const DEPS_LOCK = path.join(BACKEND_DIR, "package-lock.json");
+// Match api-stack: externalize only the core SDK clients the Node 22 runtime
+// reliably ships. The custom-message handler imports none of these (only
+// erased aws-lambda types), so this is harmless and keeps conventions aligned.
+const CORE_SDK_EXTERNALS = [
+  "@aws-sdk/client-dynamodb",
+  "@aws-sdk/lib-dynamodb",
+  "@aws-sdk/client-s3",
+];
 
 /**
  * AuthStack — Amazon Cognito user pool + public web client.
@@ -42,8 +60,47 @@ export class AuthStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
+    // ---- Custom Message trigger Lambda ----
+    // Replaces Cognito's default plain-text verification/reset emails with
+    // branded ConnectNest HTML, delivered via SES. Built with the same
+    // NodejsFunction/esbuild conventions as api-stack. No table access and no
+    // IAM beyond default logging; addTrigger wires the invoke permission.
+    const customMessageFn = new NodejsFunction(this, "CustomMessageFn", {
+      entry: path.join(BACKEND_DIR, "handlers/auth/customMessage.ts"),
+      handler: "handler",
+      runtime: Runtime.NODEJS_22_X,
+      architecture: Architecture.ARM_64,
+      memorySize: 256,
+      timeout: Duration.seconds(10),
+      projectRoot: REPO_ROOT,
+      depsLockFilePath: DEPS_LOCK,
+      bundling: {
+        format: OutputFormat.ESM,
+        minify: true,
+        target: "node22",
+        externalModules: CORE_SDK_EXTERNALS,
+      },
+    });
+
     this.userPool = new UserPool(this, "UserPool", {
       userPoolName: "connectnest-users",
+      // Branded transactional email via Amazon SES. The sender address lives on
+      // the SES domain identity created in ConnectNest-Email.
+      //
+      // MANDATORY DEPLOY ORDER:
+      //   1. deploy ConnectNest-Email (creates the SES domain identity)
+      //   2. add the 3 emitted DKIM CNAME records at Namecheap Advanced DNS
+      //   3. wait for SES domain verification (status "Verified")
+      //   4. THEN deploy ConnectNest-Auth (this stack) and ConnectNest-Hosting
+      //      (Hosting publishes the logo to CloudFront).
+      // Deploying this stack with withSES before the SES identity is verified
+      // fails — Cognito validates the referenced SES identity at deploy time.
+      email: UserPoolEmail.withSES({
+        fromEmail: "no-reply@connectnestapp.com",
+        fromName: "ConnectNest",
+        sesVerifiedDomain: "connectnestapp.com",
+        sesRegion: "us-east-1",
+      }),
       selfSignUpEnabled: true,
       signInAliases: { email: true },
       autoVerify: { email: true },
@@ -74,6 +131,14 @@ export class AuthStack extends Stack {
       },
       removalPolicy: RemovalPolicy.DESTROY,
     });
+
+    // Attach the Custom Message trigger AFTER the pool is constructed. This
+    // branded HTML overrides the default verification/reset emails for the
+    // SignUp / ResendCode / ForgotPassword flows.
+    this.userPool.addTrigger(
+      UserPoolOperation.CUSTOM_MESSAGE,
+      customMessageFn
+    );
 
     // ---- Hosted UI domain (required for the OAuth redirect flow) ----
     // Prefix must be globally unique within the region.

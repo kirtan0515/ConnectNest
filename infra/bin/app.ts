@@ -7,6 +7,7 @@ import { AuthStack } from "../lib/auth-stack";
 import { ApiStack } from "../lib/api-stack";
 import { HostingStack } from "../lib/hosting-stack";
 import { SecurityStack } from "../lib/security-stack";
+import { EmailStack } from "../lib/email-stack";
 
 const app = new App();
 
@@ -17,6 +18,11 @@ const env = {
 
 // Account-level security observability (CloudTrail + GuardDuty).
 new SecurityStack(app, "ConnectNest-Security", { env });
+
+// Amazon SES domain identity for branded transactional email. Deploy FIRST,
+// add the emitted DKIM CNAMEs at Namecheap, and wait for SES verification
+// before deploying ConnectNest-Auth (which references this SES identity).
+new EmailStack(app, "ConnectNest-Email", { env });
 
 const data = new DataStack(app, "ConnectNest-Data", { env });
 const auth = new AuthStack(app, "ConnectNest-Auth", { env });
