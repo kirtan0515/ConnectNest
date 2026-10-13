@@ -234,6 +234,7 @@ export class ApiStack extends Stack {
     });
     const createPost = makeFn("CreatePostFn", "handlers/posts/createPost.ts", {
       POSTS_TABLE: tables.posts.tableName,
+      GROUP_MEMBERS_TABLE: tables.groupMembers.tableName,
     });
     const deletePost = makeFn("DeletePostFn", "handlers/posts/deletePost.ts", {
       POSTS_TABLE: tables.posts.tableName,
@@ -262,6 +263,17 @@ export class ApiStack extends Stack {
     });
     const joinGroup = makeFn("JoinGroupFn", "handlers/groups/joinGroup.ts", {
       GROUPS_TABLE: tables.groups.tableName,
+      GROUP_MEMBERS_TABLE: tables.groupMembers.tableName,
+    });
+    const listMyGroups = makeFn(
+      "ListMyGroupsFn",
+      "handlers/groups/listMyGroups.ts",
+      {
+        GROUPS_TABLE: tables.groups.tableName,
+        GROUP_MEMBERS_TABLE: tables.groupMembers.tableName,
+      }
+    );
+    const listMembers = makeFn("ListMembersFn", "handlers/groups/listMembers.ts", {
       GROUP_MEMBERS_TABLE: tables.groupMembers.tableName,
     });
 
@@ -313,6 +325,7 @@ export class ApiStack extends Stack {
 
     tables.posts.grantReadData(listPosts);
     tables.posts.grantReadWriteData(createPost);
+    tables.groupMembers.grantReadData(createPost);
     tables.posts.grantReadWriteData(deletePost);
     tables.posts.grantReadWriteData(toggleLike);
     tables.postLikes.grantReadWriteData(toggleLike);
@@ -323,6 +336,9 @@ export class ApiStack extends Stack {
     tables.groups.grantReadWriteData(createGroup);
     tables.groups.grantReadData(joinGroup);
     tables.groupMembers.grantReadWriteData(joinGroup);
+    tables.groups.grantReadData(listMyGroups);
+    tables.groupMembers.grantReadData(listMyGroups);
+    tables.groupMembers.grantReadData(listMembers);
 
     uploadsBucket.grantPut(getUploadUrl);
     uploadsBucket.grantRead(getUploadUrl);
@@ -398,6 +414,8 @@ export class ApiStack extends Stack {
     route(HttpMethod.GET, "/groups", listGroups);
     route(HttpMethod.POST, "/groups", createGroup);
     route(HttpMethod.POST, "/groups/{groupId}/join", joinGroup);
+    route(HttpMethod.GET, "/groups/{groupId}/members", listMembers);
+    route(HttpMethod.GET, "/me/groups", listMyGroups);
 
     // Uploads
     route(HttpMethod.POST, "/uploads/presign", getUploadUrl);

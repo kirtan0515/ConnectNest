@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../../api/client";
+import { listMyGroups } from "../../services/groupServices";
 import "./Groups.css";
 
 const Groups = () => {
@@ -11,7 +12,17 @@ const Groups = () => {
 
   useEffect(() => {
     fetchGroups();
+    fetchMyGroups();
   }, []);
+
+  const fetchMyGroups = async () => {
+    try {
+      const myGroups = await listMyGroups();
+      setJoined(new Set(myGroups.map((g) => g.groupId)));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchGroups = async () => {
     try {

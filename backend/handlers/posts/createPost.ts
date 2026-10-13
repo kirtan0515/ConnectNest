@@ -1,9 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { ddb } from "../../shared/db.js";
 import {
   created,
   badRequest,
+  forbidden,
   serverError,
   getUserId,
   getName,
@@ -13,6 +14,7 @@ import {
 import { moderateText } from "../../shared/moderation.js";
 
 const TABLE = process.env.POSTS_TABLE!;
+const MEMBERS_TABLE = process.env.GROUP_MEMBERS_TABLE!;
 
 interface PostInput {
   content?: string;
@@ -33,6 +35,19 @@ export const handler = async (event: ApiEvent) => {
     // Content moderation: reject disallowed language before storing.
     const mod = moderateText(body.content);
     if (!mod.allowed) return badRequest(mod.reason!);
+
+    // Group-scoped posts require membership. Enforce only for a real group
+    // (not the "global" main feed). Identity comes from the verified JWT.
+    const requestedGroupId = body.groupId?.trim();
+    if (requestedGroupId && requestedGroupId !== "global") {
+      const member = await ddb.send(
+        new GetCommand({
+          TableName: MEMBERS_TABLE,
+          Key: { groupId: requestedGroupId, userId: authorId },
+        })
+      );
+      if (!member.Item) return forbidden("Not a member of this group");
+    }
 
     const item = {
       postId: randomUUID(),
