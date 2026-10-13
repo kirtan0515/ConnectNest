@@ -1,70 +1,133 @@
-# Getting Started with Create React App
+# ConnectNest
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A serverless campus engagement platform on AWS. React SPA on an explicit,
+Infrastructure-as-Code backend: **Cognito + API Gateway (HTTP API) + Lambda +
+DynamoDB**, all defined with the **AWS CDK**.
 
-## Available Scripts
+This project deliberately uses explicit CDK rather than a managed abstraction so
+the cloud architecture is visible and reproducible.
 
-In the project directory, you can run:
+## Repository layout
 
-### `npm start`
+```
+connectnest/
+├── package.json        root — esbuild for CDK Lambda bundling
+├── infra/              AWS CDK (TypeScript)
+│   ├── bin/app.ts      composes the stacks
+│   └── lib/
+│       ├── data-stack.ts   DynamoDB tables
+│       ├── auth-stack.ts   Cognito user pool + web client
+│       └── api-stack.ts    HTTP API + Lambdas + JWT authorizer + IAM + S3
+├── backend/            Lambda handlers (Node ESM, AWS SDK v3)
+│   ├── shared/         db.ts, http.ts
+│   └── handlers/       profiles, events, posts, groups, files
+├── frontend/           React SPA (Create React App)
+│   └── src/
+│       ├── auth/        Cognito wrapper (amazon-cognito-identity-js) + context
+│       ├── api/client.js  fetch wrapper with Cognito token
+│       └── config.js    reads REACT_APP_* env vars
+└── docs/               architecture.md, data-model.md
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Architecture
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```
+Users → Cognito (auth)
+      → API Gateway (HTTP API v2, Cognito JWT authorizer)
+      → Lambda (per-feature handlers)
+      → DynamoDB (one table per entity)
+      + S3 (presigned uploads)
+```
 
-### `npm test`
+- Authentication is delegated to **Amazon Cognito** (no hand-rolled JWT).
+- Every protected route is guarded by a **Cognito JWT authorizer**.
+- Each Lambda gets only the DynamoDB/S3 permissions it needs (least privilege).
+- User identity always comes from the **verified JWT claims**, never the request body.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+See [docs/architecture.md](docs/architecture.md) and
+[docs/data-model.md](docs/data-model.md).
 
-### `npm run build`
+## Prerequisites
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Node.js 20+
+- An AWS account and the AWS CLI configured (`aws configure`) for deploying
+- Docker is **not** required — Lambda bundling runs locally via esbuild
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Install
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Each package installs independently:
 
-### `npm run eject`
+```bash
+npm install                 # root (esbuild)
+(cd backend  && npm install)
+(cd infra    && npm install)
+(cd frontend && npm install)
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Verify locally (no AWS resources created)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+(cd backend && npx tsc --noEmit)     # typecheck Lambda handlers
+(cd infra   && npx cdk synth)        # synthesize CloudFormation + bundle Lambdas
+(cd frontend && CI=true npm run build)  # compile the SPA
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Deploy
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Deploying creates real (near-free-tier) AWS resources that bill until destroyed.
 
-## Learn More
+```bash
+cd infra
+npx cdk bootstrap        # one-time per account/region
+npx cdk deploy --all     # note the UserPoolId, UserPoolClientId, ApiUrl outputs
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Wire the outputs into the frontend (`frontend/.env`, see `frontend/.env.example`):
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+REACT_APP_AWS_REGION=us-east-1
+REACT_APP_USER_POOL_ID=...
+REACT_APP_USER_POOL_CLIENT_ID=...
+REACT_APP_API_URL=https://xxxx.execute-api.us-east-1.amazonaws.com
+```
 
-### Code Splitting
+Run the frontend:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+cd frontend && npm start   # http://localhost:3000
+```
 
-### Analyzing the Bundle Size
+## Tear down
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+cd infra && npx cdk destroy --all
+```
 
-### Making a Progressive Web App
+## API
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+All routes require a Cognito JWT (`Authorization: Bearer <idToken>`).
 
-### Advanced Configuration
+| Method | Path | Purpose |
+|---|---|---|
+| GET/PUT | `/profiles/me` | Get/update the current user's profile |
+| GET | `/profiles/{userId}` | Get a user's profile |
+| GET/POST | `/events` | List / create events |
+| GET/PUT/DELETE | `/events/{eventId}` | Get / owner-update / owner-delete an event |
+| POST | `/events/{eventId}/rsvp` | RSVP to an event (or cancel) |
+| GET | `/events/{eventId}/rsvps` | List attendees for an event |
+| GET | `/me/rsvps` | Events the current user has RSVP'd to |
+| GET/POST | `/posts` | List / create posts (`?groupId=` filters) |
+| DELETE | `/posts/{postId}` | Author-delete a post |
+| POST | `/posts/{postId}/like` | Toggle like |
+| GET/POST | `/posts/{postId}/comments` | List / add comments |
+| GET/POST | `/groups` | List / create groups |
+| POST | `/groups/{groupId}/join` | Join a group |
+| POST | `/uploads/presign` | Get a presigned S3 upload URL |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Known follow-ups
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- A "my memberships" query (GroupMembers `byUser` GSI) so joined groups persist
+  across sessions.
+- S3 read/list/delete endpoints for viewing uploaded avatars/images/files.
+- Tighten API and S3 CORS from `*` to the deployed frontend origin.
+```

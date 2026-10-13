@@ -1,0 +1,186 @@
+/* ===== ConnectNest design tokens ===== */
+/* Deep pine-teal canvas with a warm coral accent. Fonts: Unbounded (headings),
+   Hanken Grotesk (body). Loaded via <link> in public/index.html. */
+
+/* Palette is scoped to .cn-scope so it never collides with the app's
+   light-theme :root tokens in index.css. Landing + auth pages opt in via
+   the .cn-scope class on their root element. */
+.cn-scope {
+  /* Surfaces */
+  --bg: #0d2a2c;          /* page background, deep pine teal */
+  --surface: #12383a;     /* auth form panel */
+  --surface-2: #143e40;   /* image placeholders */
+
+  /* Borders */
+  --border: #2c5a5c;      /* inputs */
+  --hairline: #2a5557;    /* section hairlines */
+  --outline: #3a6a6b;     /* outline buttons, chips */
+
+  /* Text */
+  --text: #eaf4f1;
+  --text-2: #c3d9d4;      /* secondary */
+  --text-muted: #a3c0ba;
+
+  /* Accent */
+  --accent: #ff9f68;      /* coral */
+  --accent-hover: #ffbe94;
+  --on-accent: #0d2a2c;   /* text/icon color on coral fills */
+
+  /* Group colors */
+  --group-1: #ff9f68;
+  --group-2: #8ec9ff;
+  --group-3: #c8b8ff;
+  --group-4: #b8e986;
+
+  /* Status */
+  --error-bg: #46282c;
+  --error-text: #ffc2c8;
+  --success-bg: #17454c;
+  --success-text: #cfefff;
+
+  /* Type */
+  --font-head: "Unbounded", system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+/* Focus ring — visible, meets contrast */
+.cn-scope a:focus-visible,
+.cn-scope button:focus-visible,
+.cn-scope input:focus-visible,
+.cn-scope [tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ===== Reusable primitives ===== */
+
+/* Pill buttons */
+.cn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 28px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease,
+    transform 0.1s ease, border-color 0.16s ease;
+}
+.cn-btn:active {
+  transform: translateY(1px);
+}
+.cn-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.cn-btn--primary {
+  background: var(--accent);
+  color: #0d2a2c; /* explicit dark text so the label is always legible on coral */
+}
+.cn-btn--primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.cn-btn--outline {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--outline);
+}
+.cn-btn--outline:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cn-btn--sm {
+  min-height: 44px;
+  padding: 0 20px;
+  font-size: 15px;
+}
+
+/* Inputs */
+.cn-input {
+  width: 100%;
+  height: 52px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+.cn-input::placeholder {
+  color: var(--text-muted);
+}
+.cn-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 159, 104, 0.22);
+}
+
+.cn-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+/* Chips (interests, toggles) */
+.cn-chip {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--outline);
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.cn-chip[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+/* Status boxes */
+.cn-alert {
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.cn-alert--error {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+.cn-alert--success {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+/* Heading utility */
+.cn-head {
+  font-family: var(--font-head);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 0;
+}

@@ -1,0 +1,127 @@
+/* ===== Shared auth layout (Login + Signup) ===== */
+
+.auth {
+  min-height: 100vh;
+  display: flex;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+/* Left visual pane with the network canvas */
+.auth__visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px 56px;
+  overflow: hidden;
+}
+.auth__visual--login { flex: 1 1 58%; }
+.auth__visual--signup { flex: 1 1 52%; }
+
+.auth__logo {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+}
+.auth__logo img { height: 28px; width: auto; display: block; }
+
+.auth__caption {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  max-width: 22ch;
+  font-family: var(--font-head);
+  font-weight: 500;
+  font-size: 34px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* Right form pane */
+.auth__panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 56px 72px;
+  background: var(--surface);
+  box-sizing: border-box;
+}
+.auth__panel--login { flex: 0 0 560px; }
+.auth__panel--signup { flex: 0 0 640px; }
+
+.auth__form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+}
+.auth__head { display: flex; flex-direction: column; gap: 10px; }
+.auth__title { font-size: 36px; }
+.auth__subtitle { margin: 0; font-size: 17px; line-height: 1.5; color: var(--text-muted); }
+
+.auth__fields { display: flex; flex-direction: column; gap: 20px; }
+
+/* Password field */
+.auth__pw-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.auth__forgot { font-size: 14px; color: #ff9f68; text-decoration: none; }
+.auth__forgot:hover { color: #ffbe94; }
+.auth__pw-wrap { position: relative; display: flex; }
+.auth__pw-input { padding-right: 76px; }
+.auth__pw-toggle {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  height: 44px;
+  min-width: 64px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.auth__submit { width: 100%; }
+
+.auth__switch { margin: 0; font-size: 15px; color: var(--text-muted); }
+.auth__switch a {
+  color: #ff9f68; /* explicit coral so it's always visible, even if a var fails */
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.auth__switch a:hover { color: #ffbe94; }
+
+/* ===== Responsive: stack the panes ===== */
+@media (max-width: 900px) {
+  .auth { flex-direction: column; }
+  .auth__visual--login,
+  .auth__visual--signup {
+    flex: none;
+    height: 280px;
+    padding: 24px 28px;
+  }
+  .auth__caption { font-size: 24px; }
+  .auth__panel--login,
+  .auth__panel--signup {
+    flex: none;
+    width: 100%;
+    padding: 40px 24px;
+  }
+}
+
+@media (max-width: 360px) {
+  .auth__panel--login,
+  .auth__panel--signup { padding: 32px 18px; }
+}

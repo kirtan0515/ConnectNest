@@ -1,0 +1,81 @@
+/* Public site navbar — pine-teal glassy bar (matches the landing page). */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  background: rgba(13, 42, 44, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: box-shadow 0.25s ease, background 0.25s ease;
+}
+.site-nav.scrolled {
+  background: rgba(13, 42, 44, 0.92);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.site-nav__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px clamp(20px, 5vw, 72px);
+}
+
+.site-nav__brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.site-nav__brand img { height: 28px; width: auto; display: block; }
+
+.site-nav__links {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 2vw, 28px);
+  font-size: 15px;
+}
+.site-nav__links a {
+  position: relative;
+  color: #c3d9d4;
+  text-decoration: none;
+  padding: 12px 2px;
+  transition: color 0.15s ease;
+}
+.site-nav__links a::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 6px;
+  height: 2px;
+  width: 0;
+  background: #ff9f68;
+  transition: width 0.2s ease;
+  margin: 0 auto;
+}
+.site-nav__links a:hover { color: #eaf4f1; }
+.site-nav__links a:hover::after { width: calc(100% - 4px); }
+
+.site-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.site-nav__login {
+  color: #eaf4f1;
+  text-decoration: none;
+  font-size: 15px;
+  padding: 12px 4px;
+}
+.site-nav__login:hover { color: #ff9f68; }
+
+/* keep the Sign up pill coral with dark text regardless of global anchor styles */
+.site-nav__signup.cn-btn--primary { color: #0d2a2c; }
+
+@media (max-width: 720px) {
+  .site-nav__links { display: none; }
+  .site-nav__inner { padding: 14px 20px; }
+}

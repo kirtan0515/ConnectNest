@@ -1,0 +1,130 @@
+import { Stack, StackProps, RemovalPolicy } from "aws-cdk-lib";
+import { Construct } from "constructs";
+import {
+  AttributeType,
+  BillingMode,
+  Table,
+  ProjectionType,
+} from "aws-cdk-lib/aws-dynamodb";
+
+/**
+ * DataStack — one DynamoDB table per entity.
+ *
+ * Design notes:
+ * - PAY_PER_REQUEST (on-demand) keeps cost near-zero at demo scale.
+ * - RemovalPolicy.DESTROY for a student/portfolio project so `cdk destroy`
+ *   leaves nothing behind. Switch to RETAIN for real production data.
+ * - GSIs mirror the access patterns documented in docs/data-model.md.
+ */
+export class DataStack extends Stack {
+  public readonly profilesTable: Table;
+  public readonly eventsTable: Table;
+  public readonly rsvpsTable: Table;
+  public readonly postsTable: Table;
+  public readonly commentsTable: Table;
+  public readonly postLikesTable: Table;
+  public readonly groupsTable: Table;
+  public readonly groupMembersTable: Table;
+  public readonly auditLogTable: Table;
+
+  constructor(scope: Construct, id: string, props?: StackProps) {
+    super(scope, id, props);
+
+    const common = {
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      removalPolicy: RemovalPolicy.DESTROY,
+    };
+
+    // Profiles: PK userId (Cognito sub).
+    // GSI byStatus lets the scheduled purge job query profiles whose account
+    // lifecycle status is "pending_deletion" without scanning the whole table.
+    this.profilesTable = new Table(this, "ProfilesTable", {
+      partitionKey: { name: "userId", type: AttributeType.STRING },
+      ...common,
+    });
+    this.profilesTable.addGlobalSecondaryIndex({
+      indexName: "byStatus",
+      partitionKey: { name: "status", type: AttributeType.STRING },
+      sortKey: { name: "deletedAt", type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
+
+    // Events: PK eventId (UUID); GSI byOwner (ownerId, createdAt)
+    this.eventsTable = new Table(this, "EventsTable", {
+      partitionKey: { name: "eventId", type: AttributeType.STRING },
+      ...common,
+    });
+    this.eventsTable.addGlobalSecondaryIndex({
+      indexName: "byOwner",
+      partitionKey: { name: "ownerId", type: AttributeType.STRING },
+      sortKey: { name: "createdAt", type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
+
+    // RSVPs: PK eventId, SK userId; GSI byUser (userId)
+    this.rsvpsTable = new Table(this, "RsvpsTable", {
+      partitionKey: { name: "eventId", type: AttributeType.STRING },
+      sortKey: { name: "userId", type: AttributeType.STRING },
+      ...common,
+    });
+    this.rsvpsTable.addGlobalSecondaryIndex({
+      indexName: "byUser",
+      partitionKey: { name: "userId", type: AttributeType.STRING },
+      sortKey: { name: "eventId", type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
+
+    // Posts: PK postId (UUID); GSI byGroup (groupId, createdAt)
+    this.postsTable = new Table(this, "PostsTable", {
+      partitionKey: { name: "postId", type: AttributeType.STRING },
+      ...common,
+    });
+    this.postsTable.addGlobalSecondaryIndex({
+      indexName: "byGroup",
+      partitionKey: { name: "groupId", type: AttributeType.STRING },
+      sortKey: { name: "createdAt", type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
+
+    // Comments: PK postId, SK commentId
+    this.commentsTable = new Table(this, "CommentsTable", {
+      partitionKey: { name: "postId", type: AttributeType.STRING },
+      sortKey: { name: "commentId", type: AttributeType.STRING },
+      ...common,
+    });
+
+    // PostLikes: PK postId, SK userId (prevents double-likes)
+    this.postLikesTable = new Table(this, "PostLikesTable", {
+      partitionKey: { name: "postId", type: AttributeType.STRING },
+      sortKey: { name: "userId", type: AttributeType.STRING },
+      ...common,
+    });
+
+    // Groups: PK groupId (UUID)
+    this.groupsTable = new Table(this, "GroupsTable", {
+      partitionKey: { name: "groupId", type: AttributeType.STRING },
+      ...common,
+    });
+
+    // GroupMembers: PK groupId, SK userId; GSI byUser (userId)
+    this.groupMembersTable = new Table(this, "GroupMembersTable", {
+      partitionKey: { name: "groupId", type: AttributeType.STRING },
+      sortKey: { name: "userId", type: AttributeType.STRING },
+      ...common,
+    });
+    this.groupMembersTable.addGlobalSecondaryIndex({
+      indexName: "byUser",
+      partitionKey: { name: "userId", type: AttributeType.STRING },
+      sortKey: { name: "groupId", type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
+
+    // AuditLog: PK userId, SK ts (ISO timestamp). Immutable record of account
+    // lifecycle + security-relevant actions (deactivate/delete/restore/purge).
+    this.auditLogTable = new Table(this, "AuditLogTable", {
+      partitionKey: { name: "userId", type: AttributeType.STRING },
+      sortKey: { name: "ts", type: AttributeType.STRING },
+      ...common,
+    });
+  }
+}

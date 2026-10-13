@@ -1,0 +1,35 @@
+// Central config sourced from build-time env vars (CRA inlines REACT_APP_*).
+// Values come from the CDK stack outputs — see frontend/.env.example.
+
+const config = {
+  region: process.env.REACT_APP_AWS_REGION || "us-east-1",
+  userPoolId: process.env.REACT_APP_USER_POOL_ID || "",
+  userPoolClientId: process.env.REACT_APP_USER_POOL_CLIENT_ID || "",
+  // HTTP API base URL. In local dev this is the execute-api URL from .env.
+  // In the CloudFront-served production build, no REACT_APP_API_URL is set, so
+  // it defaults to the same-origin "/api" path (CloudFront routes /api/* to the
+  // HTTP API) — which also removes CORS entirely.
+  apiUrl: (process.env.REACT_APP_API_URL || "/api").replace(/\/$/, ""),
+  // Cognito Hosted UI domain for social (OAuth) sign-in, e.g.
+  // "connectnest-auth.auth.us-east-1.amazoncognito.com"
+  hostedUiDomain: (process.env.REACT_APP_HOSTED_UI_DOMAIN || "").replace(/\/$/, ""),
+  // Where Cognito redirects back after social login.
+  oauthRedirectUri:
+    process.env.REACT_APP_OAUTH_REDIRECT_URI ||
+    `${window.location.origin}/auth/callback`,
+};
+
+/** True when the Hosted UI (social login) is configured. */
+export const socialLoginEnabled = () =>
+  !!config.hostedUiDomain && !!config.userPoolClientId;
+
+if (!config.userPoolId || !config.userPoolClientId) {
+  // Surfaces misconfiguration early in dev instead of a cryptic Cognito error.
+  // eslint-disable-next-line no-console
+  console.warn(
+    "[ConnectNest] Missing Cognito config. Set REACT_APP_USER_POOL_ID and " +
+      "REACT_APP_USER_POOL_CLIENT_ID in frontend/.env (see .env.example)."
+  );
+}
+
+export default config;

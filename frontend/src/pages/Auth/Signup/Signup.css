@@ -1,0 +1,78 @@
+/* Signup uses the shared auth layout + these signup-specific pieces. */
+@import "../../../styles/auth-forms.css";
+
+/* Tighter gap for the multi-field signup form */
+.auth__panel--signup .auth__form { gap: 22px; }
+
+/* Name + Major side by side */
+.signup__row2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* Password rules — 2x2 checklist */
+.signup__rules {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 16px;
+}
+.signup__rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+}
+.signup__rule svg { flex-shrink: 0; }
+.signup__rule.met { color: var(--text); }
+
+/* Interests */
+.signup__interests { margin: 0; padding: 0; border: 0; }
+.signup__interests legend {
+  padding: 0;
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+}
+.signup__interests legend span { font-weight: 400; color: var(--text-muted); }
+.signup__chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Verification code input — big Unbounded digits */
+.signup__code {
+  height: 64px;
+  font-family: var(--font-head);
+  font-size: 26px;
+  letter-spacing: 0.4em;
+}
+
+.signup__resent { margin: 0; font-size: 15px; color: var(--success-text); }
+
+.signup__verify-actions { display: flex; gap: 20px; align-items: center; }
+.signup__link {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.signup__link:hover { color: var(--accent-hover); }
+.signup__link--muted { color: var(--text-2); font-weight: 400; }
+.signup__link--muted:hover { color: var(--text); }
+
+/* Done step */
+.signup__check { display: block; }
+
+@media (max-width: 480px) {
+  .signup__row2 { grid-template-columns: 1fr; }
+  .signup__rules { grid-template-columns: 1fr; }
+}
