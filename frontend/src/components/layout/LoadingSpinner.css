@@ -20,28 +20,28 @@
 }
 
 .square-1 {
+    background-color: #5ec8e8; /* logo gradient: cyan */
     animation: square-anim 1200ms cubic-bezier(0.445, 0.05, 0.55, 0.95) 0s infinite;
 }
 
 .square-2 {
+    background-color: #5b9ff0; /* logo gradient: sky-blue */
     animation: square-anim 1200ms cubic-bezier(0.445, 0.05, 0.55, 0.95) 200ms infinite;
 }
 
 .square-3 {
+    background-color: #6366e8; /* logo gradient: blue-violet */
     animation: square-anim 1200ms cubic-bezier(0.445, 0.05, 0.55, 0.95) 400ms infinite;
 }
 
 @keyframes square-anim {
     0% {
         height: 80px;
-        background-color: rgb(111, 163, 240);
     }
     40% {
         height: 120px;
-        background-color: rgb(111, 200, 240);
     }
     100% {
         height: 80px;
-        background-color: rgb(111, 163, 240);
     }
 }

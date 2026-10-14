@@ -4,7 +4,8 @@ import { handleOAuthCallback } from "../../../auth/oauth";
 import { useAuth } from "../../../auth/AuthContext";
 import { api } from "../../../api/client";
 import logo from "../../../assets/connectnest-logo.png";
-import "../Login/Login.css";
+import LoadingSpinner from "../../../components/layout/LoadingSpinner";
+import "./AuthCallback.css";
 
 /**
  * Handles the Cognito Hosted UI redirect: exchanges the ?code for tokens,
@@ -48,28 +49,25 @@ const AuthCallback = () => {
   }, [navigate, refresh]);
 
   return (
-    <div className="cn-scope auth">
-      <div className="auth__panel auth__panel--login" style={{ margin: "0 auto" }}>
-        <div className="auth__form">
-          <Link to="/" className="auth__logo" style={{ marginBottom: 8 }}>
-            <img src={logo} alt="ConnectNest" />
+    <div className="cn-scope authcb">
+      <Link to="/" className="authcb__logo">
+        <img src={logo} alt="ConnectNest" />
+      </Link>
+      {error ? (
+        <div className="authcb__error">
+          <h1 className="cn-head authcb__title">Sign-in didn't finish</h1>
+          <p className="cn-alert cn-alert--error" role="alert">{error}</p>
+          <Link to="/login" className="cn-btn cn-btn--primary">
+            Back to log in
           </Link>
-          {error ? (
-            <>
-              <h1 className="cn-head auth__title">Sign-in didn't finish</h1>
-              <p className="cn-alert cn-alert--error" role="alert">{error}</p>
-              <Link to="/login" className="cn-btn cn-btn--primary auth__submit">
-                Back to log in
-              </Link>
-            </>
-          ) : (
-            <>
-              <h1 className="cn-head auth__title">Signing you in…</h1>
-              <p className="auth__subtitle">Finishing up with your provider.</p>
-            </>
-          )}
         </div>
-      </div>
+      ) : (
+        <>
+          <LoadingSpinner />
+          <h1 className="cn-head authcb__title">Signing you in…</h1>
+          <p className="authcb__subtitle">Finishing up with your provider.</p>
+        </>
+      )}
     </div>
   );
 };
