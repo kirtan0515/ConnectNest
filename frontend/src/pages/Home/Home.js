@@ -97,6 +97,7 @@ const Home = () => {
         </Link>
         <nav className="home-nav__links" aria-label="Main">
           <a href="#features" onClick={(e) => scrollTo(e, "features")}>Features</a>
+          <a href="#how-it-works" onClick={(e) => scrollTo(e, "how-it-works")}>How it works</a>
           <a href="#gallery" onClick={(e) => scrollTo(e, "gallery")}>Gallery</a>
           <a href="#testimonials" onClick={(e) => scrollTo(e, "testimonials")}>Testimonials</a>
           <Link to="/about" className="home-nav__about">About</Link>
@@ -157,39 +158,78 @@ const Home = () => {
           {/* Features */}
           <section id="features" className="features">
             <div className="section-head">
-              <h2 className="cn-head">Why ConnectNest?</h2>
-              <p>Built for students, powered by modern cloud infrastructure.</p>
+              <h2 className="cn-head">Everything your campus runs on</h2>
+              <p>Six tools that actually ship in ConnectNest, built for students and powered by modern cloud infrastructure.</p>
             </div>
             <div className="features__grid">
-              <div className="feature">
+              <div className="feature cn-fade">
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="var(--group-1)" strokeWidth="1.6" aria-hidden="true">
                   <rect x="4" y="6" width="20" height="18" rx="3" /><path d="M4 11h20M10 3v5M18 3v5" />
                 </svg>
-                <h3>Campus Events</h3>
-                <p>Discover, create and RSVP to events happening across your campus.</p>
+                <h3>Events &amp; RSVP</h3>
+                <p>Discover what's on, create your own events and RSVP in a tap. Each event page keeps a live attendee list so you know who's going.</p>
               </div>
-              <div className="feature">
+              <div className="feature cn-fade">
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="var(--group-2)" strokeWidth="1.6" aria-hidden="true">
                   <circle cx="10" cy="10" r="4" /><circle cx="19" cy="12" r="3" /><path d="M3 23c1-4 4-6 7-6s6 2 7 6M16 18c3-1 7 0 9 4" />
                 </svg>
                 <h3>Groups &amp; Communities</h3>
-                <p>Find your people. Join clubs, study groups and interest communities.</p>
+                <p>Create or join clubs, study groups and interest communities. Membership gives you a dedicated group feed to keep the conversation in one place.</p>
               </div>
-              <div className="feature">
+              <div className="feature cn-fade">
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="var(--group-3)" strokeWidth="1.6" aria-hidden="true">
                   <path d="M5 6h18v12H12l-5 4v-4H5z" /><path d="M9 11h10M9 14h6" />
                 </svg>
-                <h3>Real-time Feed</h3>
-                <p>Share posts, like and comment. Stay in the loop with campus life.</p>
+                <h3>Real-time Posts Feed</h3>
+                <p>Share posts, like them and jump into the comments. The feed updates in real time so you never miss what's happening on campus.</p>
               </div>
-              <div className="feature">
+              <div className="feature cn-fade">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="var(--group-4)" strokeWidth="1.6" aria-hidden="true">
+                  <circle cx="14" cy="9" r="5" /><path d="M4 24c1.5-5 5.5-8 10-8s8.5 3 10 8" />
+                </svg>
+                <h3>Profiles</h3>
+                <p>Build a profile that shows your interests and what you're part of, so the right people and groups can find you.</p>
+              </div>
+              <div className="feature cn-fade">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="var(--group-1)" strokeWidth="1.6" aria-hidden="true">
+                  <path d="M9 4h7l5 5v15H9z" /><path d="M16 4v5h5M4 9v15h5" /><path d="M12 15l2 2 4-4" />
+                </svg>
+                <h3>File &amp; Image Sharing</h3>
+                <p>Upload files and images to share with your groups, with moderation in place so shared content stays appropriate.</p>
+              </div>
+              <div className="feature cn-fade">
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="var(--group-4)" strokeWidth="1.6" aria-hidden="true">
                   <path d="M14 3l9 4v6c0 6-4 10-9 12-5-2-9-6-9-12V7z" /><path d="M10 14l3 3 5-6" />
                 </svg>
-                <h3>Secure by Design</h3>
-                <p>Cognito-backed auth and least-privilege access keep student data safe.</p>
+                <h3>Secure Sign-in</h3>
+                <p>Sign in with Google or Microsoft through Amazon Cognito, with optional multi-factor authentication to keep your account yours.</p>
               </div>
             </div>
+          </section>
+
+          {/* How it works */}
+          <section id="how-it-works" className="how">
+            <div className="section-head">
+              <h2 className="cn-head">How it works</h2>
+              <p>From sign-up to your first connection in three steps.</p>
+            </div>
+            <ol className="how__grid">
+              <li className="how__step cn-fade">
+                <span className="how__num" aria-hidden="true">01</span>
+                <h3>Create your account</h3>
+                <p>Sign in with Google or Microsoft and set up your profile. Secure Cognito auth means you're ready in seconds, no new password to remember.</p>
+              </li>
+              <li className="how__step cn-fade">
+                <span className="how__num" aria-hidden="true">02</span>
+                <h3>Join groups &amp; events</h3>
+                <p>Find clubs, study groups and interest communities, then RSVP to events happening across campus. Everything you join shows up in one place.</p>
+              </li>
+              <li className="how__step cn-fade">
+                <span className="how__num" aria-hidden="true">03</span>
+                <h3>Share &amp; stay connected</h3>
+                <p>Post to the real-time feed, like and comment, share files with your groups and keep up with your campus as it happens.</p>
+              </li>
+            </ol>
           </section>
 
           {/* Campus highlights — Harrisburg University, downtown Harrisburg */}
@@ -283,6 +323,7 @@ const Home = () => {
                 <nav aria-label="Explore">
                   <strong>Explore</strong>
                   <a href="#features" onClick={(e) => scrollTo(e, "features")}>Features</a>
+                  <a href="#how-it-works" onClick={(e) => scrollTo(e, "how-it-works")}>How it works</a>
                   <a href="#gallery" onClick={(e) => scrollTo(e, "gallery")}>Gallery</a>
                   <a href="#testimonials" onClick={(e) => scrollTo(e, "testimonials")}>Testimonials</a>
                   <Link to="/about">About</Link>

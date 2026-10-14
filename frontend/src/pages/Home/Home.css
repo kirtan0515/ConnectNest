@@ -159,6 +159,46 @@
 .feature h3 { margin: 0; font-size: 22px; font-weight: 600; }
 .feature p { margin: 0; font-size: 17px; line-height: 1.55; color: var(--text-muted); }
 
+/* ===== How it works ===== */
+.how {
+  padding: 12vh clamp(20px, 5vw, 72px);
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+.how__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+.how__step {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+.how__step:hover {
+  transform: translateY(-4px);
+  border-color: var(--outline);
+}
+.how__num {
+  font-family: var(--font-head);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+.how__step h3 { margin: 0; font-size: 22px; font-weight: 600; }
+.how__step p { margin: 0; font-size: 17px; line-height: 1.55; color: var(--text-muted); }
+
 /* ===== Gallery ===== */
 .gallery {
   padding: 12vh clamp(20px, 5vw, 72px);
