@@ -8,6 +8,7 @@ import { ApiStack } from "../lib/api-stack";
 import { HostingStack } from "../lib/hosting-stack";
 import { SecurityStack } from "../lib/security-stack";
 import { EmailStack } from "../lib/email-stack";
+import { DnsStack } from "../lib/dns-stack";
 
 const app = new App();
 
@@ -23,6 +24,12 @@ new SecurityStack(app, "ConnectNest-Security", { env });
 // add the emitted DKIM CNAMEs at Namecheap, and wait for SES verification
 // before deploying ConnectNest-Auth (which references this SES identity).
 new EmailStack(app, "ConnectNest-Email", { env });
+
+// Route 53 hosted zone for connectnestapp.com. Additive and standalone — moves
+// DNS off Namecheap so the apex can ALIAS to CloudFront, and replicates all live
+// records (DKIM, ACM validation, SPF). No deploy / nameserver change is implied
+// by synth.
+new DnsStack(app, "ConnectNest-Dns", { env });
 
 const data = new DataStack(app, "ConnectNest-Data", { env });
 const auth = new AuthStack(app, "ConnectNest-Auth", { env });
