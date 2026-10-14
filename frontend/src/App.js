@@ -19,6 +19,8 @@ const ForgotPassword = React.lazy(() => import("./pages/Auth/ForgotPassword/Forg
 const AuthCallback = React.lazy(() => import("./pages/Auth/Callback/AuthCallback"));
 const Onboarding = React.lazy(() => import("./pages/Auth/Onboarding/Onboarding"));
 const About = React.lazy(() => import("./pages/About/About"));
+const Terms = React.lazy(() => import("./pages/Legal/Terms"));
+const Privacy = React.lazy(() => import("./pages/Legal/Privacy"));
 const Profile = React.lazy(() => import("./pages/Profile/Profile"));
 const Settings = React.lazy(() => import("./pages/Settings/Settings"));
 
@@ -49,6 +51,8 @@ function App() {
           }
         />
         <Route path={routes.about} element={<About />} />
+        <Route path={routes.terms} element={<Terms />} />
+        <Route path={routes.privacy} element={<Privacy />} />
 
         {/* Protected Routes */}
         <Route path={routes.dashboard} element={protectedPage(Dashboard)} />

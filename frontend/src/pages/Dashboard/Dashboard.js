@@ -74,6 +74,21 @@ const Dashboard = () => {
 
       {/* RIGHT */}
       <aside className="dashboard__right">
+        <div className="card sidebar-section about-card">
+          <h4 className="section-title">👋 Welcome to ConnectNest</h4>
+          <p className="about-card__lead">
+            Your campus, connected — one place for everything happening at
+            Harrisburg University.
+          </p>
+          <ul className="about-card__features">
+            <li>Events &amp; RSVP</li>
+            <li>Groups &amp; communities</li>
+            <li>Posts, likes &amp; comments feed</li>
+            <li>File &amp; image sharing</li>
+            <li>Secure Cognito login</li>
+          </ul>
+        </div>
+
         <div className="card sidebar-section">
           <h4 className="section-title">📌 Upcoming Events</h4>
           <EventFeed compact />

@@ -6,6 +6,8 @@ const routes = {
   authCallback: "/auth/callback",
   onboarding: "/onboarding",
   about: "/about",
+  terms: "/terms",
+  privacy: "/privacy",
   dashboard: "/dashboard",
   events: "/events",
   eventDetail: "/events/:eventId",

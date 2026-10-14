@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import StudentNetworkCanvas from "../../components/canvas/StudentNetworkCanvas";
 import logo from "../../assets/connectnest-logo.png";
 import harrisburgSkyline from "../../assets/harrisburg-skyline.jpg";
+import huBuilding from "../../assets/hu-building.jpg";
 import "./Home.css";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -14,29 +15,6 @@ gsap.registerPlugin(ScrollTrigger);
 /* HU is an urban STEM university in downtown Harrisburg, PA. These scenes
    reflect that: a downtown tower campus, STEM/innovation labs, and the
    capital-city setting. Drawn in the card's group color via --art. */
-
-// Downtown campus — a city skyline with HU's tower standing tall.
-const DowntownArt = () => (
-  <div className="ga ga--downtown" aria-hidden="true">
-    <svg viewBox="0 0 240 180" fill="none" preserveAspectRatio="xMidYEnd meet">
-      {/* skyline */}
-      <rect x="18" y="96" width="26" height="70" rx="2" fill="var(--surface-2)" />
-      <rect x="50" y="78" width="22" height="88" rx="2" fill="var(--surface-2)" />
-      {/* HU tower (accent) */}
-      <rect x="92" y="34" width="40" height="132" rx="3" fill="var(--art)" />
-      <g fill="var(--bg)" opacity="0.85">
-        <rect x="99" y="46" width="8" height="8" /><rect x="113" y="46" width="8" height="8" />
-        <rect x="99" y="62" width="8" height="8" /><rect x="113" y="62" width="8" height="8" />
-        <rect x="99" y="78" width="8" height="8" /><rect x="113" y="78" width="8" height="8" />
-        <rect x="99" y="94" width="8" height="8" /><rect x="113" y="94" width="8" height="8" />
-        <rect x="99" y="110" width="8" height="8" /><rect x="113" y="110" width="8" height="8" />
-      </g>
-      <rect x="140" y="70" width="22" height="96" rx="2" fill="var(--surface-2)" />
-      <rect x="168" y="88" width="26" height="78" rx="2" fill="var(--surface-2)" />
-      <rect x="200" y="104" width="22" height="62" rx="2" fill="var(--surface-2)" />
-    </svg>
-  </div>
-);
 
 // Innovation & STEM — a lab/circuit motif with connected nodes.
 const LabArt = () => (
@@ -176,16 +154,6 @@ const Home = () => {
 
         {/* Lower content (fades canvas) */}
         <div className="lower" ref={lowerRef}>
-          {/* Stats */}
-          <section className="stats" aria-label="ConnectNest at a glance">
-            <dl className="stats__grid">
-              <div className="stat"><dd>7</dd><dt>tools in one place</dt></div>
-              <div className="stat"><dd>5</dd><dt>AWS services behind it</dt></div>
-              <div className="stat"><dd>1</dd><dt>command to deploy it all</dt></div>
-              <div className="stat"><dd>0</dd><dt>servers to manage</dt></div>
-            </dl>
-          </section>
-
           {/* Features */}
           <section id="features" className="features">
             <div className="section-head">
@@ -248,10 +216,15 @@ const Home = () => {
 
             <div className="gallery__grid">
               <figure className="gallery__item">
-                <div className="gallery__art gallery__art--45" style={{ "--art": "var(--group-2)" }}>
-                  <DowntownArt />
+                <div className="gallery__art gallery__art--45 gallery__art--photo">
+                  <img
+                    className="gallery__photo"
+                    src={huBuilding}
+                    alt="The Harrisburg University building in downtown Harrisburg"
+                    loading="lazy"
+                  />
                 </div>
-                <figcaption>A downtown campus on Market Street</figcaption>
+                <figcaption>The Harrisburg University building on Market Street</figcaption>
               </figure>
               <figure className="gallery__item">
                 <div className="gallery__art gallery__art--43" style={{ "--art": "var(--group-1)" }}>
@@ -318,6 +291,11 @@ const Home = () => {
                   <strong>Get started</strong>
                   <Link to="/signup">Sign up</Link>
                   <Link to="/login">Log in</Link>
+                </nav>
+                <nav aria-label="Legal">
+                  <strong>Legal</strong>
+                  <Link to="/terms">Terms &amp; Conditions</Link>
+                  <Link to="/privacy">Privacy Policy</Link>
                 </nav>
               </div>
             </div>
