@@ -1,0 +1,13 @@
+{
+  "googleClientId": "REPLACE_WITH_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
+  "googleClientSecret": "REPLACE_WITH_GOOGLE_CLIENT_SECRET",
+  "msClientId": "REPLACE_WITH_MS_APP_CLIENT_ID",
+  "msClientSecret": "REPLACE_WITH_MS_CLIENT_SECRET",
+  "msIssuer": "https://login.microsoftonline.com/common/v2.0",
+  "hostedUiPrefix": "connectnest-auth",
+  "siteDomains": "connectnestapp.com,www.connectnestapp.com",
+  "appCallbackUrls": "http://localhost:3000/auth/callback,https://connectnestapp.com/auth/callback,https://www.connectnestapp.com/auth/callback",
+  "appLogoutUrls": "http://localhost:3000/login,https://connectnestapp.com/login,https://www.connectnestapp.com/login",
+  "appUploadOrigins": "http://localhost:3000,https://connectnestapp.com,https://www.connectnestapp.com",
+  "appCorsOrigins": "http://localhost:3000,https://connectnestapp.com,https://www.connectnestapp.com"
+}

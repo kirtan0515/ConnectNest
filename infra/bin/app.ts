@@ -47,11 +47,22 @@ const api = new ApiStack(app, "ConnectNest-Api", {
 // Hosting (CloudFront + WAF + SPA). CLOUDFRONT-scoped WAF requires us-east-1.
 // Only attach the SPA build if it exists so `cdk synth` works pre-build.
 const spaBuild = path.join(__dirname, "..", "..", "frontend", "build");
+// Optional custom domains, e.g. -c siteDomains=connectnestapp.com,www.connectnestapp.com
+const siteDomainsCtx = app.node.tryGetContext("siteDomains") as
+  | string
+  | undefined;
+const siteDomains = siteDomainsCtx
+  ? siteDomainsCtx
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+  : undefined;
 new HostingStack(app, "ConnectNest-Hosting", {
   env: { account: env.account, region: "us-east-1" },
   crossRegionReferences: true,
   apiDomain: api.apiDomain,
   spaSourcePath: fs.existsSync(spaBuild) ? spaBuild : undefined,
+  domainNames: siteDomains,
 });
 
 app.synth();

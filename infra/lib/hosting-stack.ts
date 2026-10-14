@@ -27,6 +27,10 @@ import {
   FunctionEventType,
 } from "aws-cdk-lib/aws-cloudfront";
 import { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
+import {
+  Certificate,
+  CertificateValidation,
+} from "aws-cdk-lib/aws-certificatemanager";
 import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
 
 export interface HostingStackProps extends StackProps {
@@ -34,6 +38,14 @@ export interface HostingStackProps extends StackProps {
   apiDomain: string;
   /** Path to the built SPA (frontend/build). */
   spaSourcePath?: string;
+  /**
+   * Custom domains to attach to the CloudFront distribution (apex + www).
+   * When provided and non-empty, a DNS-validated ACM certificate is created
+   * and the distribution is configured with these aliases. When
+   * absent/empty, no certificate or aliases are added and the synthesized
+   * template is byte-for-byte identical to the default (no custom domain).
+   */
+  domainNames?: string[];
 }
 
 /**
@@ -131,7 +143,25 @@ export class HostingStack extends Stack {
       ),
     });
 
+    // ---- Optional custom domain + DNS-validated ACM certificate ----
+    // Gated on props.domainNames. When absent/empty, neither `domainNames`
+    // nor `certificate` is passed to the Distribution, so synth is unchanged.
+    // The L2 Certificate must live in us-east-1 for CloudFront; this stack is
+    // already pinned there (see bin/app.ts), so a plain Certificate is correct.
+    const hasDomains = !!props.domainNames && props.domainNames.length > 0;
+    const certificate = hasDomains
+      ? new Certificate(this, "SiteCert", {
+          domainName: props.domainNames![0],
+          subjectAlternativeNames: props.domainNames!.slice(1),
+          validation: CertificateValidation.fromDns(),
+        })
+      : undefined;
+    const aliasProps = hasDomains
+      ? { domainNames: props.domainNames, certificate }
+      : {};
+
     const distribution = new Distribution(this, "Cdn", {
+      ...aliasProps,
       defaultBehavior: {
         origin: S3BucketOrigin.withOriginAccessControl(siteBucket),
         viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
@@ -190,5 +220,22 @@ export class HostingStack extends Stack {
       value: `https://${distribution.distributionDomainName}`,
     });
     new CfnOutput(this, "CdnWebAclArn", { value: webAcl.attrArn });
+
+    // ---- Custom-domain outputs (only when domains are attached) ----
+    if (hasDomains) {
+      new CfnOutput(this, "AcmValidationInstruction", {
+        value:
+          "Open the ACM console in us-east-1, select the 'SiteCert' certificate, " +
+          "copy the single CNAME validation record (name + value), and add it as a " +
+          "CNAME in Namecheap Advanced DNS. The record is not output here because the " +
+          "L2 Certificate does not expose it at synth time.",
+      });
+      new CfnOutput(this, "AliasTarget", {
+        value: distribution.distributionDomainName,
+      });
+      new CfnOutput(this, "SiteDomains", {
+        value: props.domainNames!.join(", "),
+      });
+    }
   }
 }
