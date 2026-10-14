@@ -3,6 +3,14 @@
   background: var(--bg);
 }
 
+/* Dashboard route: full-bleed pine-teal background so the dark dashboard
+   content has no light MainLayout gutter/band around it. The dark lives on
+   the full-width wrapper; .main-layout__content stays transparent so the
+   pine-teal bleeds to all four viewport edges. */
+.main-layout--dark {
+  background: #0d2a2c;
+}
+
 .main-layout__content {
   padding-top: var(--navbar-h);
   max-width: 1200px;
