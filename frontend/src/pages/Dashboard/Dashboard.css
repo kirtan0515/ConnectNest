@@ -1,9 +1,39 @@
+/* ── Dashboard pine-teal/coral theme ──
+   Remap the legacy LIGHT token NAMES to pine-teal values, scoped to .dashboard
+   only. This keeps MainLayout and other protected pages (Profile, Events,
+   Settings, Files, Chats) on the existing light theme, while every child of
+   .dashboard — including the shared .card/.btn/.divider primitives and the
+   token-driven feed components — picks up the dark brand automatically. */
 .dashboard {
+  --bg:            #0d2a2c;
+  --surface:       #12383a;
+  --surface-2:     #143e40;
+  --border:        #2c5a5c;
+  --text-primary:   #eaf4f1;
+  --text-secondary: #c3d9d4;
+  --text-muted:     #a3c0ba;
+  --brand:         #ff9f68;
+  --brand-hover:   #ffbe94;
+  --brand-light:   rgba(255, 159, 104, 0.12);
+  --success:       #cfefff;
+
+  background: var(--bg);
+  color: var(--text-primary);
+
   display: grid;
   grid-template-columns: 240px 1fr 280px;
   gap: 20px;
   padding: 24px 0;
   align-items: start;
+}
+
+/* Dark overrides so the global light .card/.divider do not stay light here */
+.dashboard .card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.dashboard .divider {
+  background: var(--border);
 }
 
 /* Sticky sidebars */
@@ -26,7 +56,8 @@
 /* Profile card */
 .profile-card__banner {
   height: 60px;
-  background: linear-gradient(135deg, var(--brand) 0%, #1e90ff 100%);
+  /* ConnectNest logo gradient: cyan -> sky -> violet */
+  background: linear-gradient(90deg, #5ec8e8 0%, #5b9ff0 50%, #6366e8 100%);
   border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
@@ -50,7 +81,7 @@
   height: 56px;
   border-radius: 50%;
   background: var(--brand);
-  color: #fff;
+  color: var(--bg);
   font-size: 18px;
   font-weight: 700;
   display: flex;
@@ -167,6 +198,26 @@
 .quick-action-btn:hover {
   background: var(--brand-light);
   color: var(--brand);
+}
+
+/* Keep keyboard focus visible on the dark canvas */
+.dashboard .quick-action-btn:focus-visible,
+.dashboard .profile-card__btn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Stat placeholders ("—") should read as intentional, not missing */
+.dashboard .stat-value {
+  color: var(--text-primary);
+}
+
+/* Empty-state polish within the dashboard scope (centered, muted, roomy) */
+.dashboard .posts__empty,
+.dashboard .ef-empty {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 32px 16px;
 }
 
 /* Responsive */
