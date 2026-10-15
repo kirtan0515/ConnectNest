@@ -150,9 +150,25 @@ export default function AuthNetworkCanvas({ youInitials = "" }) {
 
       const youIni = (youRef.current || "").slice(0, 2).toUpperCase();
       const P = state.people;
+
+      // Base (desktop) layout: cx=w/2, cy=h*0.5, R=min(w,h)*0.36 with x spread *1.25.
+      // For short/wide bands (stacked mobile), clamp R and nudge cy up so neither
+      // the outer avatars nor the center "You" node + label get clipped. These
+      // expressions reduce exactly to the base layout for tall/desktop panes.
+      const SPREAD = 1.25;
+      const edgeMargin = 20;          // keep outer avatars off the left/right edges
+      const labelReserve = 48;        // room below "You" node for its label (r + 16 + text)
       const cx = w / 2;
-      const cy = h * 0.5;
-      const R = Math.min(w, h) * 0.36;
+
+      const Rdesktop = Math.min(w, h) * 0.36;
+      // Horizontal radius so cx +/- R*SPREAD*(~1.1 max ox) stays inside the band.
+      const Rh = (w / 2 - edgeMargin) / SPREAD;
+      // Vertical radius so the web's top and bottom (plus label) stay inside the band.
+      const Rv = h / 2 - labelReserve;
+      const R = Math.max(0, Math.min(Rdesktop, Rh, Rv));
+
+      // Keep the center + label fully visible on short bands; equals h*0.5 when tall.
+      const cy = Math.min(h * 0.5, h - labelReserve);
 
       for (let i = 0; i < P.length; i++) {
         const p = P[i];

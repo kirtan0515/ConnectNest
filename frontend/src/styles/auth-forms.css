@@ -109,7 +109,8 @@
   .auth__visual--login,
   .auth__visual--signup {
     flex: none;
-    height: 280px;
+    height: auto;
+    min-height: clamp(300px, 42vh, 420px);
     padding: 24px 28px;
   }
   .auth__caption { font-size: 24px; }
