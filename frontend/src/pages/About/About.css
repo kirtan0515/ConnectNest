@@ -85,3 +85,9 @@
 }
 .about__cta h2 { font-size: clamp(24px, 3vw, 36px); letter-spacing: -0.02em; }
 .about__cta-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* Phone: the 40px CTA box padding leaves only ~240px of inner room at 360px,
+   crowding the heading/actions. Trim padding so the content breathes. */
+@media (max-width: 420px) {
+  .about__cta { padding: 28px 20px; }
+}

@@ -483,3 +483,12 @@
 @media (max-width: 640px) {
   .home-footer__cols { gap: 40px; }
 }
+
+/* Phone: three footer nav columns in a row crush each link into a ~80px strip
+   that wraps ("Terms & Conditions"). Stack them so each column is full-width. */
+@media (max-width: 480px) {
+  .home-footer__cols {
+    flex-direction: column;
+    gap: 28px;
+  }
+}
