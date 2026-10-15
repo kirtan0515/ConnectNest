@@ -183,3 +183,33 @@
   .dash-nav-item { padding: 8px 12px; }
   .dash-navbar__inner { padding: 0 16px; }
 }
+
+/* Narrow phones (<=480px, covers 360/390): keep all 5 icons by letting the
+   icon row scroll horizontally; the logo and avatar stay pinned. */
+@media (max-width: 480px) {
+  .dash-navbar__inner { gap: 10px; }
+
+  .dash-navbar__nav {
+    gap: 2px;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;              /* Firefox */
+    -ms-overflow-style: none;           /* IE/Edge */
+  }
+  .dash-navbar__nav::-webkit-scrollbar { display: none; } /* WebKit */
+
+  .dash-navbar__logo,
+  .dash-navbar__right { flex-shrink: 0; }
+
+  .dash-nav-item {
+    padding: 8px 10px;
+    flex-shrink: 0;
+  }
+
+  /* Keep the dropdown inside the viewport on narrow screens. */
+  .dash-dropdown {
+    width: min(240px, calc(100vw - 24px));
+  }
+}

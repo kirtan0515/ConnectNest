@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Lenis from "lenis";
 import { gsap } from "gsap";
@@ -54,6 +54,7 @@ const Home = () => {
   const storyRef = useRef(null);
   const lowerRef = useRef(null);
   const lenisRef = useRef(null);
+  const [navOpen, setNavOpen] = useState(false);
 
   // Lenis smooth scroll (landing page only), synced with ScrollTrigger.
   useEffect(() => {
@@ -80,10 +81,16 @@ const Home = () => {
   // Anchor links scroll through Lenis (falls back to native).
   const scrollTo = (e, id) => {
     e.preventDefault();
+    setNavOpen(false);
     const el = document.getElementById(id);
     if (!el) return;
     if (lenisRef.current) lenisRef.current.scrollTo(el, { offset: -80 });
     else el.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Close the mobile nav on Escape.
+  const onNavKeyDown = (e) => {
+    if (e.key === "Escape") setNavOpen(false);
   };
 
   return (
@@ -91,18 +98,36 @@ const Home = () => {
       <StudentNetworkCanvas storyRef={storyRef} lowerRef={lowerRef} />
 
       {/* Navbar */}
-      <header className="home-nav">
+      <header className={`home-nav${navOpen ? " is-open" : ""}`} onKeyDown={onNavKeyDown}>
         <Link to="/" className="home-nav__brand">
           <img src={logo} alt="ConnectNest" />
         </Link>
-        <nav className="home-nav__links" aria-label="Main">
+        <button
+          type="button"
+          className="home-nav__toggle"
+          aria-expanded={navOpen}
+          aria-controls="home-nav-menu"
+          aria-label={navOpen ? "Close menu" : "Open menu"}
+          onClick={() => setNavOpen((o) => !o)}
+        >
+          {navOpen ? (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            </svg>
+          )}
+        </button>
+        <nav className="home-nav__links" id="home-nav-menu" aria-label="Main">
           <a href="#features" onClick={(e) => scrollTo(e, "features")}>Features</a>
           <a href="#how-it-works" onClick={(e) => scrollTo(e, "how-it-works")}>How it works</a>
           <a href="#gallery" onClick={(e) => scrollTo(e, "gallery")}>Gallery</a>
           <a href="#testimonials" onClick={(e) => scrollTo(e, "testimonials")}>Testimonials</a>
-          <Link to="/about" className="home-nav__about">About</Link>
-          <Link to="/login" className="home-nav__login">Log in</Link>
-          <Link to="/signup" className="cn-btn cn-btn--primary cn-btn--sm">Sign up</Link>
+          <Link to="/about" className="home-nav__about" onClick={() => setNavOpen(false)}>About</Link>
+          <Link to="/login" className="home-nav__login" onClick={() => setNavOpen(false)}>Log in</Link>
+          <Link to="/signup" className="cn-btn cn-btn--primary cn-btn--sm" onClick={() => setNavOpen(false)}>Sign up</Link>
         </nav>
       </header>
 

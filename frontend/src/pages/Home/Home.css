@@ -36,6 +36,21 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
+/* Hamburger toggle — hidden on desktop, shown in the mobile breakpoint. */
+.home-nav__toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  color: var(--text);
+  cursor: pointer;
+}
+.home-nav__toggle svg { width: 24px; height: 24px; display: block; }
+.home-nav__toggle:hover { background: rgba(255, 255, 255, 0.06); }
 .home-nav__brand {
   display: flex;
   align-items: center;
@@ -58,6 +73,46 @@
 .home-nav__login { color: var(--text) !important; }
 /* Sign up pill keeps its coral bg + dark text */
 .home-nav__links > a.cn-btn--primary { color: #0d2a2c; }
+
+/* Mobile nav: hamburger + full-width dropdown panel below the sticky bar. */
+@media (max-width: 720px) {
+  .home-nav { padding: 14px 20px; }
+  .home-nav__toggle { display: inline-flex; }
+
+  .home-nav__links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 12px 20px 20px;
+    font-size: 17px;
+    background: rgba(13, 42, 44, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid #214b4d;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+    /* hidden until the header carries .is-open */
+    display: none;
+  }
+  .home-nav.is-open .home-nav__links { display: flex; }
+
+  .home-nav__links > a:not(.cn-btn) {
+    padding: 14px 4px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .home-nav__links > a.cn-btn {
+    min-height: 44px;
+    margin-top: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
 
 .home-main { position: relative; z-index: 1; }
 
