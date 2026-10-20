@@ -18,7 +18,12 @@ import {
   BlockPublicAccess,
   BucketEncryption,
 } from "aws-cdk-lib/aws-s3";
-import { HttpApi, HttpMethod, CorsHttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
+import {
+  HttpApi,
+  HttpMethod,
+  CorsHttpMethod,
+  WebSocketApi,
+} from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpUserPoolAuthorizer } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { S3EventSource } from "aws-cdk-lib/aws-lambda-event-sources";
@@ -45,6 +50,17 @@ export interface ApiStackProps extends StackProps {
     groups: Table;
     groupMembers: Table;
     auditLog: Table;
+  };
+  /**
+   * Optional realtime wiring. When present, createPost/createEvent gain the
+   * env + IAM needed to push new items to connected WebSocket clients.
+   */
+  realtime?: {
+    connectionsTable: Table;
+    // grantManageConnections is defined on the concrete WebSocketApi class
+    // (not the IWebSocketApi interface) in aws-cdk-lib 2.271.0.
+    webSocketApi: WebSocketApi;
+    managementEndpoint: string;
   };
 }
 
@@ -349,6 +365,28 @@ export class ApiStack extends Stack {
     uploadsBucket.grantRead(getUploadUrl);
     // Download handler only needs to read objects for presigned GETs.
     uploadsBucket.grantRead(getDownloadUrl);
+
+    // ---- Realtime push (optional, additive) ----
+    // When the realtime stack is wired in, createPost/createEvent broadcast the
+    // new item to connected WebSocket clients. addEnvironment preserves each
+    // handler's existing env; nothing outside this block changes.
+    if (props.realtime) {
+      const { connectionsTable, webSocketApi, managementEndpoint } =
+        props.realtime;
+
+      createPost.addEnvironment("CONNECTIONS_TABLE", connectionsTable.tableName);
+      createPost.addEnvironment("WS_MANAGEMENT_ENDPOINT", managementEndpoint);
+      createEvent.addEnvironment(
+        "CONNECTIONS_TABLE",
+        connectionsTable.tableName
+      );
+      createEvent.addEnvironment("WS_MANAGEMENT_ENDPOINT", managementEndpoint);
+
+      connectionsTable.grantReadWriteData(createPost);
+      connectionsTable.grantReadWriteData(createEvent);
+      webSocketApi.grantManageConnections(createPost);
+      webSocketApi.grantManageConnections(createEvent);
+    }
 
     // ---- Image moderation: S3 ObjectCreated -> Rekognition -> delete if unsafe ----
     const moderateImage = makeFn(

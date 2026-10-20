@@ -5,6 +5,7 @@ import * as fs from "fs";
 import { DataStack } from "../lib/data-stack";
 import { AuthStack } from "../lib/auth-stack";
 import { ApiStack } from "../lib/api-stack";
+import { RealtimeStack } from "../lib/realtime-stack";
 import { HostingStack } from "../lib/hosting-stack";
 import { SecurityStack } from "../lib/security-stack";
 import { EmailStack } from "../lib/email-stack";
@@ -34,6 +35,15 @@ new DnsStack(app, "ConnectNest-Dns", { env });
 const data = new DataStack(app, "ConnectNest-Data", { env });
 const auth = new AuthStack(app, "ConnectNest-Auth", { env });
 
+// Realtime push (WebSocket API + Connections table + lifecycle Lambdas).
+// Instantiated before ApiStack so its references can be passed in; CDK orders
+// the stacks from the construct references without a cycle.
+const realtime = new RealtimeStack(app, "ConnectNest-Realtime", {
+  env,
+  userPool: auth.userPool,
+  userPoolClientId: auth.userPoolClient.userPoolClientId,
+});
+
 const api = new ApiStack(app, "ConnectNest-Api", {
   env,
   userPool: auth.userPool,
@@ -48,6 +58,11 @@ const api = new ApiStack(app, "ConnectNest-Api", {
     groups: data.groupsTable,
     groupMembers: data.groupMembersTable,
     auditLog: data.auditLogTable,
+  },
+  realtime: {
+    connectionsTable: realtime.connectionsTable,
+    webSocketApi: realtime.webSocketApi,
+    managementEndpoint: realtime.managementEndpoint,
   },
 });
 
