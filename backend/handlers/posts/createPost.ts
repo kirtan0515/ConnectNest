@@ -11,6 +11,7 @@ import {
   parseBody,
   type ApiEvent,
 } from "../../shared/http.js";
+import { broadcast } from "../../shared/broadcast.js";
 import { moderateText } from "../../shared/moderation.js";
 
 const TABLE = process.env.POSTS_TABLE!;
@@ -62,6 +63,7 @@ export const handler = async (event: ApiEvent) => {
     };
 
     await ddb.send(new PutCommand({ TableName: TABLE, Item: item }));
+    await broadcast({ type: "post.created", item });
     return created(item);
   } catch (err) {
     console.error("createPost error", err);
