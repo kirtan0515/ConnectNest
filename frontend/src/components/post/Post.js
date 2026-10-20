@@ -3,6 +3,7 @@ import moment from "moment";
 import { useAuth } from "../../auth/AuthContext";
 import { api } from "../../api/client";
 import { toggleLike } from "./postLikeUtils";
+import { useRealtime } from "../../realtime/useRealtime";
 import AuthImage from "../common/AuthImage";
 import "./Post.css";
 
@@ -24,6 +25,15 @@ export default function Posts({ posts: propPosts = null }) {
       }
     })();
   }, [propPosts]);
+
+  // Live inserts only when this component owns its data (Dashboard feed).
+  // Profile passes propPosts and must never be mutated. De-dupe by postId.
+  useRealtime("post.created", (item) => {
+    if (propPosts !== null) return;
+    setPosts((prev) =>
+      prev.some((p) => p.postId === item.postId) ? prev : [item, ...prev]
+    );
+  });
 
   return (
     <div className="posts">

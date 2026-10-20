@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../api/client";
+import { useRealtime } from "../../realtime/useRealtime";
 import AuthImage from "../../components/common/AuthImage";
 import "./EventFeed.css";
 
@@ -27,6 +28,19 @@ const EventFeed = ({ compact = false }) => {
     const id = setInterval(load, 15000);
     return () => clearInterval(id);
   }, [load]);
+
+  // Live inserts; the 15s poll above stays as an idempotent reconciliation
+  // backstop. De-dupe by eventId, keep the upcoming filter + startsAt sort.
+  useRealtime("event.created", (item) =>
+    setEvents((prev) => {
+      if (prev.some((e) => e.eventId === item.eventId)) return prev;
+      const next = [...prev, item].filter(
+        (e) => !e.startsAt || new Date(e.startsAt) >= new Date()
+      );
+      next.sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt));
+      return next;
+    })
+  );
 
   if (events.length === 0) {
     return <p className="ef-empty">No upcoming events yet.</p>;

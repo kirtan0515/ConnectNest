@@ -10,6 +10,10 @@ const config = {
   // it defaults to the same-origin "/api" path (CloudFront routes /api/* to the
   // HTTP API) — which also removes CORS entirely.
   apiUrl: (process.env.REACT_APP_API_URL || "/api").replace(/\/$/, ""),
+  // WebSocket API base URL for live updates. No same-origin fallback (unlike
+  // apiUrl): the socket cannot be proxied through CloudFront /api/*, so when
+  // REACT_APP_WS_URL is unset this stays blank and live updates are disabled.
+  wsUrl: (process.env.REACT_APP_WS_URL || "").replace(/\/$/, ""),
   // Cognito Hosted UI domain for social (OAuth) sign-in, e.g.
   // "connectnest-auth.auth.us-east-1.amazoncognito.com"
   hostedUiDomain: (process.env.REACT_APP_HOSTED_UI_DOMAIN || "").replace(/\/$/, ""),
