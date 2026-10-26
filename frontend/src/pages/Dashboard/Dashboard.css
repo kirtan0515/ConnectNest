@@ -89,6 +89,7 @@
 }
 .cn-feed {
   grid-column: 1 / 8;
+  grid-row: 3;
 }
 
 /* ONE sticky rail wrapper — groups/events/actions are its flex children, so
@@ -285,6 +286,7 @@
   }
   .cn-feed {
     grid-column: 1 / 2;
+    grid-row: 4;
   }
   .cn-rail {
     grid-column: 2 / 3;
