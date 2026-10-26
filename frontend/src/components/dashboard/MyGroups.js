@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../../api/client";
+import { listMyGroups } from "../../services/groupServices";
+import ConnectorGlyph from "./ConnectorGlyph";
 import "./MyGroups.css";
 
-/**
- * Shows recent groups. A dedicated "my memberships" endpoint (GroupMembers
- * byUser GSI) is a planned follow-up; for now this lists available groups.
- */
+/** Shows the groups the current user belongs to (GET /me/groups). */
 const MyGroups = () => {
   const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
@@ -14,8 +12,8 @@ const MyGroups = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get("/groups");
-        setGroups((res?.items || []).slice(0, 5));
+        const items = await listMyGroups();
+        setGroups(items.slice(0, 5));
       } catch (e) {
         console.error(e);
       }
@@ -25,20 +23,31 @@ const MyGroups = () => {
   return (
     <div className="my-groups card">
       <div className="my-groups__header">
-        <h4 className="section-title" style={{ margin: 0 }}>Groups</h4>
+        <h2 className="section-title section-title--glyph" style={{ margin: 0 }}>
+          <ConnectorGlyph />
+          Groups
+        </h2>
         <button className="btn-ghost" style={{ fontSize: 12 }} onClick={() => navigate("/groups")}>
           See all
         </button>
       </div>
 
       {groups.length === 0 ? (
-        <p className="my-groups__empty">No groups yet.</p>
+        <div className="my-groups__empty">
+          <ConnectorGlyph size={28} className="my-groups__empty-glyph" />
+          <p>No groups yet — join one to grow your network.</p>
+        </div>
       ) : (
         <ul className="my-groups__list">
-          {groups.map((g) => (
+          {groups.map((g, i) => (
             <li key={g.groupId} className="my-groups__item" onClick={() => navigate("/groups")}>
-              <div className="my-groups__icon">{g.name[0].toUpperCase()}</div>
-              <span>{g.name}</span>
+              <div
+                className="my-groups__icon"
+                style={{ background: `var(--group-${(i % 4) + 1})` }}
+              >
+                {(g.name || "?").charAt(0).toUpperCase()}
+              </div>
+              <span>{g.name || "Untitled group"}</span>
             </li>
           ))}
         </ul>

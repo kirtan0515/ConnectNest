@@ -1,10 +1,13 @@
 import React from "react";
 import { useAuth } from "../../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { CalendarPlus, UsersRound, Upload } from "lucide-react";
 import Share from "../../components/share/Share";
 import Posts from "../../components/post/Post";
 import EventFeed from "../Events/EventFeed";
 import MyGroups from "../../components/dashboard/MyGroups";
+import CampusNetwork from "../../components/dashboard/CampusNetwork";
+import ConnectorGlyph from "../../components/dashboard/ConnectorGlyph";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -17,9 +20,17 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      {/* LEFT */}
-      <aside className="dashboard__left">
+      {/* HERO — the page's only <h1> lives inside CampusNetwork */}
+      <section className="cn-hero" aria-label="Your campus network">
+        <CampusNetwork />
+      </section>
+
+      {/* IDENTITY (top row, beside the hero) */}
+      <section className="cn-identity" aria-labelledby="cn-identity-title">
         <div className="card profile-card">
+          <h2 id="cn-identity-title" className="sr-only-visually section-title" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>
+            Your profile
+          </h2>
           <div className="profile-card__banner" />
           <div className="profile-card__body">
             {pictureUrl
@@ -44,54 +55,53 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+      </section>
 
-        <MyGroups />
+      {/* COMPOSER */}
+      <section className="cn-composer" aria-label="Share an update">
+        <Share />
+      </section>
 
-        <div className="card quick-actions">
-          <h4 className="section-title">Quick Actions</h4>
+      {/* FEED */}
+      <section className="cn-feed" aria-label="Campus feed">
+        <Posts />
+      </section>
+
+      {/* RAIL — single sticky wrapper holding groups / events / quick actions.
+          On phone it becomes display:contents so these three reflow into the
+          single column (REQUIRED FIX 2). */}
+      <div className="cn-rail">
+        <section className="cn-groups">
+          <MyGroups />
+        </section>
+
+        <section className="cn-events card sidebar-section" id="cn-events" tabIndex={-1} aria-labelledby="cn-events-title">
+          <h2 id="cn-events-title" className="section-title section-title--glyph">
+            <ConnectorGlyph />
+            Upcoming Events
+          </h2>
+          <EventFeed compact />
+        </section>
+
+        <section className="cn-actions card quick-actions" aria-labelledby="cn-actions-title">
+          <h2 id="cn-actions-title" className="section-title section-title--glyph">
+            <ConnectorGlyph />
+            Quick Actions
+          </h2>
           <button className="quick-action-btn" onClick={() => navigate("/events")}>
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+            <CalendarPlus strokeWidth={1.75} aria-hidden="true" />
             Create Event
           </button>
           <button className="quick-action-btn" onClick={() => navigate("/groups")}>
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            <UsersRound strokeWidth={1.75} aria-hidden="true" />
             Create Group
           </button>
           <button className="quick-action-btn" onClick={() => navigate("/files")}>
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+            <Upload strokeWidth={1.75} aria-hidden="true" />
             Upload File
           </button>
-        </div>
-      </aside>
-
-      {/* CENTER */}
-      <div className="dashboard__center">
-        <Share />
-        <Posts />
+        </section>
       </div>
-
-      {/* RIGHT */}
-      <aside className="dashboard__right">
-        <div className="card sidebar-section about-card">
-          <h4 className="section-title">Welcome to ConnectNest</h4>
-          <p className="about-card__lead">
-            Your campus, connected — one place for everything happening at
-            Harrisburg University.
-          </p>
-          <ul className="about-card__features">
-            <li>Events &amp; RSVP</li>
-            <li>Groups &amp; communities</li>
-            <li>Posts, likes &amp; comments feed</li>
-            <li>File &amp; image sharing</li>
-            <li>Secure Cognito login</li>
-          </ul>
-        </div>
-
-        <div className="card sidebar-section">
-          <h4 className="section-title">Upcoming Events</h4>
-          <EventFeed compact />
-        </div>
-      </aside>
     </div>
   );
 };

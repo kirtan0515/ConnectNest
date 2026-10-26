@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import moment from "moment";
+import { Heart, MessageCircle, Share2, SendHorizontal } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
 import { api } from "../../api/client";
 import { toggleLike } from "./postLikeUtils";
@@ -153,18 +154,20 @@ function PostItem({ post }) {
           onClick={handleLike}
           disabled={likeLoading}
         >
-          {liked
-            ? <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
-            : <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 21h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2zM9 9l4.34-4.34L12 10h9v2l-3 7H9V9zM1 9h4v12H1z"/></svg>
-          }
+          <Heart
+            size={18}
+            strokeWidth={1.75}
+            fill={liked ? "currentColor" : "none"}
+            aria-hidden="true"
+          />
           Like
         </button>
         <button className="post__action-btn" onClick={toggleComments}>
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>
+          <MessageCircle size={18} strokeWidth={1.75} aria-hidden="true" />
           Comment
         </button>
         <button className="post__action-btn">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+          <Share2 size={18} strokeWidth={1.75} aria-hidden="true" />
           Share
         </button>
       </div>
@@ -187,8 +190,8 @@ function PostItem({ post }) {
               onKeyDown={(e) => e.key === "Enter" && submitComment()}
               disabled={commentBusy}
             />
-            <button onClick={submitComment} disabled={commentBusy || !commentText.trim()}>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            <button onClick={submitComment} disabled={commentBusy || !commentText.trim()} aria-label="Post comment">
+              <SendHorizontal size={16} strokeWidth={1.75} aria-hidden="true" />
             </button>
           </div>
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { MapPin } from "lucide-react";
 import { api } from "../../api/client";
 import { useRealtime } from "../../realtime/useRealtime";
 import AuthImage from "../../components/common/AuthImage";
@@ -43,7 +44,7 @@ const EventFeed = ({ compact = false }) => {
   );
 
   if (events.length === 0) {
-    return <p className="ef-empty">No upcoming events yet.</p>;
+    return <p className="ef-empty">No upcoming events yet. Check back soon.</p>;
   }
 
   return (
@@ -82,7 +83,7 @@ const EventFeed = ({ compact = false }) => {
             <div className="ef-card__meta">
               {event.location && (
                 <span>
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                  <MapPin size={13} strokeWidth={1.75} aria-hidden="true" />
                   {event.location}
                 </span>
               )}

@@ -26,6 +26,11 @@
   justify-content: center;
   flex-shrink: 0;
 }
+/* Under the dashboard scope --brand is coral; white fails contrast, so use
+   dark-on-coral (#0d2a2c, 7.52:1). Light /profile keeps white-on-blue. */
+.dashboard .share__initials {
+  color: #0d2a2c;
+}
 
 .share__input {
   flex: 1;
@@ -83,6 +88,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  min-height: 44px;
   background: none;
   border: none;
   padding: 7px 12px;
@@ -104,6 +110,7 @@
 
 .share__post-btn {
   margin-left: auto;
+  min-height: 44px;
   padding: 8px 22px;
 }
 .share__post-btn:disabled { opacity: 0.5; cursor: default; }

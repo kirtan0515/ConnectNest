@@ -1,0 +1,125 @@
+/* Campus Network hero — the dashboard's signature tile.
+   The canvas sits absolutely inside this relative box; the accessible overlay
+   is layered on top with a left-anchored gradient scrim for text legibility. */
+.cn-hero__canvas {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: 280px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background:
+    radial-gradient(120% 140% at 72% 18%, rgba(255, 159, 104, 0.10), transparent 60%),
+    var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.cn-hero__canvas-el {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Overlay content — real DOM, left-anchored over a soft scrim. */
+.cn-hero__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 14px;
+  padding: 22px 24px;
+  pointer-events: none; /* let the canvas breathe; re-enable on controls */
+  background: linear-gradient(
+    90deg,
+    rgba(13, 42, 44, 0.78) 0%,
+    rgba(13, 42, 44, 0.42) 42%,
+    transparent 72%
+  );
+}
+
+.cn-hero__greeting {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--text-primary);
+  max-width: 60%;
+}
+
+.cn-hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: auto;
+}
+
+.cn-hero__stat {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.cn-hero__stat-num {
+  font-family: var(--font-head);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.cn-hero__stat-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.cn-hero__events-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cn-hero__events-link:hover {
+  color: var(--brand-hover);
+}
+.cn-hero__events-link:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 768px) {
+  .cn-hero__canvas {
+    height: 180px;
+  }
+  .cn-hero__overlay {
+    padding: 16px 16px;
+    gap: 10px;
+    /* On phone the canvas is short; use a full-width scrim so text stays legible. */
+    background: linear-gradient(
+      0deg,
+      rgba(13, 42, 44, 0.82) 0%,
+      rgba(13, 42, 44, 0.45) 55%,
+      rgba(13, 42, 44, 0.15) 100%
+    );
+  }
+  .cn-hero__greeting {
+    max-width: 100%;
+    font-size: clamp(20px, 6vw, 24px);
+  }
+}

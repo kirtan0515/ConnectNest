@@ -17,12 +17,30 @@
   --brand-light:   rgba(255, 159, 104, 0.12);
   --success:       #cfefff;
 
+  /* Brand fonts (loaded globally in public/index.html) */
+  --font-head: "Unbounded", system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+
+  /* Group accent colors — MUST equal GROUP_HEX in CampusNetwork.js
+     (#ff9f68/#8ec9ff/#c8b8ff/#b8e986), same index-cycling rule. */
+  --group-1: #ff9f68;
+  --group-2: #8ec9ff;
+  --group-3: #c8b8ff;
+  --group-4: #b8e986;
+
+  /* Legible dark color for text/icons on coral fills (7.52:1 on #ff9f68).
+     Exists only in .cn-scope globally; added here so coral CTAs pass WCAG. */
+  --on-accent: #0d2a2c;
+
   background: var(--bg);
   color: var(--text-primary);
+  font-family: var(--font-body);
 
+  /* Asymmetric 12-col bento (capped at 1200px by .main-layout__content) */
   display: grid;
-  grid-template-columns: 240px 1fr 280px;
-  gap: 20px;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: min-content;
+  gap: 16px;
   padding: 24px 0;
   align-items: start;
 }
@@ -36,24 +54,62 @@
   background: var(--border);
 }
 
-/* Sticky sidebars */
-.dashboard__left,
-.dashboard__right {
-  position: sticky;
-  top: calc(var(--navbar-h) + 24px);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+/* Brand heading font on titles + hero greeting */
+.dashboard .section-title {
+  font-family: var(--font-head);
 }
 
-.dashboard__center {
+/* Coral-fill legibility override (WCAG 1.4.3): .btn-primary remaps to coral
+   under .dashboard, so dark-on-coral (#0d2a2c, 7.52:1) replaces the inherited
+   white-on-coral (2.02:1). The global/light .btn-primary (white-on-blue) is
+   left untouched. */
+.dashboard .btn-primary {
+  color: #0d2a2c;
+}
+
+/* ── Bento grid children (desktop ≥1025px base rules) ── */
+.cn-hero,
+.cn-identity,
+.cn-composer,
+.cn-feed {
+  min-width: 0;
+}
+
+.cn-hero {
+  grid-column: 1 / 8;
+  grid-row: 1;
+}
+.cn-identity {
+  grid-column: 8 / 13;
+  grid-row: 1;
+}
+.cn-composer {
+  grid-column: 1 / 8;
+  grid-row: 2;
+}
+.cn-feed {
+  grid-column: 1 / 8;
+}
+
+/* ONE sticky rail wrapper — groups/events/actions are its flex children, so
+   position: sticky pins the whole stack as a single unit while the feed
+   scrolls. This is the mechanism the old .dashboard__right wrapper used. */
+.cn-rail {
+  grid-column: 8 / 13;
+  grid-row: 2 / -1;
+  align-self: start;
+  position: sticky;
+  top: calc(var(--navbar-h) + 16px);
   display: flex;
   flex-direction: column;
   gap: 16px;
   min-width: 0;
 }
+.cn-rail > * {
+  min-width: 0;
+}
 
-/* Profile card */
+/* Profile / identity card */
 .profile-card__banner {
   height: 60px;
   /* Flat on-brand pine-teal surface with a subtle coral tint */
@@ -82,7 +138,7 @@
   height: 56px;
   border-radius: 50%;
   background: var(--brand);
-  color: var(--bg);
+  color: var(--on-accent);
   font-size: 18px;
   font-weight: 700;
   display: flex;
@@ -108,6 +164,7 @@
 .profile-card__btn {
   margin-top: 12px;
   width: 100%;
+  min-height: 44px;
   text-align: center;
 }
 
@@ -143,32 +200,16 @@
   margin-bottom: 12px;
 }
 
+/* Section title with the connector glyph before it */
+.section-title--glyph {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Sidebar section */
 .sidebar-section {
   padding: 16px;
-}
-
-/* Welcome / About card */
-.about-card__lead {
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--text-secondary);
-  margin-bottom: 10px;
-}
-.about-card__features {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-.about-card__features li::before {
-  content: "•";
-  color: var(--brand);
-  margin-right: 8px;
 }
 
 /* Quick actions */
@@ -181,9 +222,10 @@
   align-items: center;
   gap: 10px;
   width: 100%;
+  min-height: 44px;
   background: none;
   border: none;
-  padding: 9px 8px;
+  padding: 9px 10px;
   border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
@@ -195,15 +237,18 @@
   width: 18px;
   height: 18px;
   flex-shrink: 0;
+  color: var(--brand);
 }
 .quick-action-btn:hover {
   background: var(--brand-light);
   color: var(--brand);
 }
 
-/* Keep keyboard focus visible on the dark canvas */
+/* Keep keyboard focus visible on the dark canvas for every interactive el */
 .dashboard .quick-action-btn:focus-visible,
-.dashboard .profile-card__btn:focus-visible {
+.dashboard .profile-card__btn:focus-visible,
+.dashboard .cn-hero__events-link:focus-visible,
+.dashboard .btn-ghost:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
@@ -221,18 +266,61 @@
   padding: 32px 16px;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
+/* ── Tablet (769–1024px): hero full-width banner + narrowed sticky rail ── */
+@media (min-width: 769px) and (max-width: 1024px) {
   .dashboard {
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: 1fr 300px;
   }
-  .dashboard__right { display: none; }
+  .cn-hero {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  .cn-identity {
+    grid-column: 1 / 2;
+    grid-row: 2;
+  }
+  .cn-composer {
+    grid-column: 1 / 2;
+    grid-row: 3;
+  }
+  .cn-feed {
+    grid-column: 1 / 2;
+  }
+  .cn-rail {
+    grid-column: 2 / 3;
+    grid-row: 2 / -1;
+  }
 }
 
+/* ── Phone (≤768px): single column, rail unwraps via display:contents ── */
 @media (max-width: 768px) {
   .dashboard {
     grid-template-columns: 1fr;
   }
-  .dashboard__left { position: static; }
-  .dashboard__right { display: none; }
+
+  /* Rail dissolves: its three children promote into the single-column grid
+     and participate in the ONE grid gap (16px). We deliberately set no
+     vertical margins or residual rail gap here, so spacing stays even with no
+     doubled/missing gap when the wrapper vanishes (REQUIRED FIX 2). */
+  .cn-rail {
+    display: contents;
+    position: static;
+  }
+
+  .cn-hero     { order: 1; grid-column: 1 / -1; }
+  .cn-identity { order: 2; }
+  .cn-composer { order: 3; }
+  .cn-actions  { order: 4; }
+  .cn-groups   { order: 5; }
+  .cn-events   { order: 6; }
+  .cn-feed     { order: 7; }
+}
+
+@media (max-width: 390px) {
+  .dashboard .card,
+  .dashboard .sidebar-section,
+  .dashboard .quick-actions {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
 }
