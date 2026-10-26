@@ -1,72 +1,124 @@
 # ConnectNest — Architecture
 
-ConnectNest is a serverless campus engagement platform. The frontend is a React
-single-page app; the backend is defined entirely as code with the AWS CDK.
+ConnectNest is a serverless campus engagement platform for Harrisburg University
+students. The frontend is a React single-page app; the entire backend and
+infrastructure are defined as code with the AWS CDK and deployed to AWS account
+us-east-1. The app is live at **https://connectnestapp.com**.
 
-## Diagram
+## High-level diagram
 
 ```
-                    ┌─────────────┐
-   Users ──────────▶│  S3 + CDN   │   React static build (Weeks 13–14)
-                    └──────┬──────┘
-                           │  auth + API calls (JWT)
-              ┌────────────┼─────────────┐
-              ▼                           ▼
-     ┌─────────────┐            ┌──────────────────┐
-     │   Cognito   │            │   API Gateway    │
-     │  User Pool  │◀──authorize│  (HTTP API v2)   │
-     └─────────────┘            └────────┬─────────┘
-                                         │  (Cognito JWT authorizer)
-                                  ┌──────▼──────┐
-                                  │   Lambda    │   business logic
-                                  │  handlers   │   (profiles, events,
-                                  └──────┬──────┘    posts, groups, files)
-                                         │
-                          ┌──────────────┴───────────────┐
-                          ▼                               ▼
-                   ┌─────────────┐                 ┌─────────────┐
-                   │  DynamoDB   │                 │     S3      │
-                   │ (per-entity │                 │  uploads    │
-                   │   tables)   │                 │ (presigned) │
-                   └─────────────┘                 └─────────────┘
+                         Internet (HTTPS)
+                              │
+                     ┌────────▼─────────┐
+                     │    CloudFront    │  ← AWS WAF (managed rules + rate limit)
+                     │  connectnestapp  │     TLS via ACM; apex ALIAS in Route 53
+                     │      .com        │
+                     └───┬──────────┬───┘
+            default      │          │   /api/*  (CloudFront Function strips /api)
+                         ▼          ▼
+                  ┌───────────┐  ┌──────────────────┐
+                  │ S3 (SPA)  │  │  API Gateway     │
+                  │ private,  │  │  HTTP API v2     │──▶ Cognito JWT authorizer
+                  │ OAC only  │  └────────┬─────────┘
+                  └───────────┘           │
+                                   ┌──────▼──────┐
+                                   │   Lambda    │  per-feature handlers
+                                   │  handlers   │  (profiles, events, posts,
+                                   └──────┬──────┘   groups, files, account)
+                                          │
+                        ┌─────────────────┼──────────────────┐
+                        ▼                 ▼                  ▼
+                 ┌────────────┐    ┌────────────┐    ┌──────────────┐
+                 │  DynamoDB  │    │     S3     │    │  Rekognition │
+                 │ per-entity │    │  uploads   │    │  (image      │
+                 │   tables   │    │ (presigned)│    │  moderation) │
+                 └────────────┘    └────────────┘    └──────────────┘
+
+   Auth:  Amazon Cognito (email/password + Google + Microsoft via Hosted UI,
+          optional TOTP MFA). Branded email via Amazon SES (connectnestapp.com).
+
+   Real-time (in progress): API Gateway WebSocket API pushes post.created /
+          event.created events to connected clients (no page refresh).
+
+   Account-wide security: CloudTrail (audit) + GuardDuty (threat detection).
 ```
 
-## Stacks (CDK)
+## CDK stacks (deployed)
 
 | Stack | Contents |
 |---|---|
-| `ConnectNest-Data` | 8 DynamoDB tables (see data-model.md), on-demand billing |
-| `ConnectNest-Auth` | Cognito user pool + public web client |
-| `ConnectNest-Api` | HTTP API, Cognito JWT authorizer, Lambda handlers, IAM, S3 uploads bucket |
+| `ConnectNest-Data` | DynamoDB tables (one per entity) + GSIs, on-demand billing |
+| `ConnectNest-Auth` | Cognito user pool, Hosted UI domain, Google + Microsoft IdPs, optional MFA, SES-backed branded email + custom-message Lambda trigger |
+| `ConnectNest-Api` | HTTP API v2, Cognito JWT authorizer, Lambda handlers, least-privilege IAM, S3 uploads bucket, Rekognition image moderation, scheduled account purge |
+| `ConnectNest-Hosting` | CloudFront + private S3 SPA (OAC), `/api/*` proxy behavior, CloudFront Function prefix strip, CLOUDFRONT-scoped WAF, ACM cert + apex/www aliases |
+| `ConnectNest-Security` | CloudTrail (multi-region audit trail → private S3) + GuardDuty detector |
+| `ConnectNest-Email` | Amazon SES domain identity (connectnestapp.com) with Easy DKIM |
+| `ConnectNest-Dns` | Route 53 public hosted zone for connectnestapp.com (apex ALIAS → CloudFront, DKIM/SPF/ACM records) |
+| `ConnectNest-Realtime` *(in progress)* | API Gateway WebSocket API ($connect JWT authorizer, $disconnect, $default), Connections DynamoDB table; createPost/createEvent broadcast new items |
 
 ## Services
 
 | Layer | Service | Responsibility |
 |---|---|---|
-| Auth | Amazon Cognito | Sign-up, sign-in, tokens, password policy, recovery |
-| API | API Gateway (HTTP API v2) | Public entry; validates the Cognito JWT before routing |
-| Compute | AWS Lambda (Node 22, ARM64) | Stateless business logic per feature |
-| Data | Amazon DynamoDB | Profiles, events, posts, comments, likes, groups |
-| Storage | Amazon S3 | User uploads via presigned URLs |
+| DNS | Amazon Route 53 | Authoritative DNS for connectnestapp.com (apex ALIAS to CloudFront) |
+| Edge / CDN | Amazon CloudFront + AWS WAF | Global HTTPS delivery; single public entry; managed-rule + rate-limit protection |
+| TLS | AWS Certificate Manager | Certificate for connectnestapp.com / www |
+| Hosting | Amazon S3 (private, OAC) | React SPA static assets, reachable only via CloudFront |
+| Auth | Amazon Cognito | Sign-up/in, tokens, Google + Microsoft federation, optional TOTP MFA |
+| Email | Amazon SES | Branded transactional email (verification / password reset) from the domain |
+| API | API Gateway (HTTP API v2) | Public REST entry; validates the Cognito JWT before routing |
+| Real-time | API Gateway (WebSocket API) | Push post/event updates to connected clients *(in progress)* |
+| Compute | AWS Lambda (Node 22, ARM64, ESM) | Stateless business logic per feature |
+| Data | Amazon DynamoDB | Profiles, events, RSVPs, posts, comments, likes, groups, members, audit log, connections |
+| Storage | Amazon S3 | User image uploads via presigned POST (image allowlist + size cap) |
+| Trust & Safety | Amazon Rekognition | Auto-moderates uploaded images (nudity/violence → deleted) |
+| Secrets | AWS Secrets Manager | Google OAuth client secret (dynamic reference, not in template) |
+| Observability / Audit | CloudTrail + GuardDuty + CloudWatch | Account-wide audit trail, threat detection, logs/metrics |
 | Identity | IAM | Least-privilege role per Lambda |
-| Observability | CloudWatch | Logs and metrics |
 
 ## Security principles
 
 - Authentication delegated to Cognito — no custom password/JWT handling.
-- Every protected route sits behind a Cognito JWT authorizer.
+- Every protected HTTP route sits behind a Cognito JWT authorizer; the WebSocket
+  `$connect` validates the Cognito id token via a Lambda authorizer.
 - Handlers derive the user id from the verified JWT claim
-  (`event.requestContext.authorizer.jwt.claims.sub`), never from the body.
-  Owner-only mutations verify `ownerId === userId`.
-- Each Lambda receives only the table/bucket permissions it needs
-  (read-only vs read-write) via CDK `grant*` calls.
-- No secrets or backend libraries are shipped in the frontend bundle.
+  (`event.requestContext.authorizer.jwt.claims.sub`), never from the request body.
+  Owner-only mutations verify `ownerId === userId`; group-scoped writes verify
+  GroupMembers membership.
+- Each Lambda receives only the table/bucket permissions it needs via CDK
+  `grant*` calls (least privilege).
+- Private S3 buckets (BLOCK_ALL public access, SSE); uploads via short-lived
+  presigned POST constrained to an image allowlist and size cap.
+- Secrets live in Secrets Manager / gitignored CDK context — never in the repo
+  or the frontend bundle.
+- Defense-in-depth at the edge (WAF), identity (Cognito + MFA), content
+  (text block-list + Rekognition), and detection (CloudTrail + GuardDuty).
+
+## Content moderation
+
+- **Text** (posts, comments, events, groups): a server-side block-list rejects
+  profanity / slurs / offensive content with a 400 before storage;
+  obfuscation-tolerant.
+- **Images**: Amazon Rekognition scans each upload on an S3 ObjectCreated event
+  and deletes any with explicit/violent content so it can never be served.
+
+## Account lifecycle
+
+Deactivate / soft-delete (30-day grace) / scheduled hard-purge across all tables
++ Cognito, with an AuditLog table recording actions. Logging in reactivates a
+deactivated or pending-deletion account.
 
 ## Frontend integration
 
-- `amazon-cognito-identity-js` handles the Cognito flows, isolated in
-  `frontend/src/auth/auth.js` so the library is swappable.
-- `AuthContext` exposes the signed-in user and auth actions to the app.
-- `api/client.js` attaches the Cognito id token as a Bearer credential on
-  every request and points at the API base URL from `config.js`.
-- Real-time features (event feed, chat) use polling rather than subscriptions.
+- `amazon-cognito-identity-js` handles Cognito flows, isolated in
+  `frontend/src/auth/auth.js`. OAuth (Google/Microsoft) uses the Cognito Hosted
+  UI redirect flow (`frontend/src/auth/oauth.js`).
+- `AuthContext` exposes the signed-in user and auth actions.
+- `api/client.js` attaches the Cognito id token as a Bearer credential and points
+  at the API base (same-origin `/api` in production via CloudFront).
+- In production the SPA calls the API same-origin through CloudFront's `/api/*`
+  behavior, so there is no CORS and no cross-origin exposure.
+- Real-time: a WebSocket client (in progress) connects with the Cognito id token
+  and applies pushed post/event updates live; it degrades gracefully to
+  fetch-on-load if the socket is unavailable.

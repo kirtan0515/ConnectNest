@@ -14,6 +14,12 @@ switch to `RETAIN` for production data).
 | PostLikes | `postId` | `userId` | — | createdAt (prevents double-likes) |
 | Groups | `groupId` (UUID) | — | — | name, description, ownerId, memberCount, createdAt |
 | GroupMembers | `groupId` | `userId` | `byUser` (userId, groupId) | role (member/admin), joinedAt |
+| AuditLog | `userId` | `timestamp` | — | action (deactivate/delete/reactivate/purge), detail, createdAt |
+| Connections | `connectionId` | — | — | userId, ttl (auto-expire stale WebSocket connections) |
+
+The AuditLog table (account lifecycle) and Connections table (real-time
+WebSocket push) live in `ConnectNest-Data` and `ConnectNest-Realtime`
+respectively.
 
 ## Access patterns
 
@@ -26,7 +32,15 @@ switch to `RETAIN` for production data).
 - **Like toggle** — check PostLikes (`postId`,`userId`); write/delete the like row
   and atomically `ADD` to Posts.likeCount.
 - **Group membership** — `Put` a GroupMembers row (`groupId`,`userId`). A user's
-  groups would use the `byUser` GSI (planned follow-up).
+  groups ("my groups") use the `byUser` GSI (`GET /me/groups`); group members
+  list via `Query` on `groupId` (`GET /groups/{groupId}/members`).
+- **Group-scoped posting** — `createPost` verifies a GroupMembers row exists for
+  (`groupId`,`userId`) before allowing a post to a group (403 otherwise).
+- **Account lifecycle** — writes an AuditLog row per action; the scheduled purge
+  hard-deletes a user's rows across all tables + Cognito after the grace period.
+- **Real-time push** — `$connect` stores `connectionId` (+ `userId`) in
+  Connections; `createPost`/`createEvent` scan Connections and push the new item
+  to each via the API Gateway Management API; stale rows (410 Gone) are pruned.
 
 ## Notes on identity
 
