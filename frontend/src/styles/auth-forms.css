@@ -103,6 +103,9 @@
 }
 .auth__switch a:hover { color: #ffbe94; }
 
+/* Mobile-only brand header + nest accent — hidden on desktop/tablet. */
+.auth__mobile { display: none; }
+
 /* ===== Responsive: stack the panes ===== */
 @media (max-width: 900px) {
   .auth { flex-direction: column; }
@@ -122,7 +125,69 @@
   }
 }
 
+/* ===== Phones: single-column branded auth screen ===== */
+@media (max-width: 600px) {
+  /* Full pine-teal background edge to edge, single column, no white. */
+  .auth {
+    flex-direction: column;
+    background: var(--bg);
+  }
+
+  /* Hide the heavy network-canvas visual pane on phones. */
+  .auth__visual--login,
+  .auth__visual--signup { display: none; }
+
+  /* Form panel: full width, same pine-teal background (no white surface),
+     comfortable padding, no horizontal overflow at 360px. */
+  .auth__panel--login,
+  .auth__panel--signup {
+    flex: none;
+    width: 100%;
+    padding: 28px 20px 40px;
+    background: var(--bg);
+    justify-content: flex-start;
+    gap: 24px;
+  }
+
+  /* Compact brand header + nest accent. */
+  .auth__mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+  }
+  .auth__mobile-logo {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    text-decoration: none;
+  }
+  .auth__mobile-logo img { height: 30px; width: auto; display: block; }
+  .auth__mobile-tagline {
+    font-size: 22px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .auth-nest { width: 120px; height: 120px; }
+}
+
 @media (max-width: 360px) {
   .auth__panel--login,
-  .auth__panel--signup { padding: 32px 18px; }
+  .auth__panel--signup { padding: 28px 16px 36px; }
+}
+
+/* Gentle pulse on the nest center node; disabled under reduced motion. */
+@keyframes auth-nest-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.78; transform: scale(1.12); }
+}
+.auth-nest__pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: auth-nest-pulse 2.8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-nest__pulse { animation: none; }
 }

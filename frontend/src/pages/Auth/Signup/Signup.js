@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthContext";
 import { api } from "../../../api/client";
 import AuthNetworkCanvas from "../../../components/canvas/AuthNetworkCanvas";
+import AuthNestAccent from "../../../components/auth/AuthNestAccent";
 import SocialButtons from "../../../components/auth/SocialButtons";
 import logo from "../../../assets/connectnest-logo.png";
 import "./Signup.css";
@@ -156,6 +157,14 @@ const Signup = () => {
 
       {/* Right form pane */}
       <div className="auth__panel auth__panel--signup">
+        <div className="auth__mobile">
+          <Link to="/" className="auth__mobile-logo">
+            <img src={logo} alt="ConnectNest" />
+          </Link>
+          <p className="cn-head auth__mobile-tagline">Join your campus community.</p>
+          <AuthNestAccent />
+        </div>
+
         {step === "form" && (
           <form className="auth__form" onSubmit={handleCreate} noValidate>
             <div className="auth__head">
