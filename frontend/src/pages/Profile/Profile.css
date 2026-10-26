@@ -14,7 +14,9 @@
 
 .profile-cover__banner {
   height: 120px;
-  background: linear-gradient(135deg, var(--brand) 0%, #1e90ff 100%);
+  /* Flat on-brand surface, no off-brand bluish gradient */
+  background: var(--surface-2);
+  border-bottom: 2px solid var(--brand-light);
 }
 
 .profile-cover__body {

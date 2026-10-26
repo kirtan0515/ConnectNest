@@ -40,7 +40,13 @@ function renderEmail({ heading, intro, code, footerNote }: EmailParts): string {
     `<tr><td align="center" style="padding:32px 16px;">`,
     `<table role="presentation" width="480" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:480px;background-color:${PANEL};border-radius:16px;">`,
     `<tr><td align="center" style="padding:32px 32px 8px 32px;">`,
-    `<img src="${LOGO_URL}" width="160" alt="ConnectNest" style="display:block;border:0;outline:none;text-decoration:none;max-width:160px;height:auto;" />`,
+    // Logo sits inside a light rounded "chip" so the wordmark renders legibly
+    // across clients regardless of the artwork's own color / transparency.
+    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff;border-radius:12px;">`,
+    `<tr><td style="padding:14px 20px;">`,
+    `<img src="${LOGO_URL}" width="180" height="22" alt="ConnectNest" style="display:block;border:0;outline:none;text-decoration:none;width:180px;max-width:180px;height:auto;" />`,
+    `</td></tr>`,
+    `</table>`,
     `</td></tr>`,
     `<tr><td style="padding:16px 32px 0 32px;">`,
     `<h1 style="margin:0;font-family:${FONT};font-size:24px;line-height:1.3;color:#ffffff;text-align:center;">${heading}</h1>`,

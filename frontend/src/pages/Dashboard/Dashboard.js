@@ -1,7 +1,6 @@
 import React from "react";
 import { useAuth } from "../../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
-import Stories from "../../components/stories/Stories";
 import Share from "../../components/share/Share";
 import Posts from "../../components/post/Post";
 import EventFeed from "../Events/EventFeed";
@@ -67,7 +66,6 @@ const Dashboard = () => {
 
       {/* CENTER */}
       <div className="dashboard__center">
-        <Stories />
         <Share />
         <Posts />
       </div>
@@ -75,7 +73,7 @@ const Dashboard = () => {
       {/* RIGHT */}
       <aside className="dashboard__right">
         <div className="card sidebar-section about-card">
-          <h4 className="section-title">👋 Welcome to ConnectNest</h4>
+          <h4 className="section-title">Welcome to ConnectNest</h4>
           <p className="about-card__lead">
             Your campus, connected — one place for everything happening at
             Harrisburg University.
@@ -90,7 +88,7 @@ const Dashboard = () => {
         </div>
 
         <div className="card sidebar-section">
-          <h4 className="section-title">📌 Upcoming Events</h4>
+          <h4 className="section-title">Upcoming Events</h4>
           <EventFeed compact />
         </div>
       </aside>

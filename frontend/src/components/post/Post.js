@@ -140,7 +140,7 @@ function PostItem({ post }) {
       {/* Stats row */}
       {likeCount > 0 && (
         <div className="post__stats">
-          <span>👍 {likeCount} {likeCount === 1 ? "like" : "likes"}</span>
+          <span>{likeCount} {likeCount === 1 ? "like" : "likes"}</span>
         </div>
       )}
 
