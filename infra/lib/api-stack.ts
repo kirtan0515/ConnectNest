@@ -155,6 +155,13 @@ export class ApiStack extends Stack {
           minify: true,
           target: "node22",
           externalModules: CORE_SDK_EXTERNALS,
+          // Some AWS SDK clients (e.g. apigatewaymanagementapi, used by the
+          // real-time broadcast helper) do a dynamic `require("node:https")`.
+          // In an esbuild ESM bundle that throws "Dynamic require of X is not
+          // supported" and crashes the Lambda on load. This banner recreates a
+          // CommonJS `require` from `node:module` so those dynamic requires work.
+          banner:
+            "import{createRequire as __cr}from'node:module';import{fileURLToPath as __ftu}from'node:url';import{dirname as __dn}from'node:path';const require=__cr(import.meta.url);const __filename=__ftu(import.meta.url);const __dirname=__dn(__filename);",
         },
         environment: env,
       });
