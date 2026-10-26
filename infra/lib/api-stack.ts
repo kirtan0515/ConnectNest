@@ -85,7 +85,12 @@ export class ApiStack extends Stack {
       enforceSSL: true,
       cors: [
         {
-          allowedMethods: [HttpMethods.GET, HttpMethods.PUT, HttpMethods.HEAD],
+          allowedMethods: [
+            HttpMethods.GET,
+            HttpMethods.PUT,
+            HttpMethods.POST,
+            HttpMethods.HEAD,
+          ],
           // Allowed upload origins. Override via -c appUploadOrigins=... in prod.
           allowedOrigins:
             (this.node.tryGetContext("appUploadOrigins") as string | undefined)
