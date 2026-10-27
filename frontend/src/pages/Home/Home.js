@@ -7,6 +7,8 @@ import StudentNetworkCanvas from "../../components/canvas/StudentNetworkCanvas";
 import logo from "../../assets/connectnest-logo.png";
 import harrisburgSkyline from "../../assets/harrisburg-skyline.jpg";
 import huBuilding from "../../assets/hu-building.jpg";
+import innovationLab from "../../assets/innovation-lab.jpg";
+import capitolInternships from "../../assets/capitol-internships.jpg";
 import "./Home.css";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -15,40 +17,6 @@ gsap.registerPlugin(ScrollTrigger);
 /* HU is an urban STEM university in downtown Harrisburg, PA. These scenes
    reflect that: a downtown tower campus, STEM/innovation labs, and the
    capital-city setting. Drawn in the card's group color via --art. */
-
-// Innovation & STEM — a lab/circuit motif with connected nodes.
-const LabArt = () => (
-  <div className="ga ga--lab" aria-hidden="true">
-    <svg viewBox="0 0 220 165" fill="none" preserveAspectRatio="xMidYMid meet"
-      stroke="var(--art)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-      {/* circuit traces */}
-      <path d="M30 120h40v-40h40v-30h50" opacity="0.6" />
-      <path d="M30 60h30v30" opacity="0.6" />
-      {/* nodes */}
-      <g fill="var(--art)" stroke="none">
-        <circle cx="30" cy="120" r="7" /><circle cx="70" cy="80" r="7" />
-        <circle cx="110" cy="50" r="7" /><circle cx="160" cy="50" r="9" />
-        <circle cx="60" cy="90" r="5" />
-      </g>
-      {/* beaker */}
-      <path d="M150 95v22l-14 24h40l-14-24V95" fill="none" />
-      <path d="M143 128h26" />
-    </svg>
-  </div>
-);
-
-// Capital-city opportunities — internship/offer cards stacking up.
-const OpportunityArt = () => (
-  <div className="ga ga--opp" aria-hidden="true">
-    <div className="ga__offer ga__offer--back" />
-    <div className="ga__offer ga__offer--mid" />
-    <div className="ga__offer ga__offer--front">
-      <span className="ga__offer-dot" />
-      <span className="ga__line ga__line--title" />
-      <span className="ga__line ga__line--sub" />
-    </div>
-  </div>
-);
 
 const Home = () => {
   const storyRef = useRef(null);
@@ -292,14 +260,24 @@ const Home = () => {
                 <figcaption>The Harrisburg University building on Market Street</figcaption>
               </figure>
               <figure className="gallery__item">
-                <div className="gallery__art gallery__art--43" style={{ "--art": "var(--group-1)" }}>
-                  <LabArt />
+                <div className="gallery__art gallery__art--43 gallery__art--photo">
+                  <img
+                    className="gallery__photo"
+                    src={innovationLab}
+                    alt="A student using a VR headset in a Harrisburg University innovation lab"
+                    loading="lazy"
+                  />
                 </div>
                 <figcaption>Innovation, AI &amp; STEM labs</figcaption>
               </figure>
               <figure className="gallery__item">
-                <div className="gallery__art gallery__art--11" style={{ "--art": "var(--group-4)" }}>
-                  <OpportunityArt />
+                <div className="gallery__art gallery__art--11 gallery__art--photo">
+                  <img
+                    className="gallery__photo"
+                    src={capitolInternships}
+                    alt="The Pennsylvania State Capitol dome in downtown Harrisburg"
+                    loading="lazy"
+                  />
                 </div>
                 <figcaption>Internships in the capital city</figcaption>
               </figure>
