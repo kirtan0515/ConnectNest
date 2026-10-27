@@ -1,6 +1,10 @@
 .main-layout {
   min-height: 100vh;
   background: var(--bg);
+  /* Sticky-footer layout: content grows to fill the viewport so the footer is
+     pushed to the bottom even when a page's content is short. */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Dashboard route: full-bleed pine-teal background so the dark dashboard
@@ -12,9 +16,12 @@
 }
 
 .main-layout__content {
+  flex: 1 0 auto;           /* grow to fill, pushing the footer to the bottom */
+  width: 100%;
   padding-top: var(--navbar-h);
   max-width: 1200px;
   margin: 0 auto;
   padding-left: 20px;
   padding-right: 20px;
+  box-sizing: border-box;
 }

@@ -19,7 +19,7 @@ export default function AppFooter() {
           <Link to="/terms">Terms</Link>
         </nav>
         <span className="app-footer__meta">
-          Harrisburg University &middot; &copy; {year} ConnectNest
+          &copy; {year} ConnectNest
         </span>
       </div>
     </footer>
