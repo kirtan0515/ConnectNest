@@ -1,51 +1,86 @@
+/* Settings — pine-teal/coral Campus Network theme (scoped token remap, same
+   mechanism as the Dashboard). MainLayout applies .main-layout--dark on
+   /settings so the page background is pine-teal; these tokens style the content. */
 .settings {
+  /* Remap the legacy light token NAMES to pine-teal values, scoped here. */
+  --bg: #0d2a2c;
+  --surface: #12383a;
+  --surface-2: #143e40;
+  --border: #2c5a5c;
+  --text-primary: #eaf4f1;
+  --text-secondary: #c3d9d4;
+  --text-muted: #a3c0ba;
+  --brand: #ff9f68;
+
   max-width: 680px;
   margin: 0 auto;
   padding: 32px 20px 80px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  color: var(--text-primary);
+  font-family: "Hanken Grotesk", system-ui, sans-serif;
 }
 
-.settings__title { margin: 0; font-size: 28px; font-weight: 700; color: var(--text-primary, #191919); }
-.settings__sub { margin: 0; color: var(--text-secondary, #666); font-size: 15px; }
+.settings__title {
+  margin: 0;
+  font-family: "Unbounded", system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.settings__sub { margin: 0; color: var(--text-muted); font-size: 15px; }
 
 .settings__error {
   padding: 12px 14px;
   border-radius: 10px;
-  background: #fdecea;
-  color: #b42318;
+  background: #46282c;   /* dark error surface */
+  color: #ffc2c8;        /* legible error text on dark */
   font-size: 14px;
 }
 
 .settings__card {
-  background: var(--surface, #fff);
-  border: 1px solid var(--border, #e0e0e0);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
-.settings__card h2 { margin: 0; font-size: 18px; font-weight: 700; }
-.settings__card p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-secondary, #555); }
-.settings__card--danger { border-color: #f1c7c4; background: #fffafa; }
+.settings__card h2 { margin: 0; font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.settings__card p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-secondary); }
+/* Danger zone: subtle red-tinted dark surface + warm border so it reads as
+   "caution" without the old white-on-light look. */
+.settings__card--danger {
+  border-color: #6e3b3b;
+  background: #1c3133;
+}
 
 .settings__confirm {
   display: flex;
   flex-direction: column;
   gap: 6px;
   font-size: 14px;
-  color: var(--text-secondary, #555);
+  color: var(--text-secondary);
   margin-top: 4px;
 }
 .settings__confirm input {
   height: 42px;
   padding: 0 12px;
-  border: 1px solid var(--border, #d0d0d0);
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 15px;
   max-width: 220px;
+  background: var(--bg);
+  color: var(--text-primary);
+}
+.settings__confirm input::placeholder { color: var(--text-muted); }
+.settings__confirm input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(255, 159, 104, 0.22);
 }
 
 .settings__btn {
@@ -60,7 +95,9 @@
   transition: opacity 0.15s ease, background 0.15s ease;
 }
 .settings__btn:disabled { opacity: 0.5; cursor: not-allowed; }
+/* Semantic warn/danger colors kept, with legible text contrast. */
 .settings__btn--warn { background: #f5a623; color: #1a1a2e; }
 .settings__btn--warn:hover:not(:disabled) { background: #e0961a; }
-.settings__btn--danger { background: #cc1016; color: #fff; }
-.settings__btn--danger:hover:not(:disabled) { background: #a60d12; }
+.settings__btn--danger { background: #e5484d; color: #ffffff; }
+.settings__btn--danger:hover:not(:disabled) { background: #cc3a3f; }
+.settings__btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
