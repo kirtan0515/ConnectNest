@@ -1,6 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import DashboardNavbar from "./DashboardNavbar";
+import AppFooter from "./AppFooter";
 import "./MainLayout.css";
 
 const DARK_ROUTES = ["/dashboard", "/events", "/groups", "/chat", "/files", "/profile"];
@@ -15,6 +16,7 @@ const MainLayout = ({ children }) => {
       <main className="main-layout__content">
         {children}
       </main>
+      <AppFooter />
     </div>
   );
 };

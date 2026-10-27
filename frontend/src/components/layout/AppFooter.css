@@ -1,0 +1,62 @@
+/* Minimal authenticated-app footer — pine-teal, on brand, unobtrusive. */
+.app-footer {
+  border-top: 1px solid #2a5557; /* --hairline */
+  background: transparent;
+  padding: 20px 0 32px;
+  margin-top: 24px;
+}
+
+.app-footer__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: "Hanken Grotesk", system-ui, sans-serif;
+  font-size: 13px;
+  color: #a3c0ba; /* --text-muted */
+}
+
+.app-footer__brand {
+  font-family: "Unbounded", system-ui, sans-serif;
+  font-weight: 500;
+  color: #eaf4f1; /* --text */
+  letter-spacing: -0.01em;
+}
+
+.app-footer__links {
+  display: flex;
+  gap: 20px;
+}
+
+.app-footer__links a {
+  color: #c3d9d4; /* --text-2 */
+  text-decoration: none;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s ease;
+}
+.app-footer__links a:hover {
+  color: #ff9f68; /* --accent coral */
+}
+.app-footer__links a:focus-visible {
+  outline: 2px solid #ff9f68;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.app-footer__meta {
+  color: #a3c0ba;
+}
+
+@media (max-width: 600px) {
+  .app-footer__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
