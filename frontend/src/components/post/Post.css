@@ -163,7 +163,9 @@
    be dark-on-coral (#0d2a2c on #ff9f68 = 7.52:1), not white-on-coral (2.02:1).
    This button is NOT .btn-primary, so it needs its own scoped color; the
    higher-specificity .dashboard selector overrides the white default. */
-.dashboard .post__comment-input button {
+.dashboard .post__comment-input button,
+.events-page .post__comment-input button,
+.profile-page .post__comment-input button {
   color: #0d2a2c;
 }
 .post__comment-input button:hover { background: var(--brand-hover); }

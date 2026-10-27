@@ -1,9 +1,34 @@
+/* ── Campus Network pine-teal/coral theme (matches Dashboard.css) ──
+   Scoped token remap for the groups page. */
 .groups-page {
+  --bg:             #0d2a2c;
+  --surface:        #12383a;
+  --surface-2:      #143e40;
+  --border:         #2c5a5c;
+  --text-primary:   #eaf4f1;
+  --text-secondary: #c3d9d4;
+  --text-muted:     #a3c0ba;
+  --brand:          #ff9f68;
+  --brand-hover:    #ffbe94;
+  --brand-light:    rgba(255, 159, 104, 0.12);
+  --success:        #cfefff;
+  --on-accent:      #0d2a2c;
+  --font-head: "Unbounded", system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+
   padding: 24px 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
+
+.groups-page .card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.groups-page .btn-primary { color: var(--on-accent); }
 
 .groups-page__header {
   display: flex;
@@ -43,6 +68,8 @@
   font-family: inherit;
   outline: none;
   resize: vertical;
+  background: var(--surface-2);
+  color: var(--text-primary);
   transition: border-color var(--transition);
 }
 .group-create__input:focus { border-color: var(--brand); }

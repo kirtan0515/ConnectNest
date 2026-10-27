@@ -23,6 +23,12 @@
   padding: 8px 12px;
   font-size: 13px;
 }
+/* Dark-scope fix: the light red box is unreadable on the pine-teal page. */
+.events-page .event-form__error {
+  background: var(--error-bg, #46282c);
+  color: var(--error-text, #ffc2c8);
+  border-color: transparent;
+}
 
 .event-form__input,
 .event-form__textarea {

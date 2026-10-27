@@ -3,12 +3,14 @@ import { useLocation } from "react-router-dom";
 import DashboardNavbar from "./DashboardNavbar";
 import "./MainLayout.css";
 
+const DARK_ROUTES = ["/dashboard", "/events", "/groups", "/chat", "/files", "/profile"];
+
 const MainLayout = ({ children }) => {
   const { pathname } = useLocation();
-  const isDashboard = pathname === "/dashboard";
+  const isDark = DARK_ROUTES.includes(pathname) || pathname.startsWith("/events/");
 
   return (
-    <div className={`main-layout${isDashboard ? " main-layout--dark" : ""}`}>
+    <div className={`main-layout${isDark ? " main-layout--dark" : ""}`}>
       <DashboardNavbar />
       <main className="main-layout__content">
         {children}

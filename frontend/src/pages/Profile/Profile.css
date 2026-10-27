@@ -1,4 +1,23 @@
+/* ── Campus Network pine-teal/coral theme (matches Dashboard.css) ──
+   Scoped token remap for the profile page. */
 .profile-page {
+  --bg:             #0d2a2c;
+  --surface:        #12383a;
+  --surface-2:      #143e40;
+  --border:         #2c5a5c;
+  --text-primary:   #eaf4f1;
+  --text-secondary: #c3d9d4;
+  --text-muted:     #a3c0ba;
+  --brand:          #ff9f68;
+  --brand-hover:    #ffbe94;
+  --brand-light:    rgba(255, 159, 104, 0.12);
+  --success:        #cfefff;
+  --on-accent:      #0d2a2c;
+  --font-head: "Unbounded", system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+
   padding: 24px 0;
   max-width: 720px;
   margin: 0 auto;
@@ -6,6 +25,13 @@
   flex-direction: column;
   gap: 16px;
 }
+
+.profile-page .card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.profile-page .btn-primary { color: var(--on-accent); }
+.profile-page .profile-cover__name { font-family: var(--font-head); }
 
 /* Cover card */
 .profile-cover {
@@ -46,7 +72,7 @@
   height: 80px;
   border-radius: 50%;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-accent);
   font-size: 26px;
   font-weight: 700;
   display: flex;
@@ -137,6 +163,8 @@
   font-family: inherit;
   resize: none;
   outline: none;
+  background: var(--surface-2);
+  color: var(--text-primary);
   transition: border-color var(--transition);
 }
 .profile-bio-edit textarea:focus { border-color: var(--brand); }

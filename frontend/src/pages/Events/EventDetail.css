@@ -1,4 +1,23 @@
+/* ── Campus Network pine-teal/coral theme (matches Dashboard.css) ──
+   Scoped token remap for the event detail page. */
 .event-detail {
+  --bg:             #0d2a2c;
+  --surface:        #12383a;
+  --surface-2:      #143e40;
+  --border:         #2c5a5c;
+  --text-primary:   #eaf4f1;
+  --text-secondary: #c3d9d4;
+  --text-muted:     #a3c0ba;
+  --brand:          #ff9f68;
+  --brand-hover:    #ffbe94;
+  --brand-light:    rgba(255, 159, 104, 0.12);
+  --success:        #cfefff;
+  --on-accent:      #0d2a2c;
+  --font-head: "Unbounded", system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+
   max-width: 760px;
   margin: 0 auto;
   padding: 24px 20px 60px;
@@ -6,6 +25,12 @@
   flex-direction: column;
   gap: 20px;
 }
+
+.event-detail .card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.event-detail .ed-title { font-family: var(--font-head); }
 
 .ed-back {
   align-self: flex-start;
@@ -115,4 +140,7 @@
 .ed-muted { color: var(--text-secondary, #666); font-size: 15px; }
 
 .cn-alert { padding: 10px 14px; border-radius: 10px; font-size: 14px; }
-.cn-alert--error { background: #fdecea; color: #b42318; }
+.cn-alert--error {
+  background: var(--error-bg, #46282c);
+  color: var(--error-text, #ffc2c8);
+}

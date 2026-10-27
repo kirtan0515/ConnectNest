@@ -1,6 +1,34 @@
+/* ── Campus Network pine-teal/coral theme (matches Dashboard.css) ──
+   Remap legacy light token NAMES to pine-teal values, scoped to .events-page.
+   Children (global .card/.btn-primary + token-driven EventFeed) pick up the
+   dark brand automatically. No layout/structure changes. */
 .events-page {
+  --bg:             #0d2a2c;
+  --surface:        #12383a;
+  --surface-2:      #143e40;
+  --border:         #2c5a5c;
+  --text-primary:   #eaf4f1;
+  --text-secondary: #c3d9d4;
+  --text-muted:     #a3c0ba;
+  --brand:          #ff9f68;
+  --brand-hover:    #ffbe94;
+  --brand-light:    rgba(255, 159, 104, 0.12);
+  --success:        #cfefff;
+  --on-accent:      #0d2a2c;
+  --font-head: "Unbounded", system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+
   padding: 24px 0;
 }
+
+.events-page .card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.events-page .btn-primary { color: var(--on-accent); }
+.events-page .section-title { font-family: var(--font-head); }
 
 .events-page__header {
   margin-bottom: 24px;
