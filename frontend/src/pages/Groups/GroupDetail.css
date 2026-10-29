@@ -1,0 +1,176 @@
+/* ── Campus Network pine-teal/coral theme (matches Groups.css) ──
+   Scoped token remap for the group detail page. MainLayout applies
+   .main-layout--dark on /groups/* so the page background is pine-teal. */
+.group-detail {
+  --bg:             #0d2a2c;
+  --surface:        #12383a;
+  --surface-2:      #143e40;
+  --border:         #2c5a5c;
+  --text-primary:   #eaf4f1;
+  --text-secondary: #c3d9d4;
+  --text-muted:     #a3c0ba;
+  --brand:          #ff9f68;
+  --on-accent:      #0d2a2c;
+  --font-head: "Unbounded", system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 0 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+.group-detail .card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.group-detail .btn-primary { color: var(--on-accent); }
+
+.gd-muted {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.gd-back {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 10px 4px;
+  min-height: 44px;
+}
+.gd-back:hover { color: var(--text-primary); }
+
+/* Header card */
+.gd-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gd-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.gd-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(255, 159, 104, 0.12);
+  color: var(--brand);
+  font-size: 24px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-head);
+}
+
+.gd-title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.gd-count {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.gd-desc {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.gd-actions {
+  display: flex;
+  gap: 12px;
+}
+.gd-actions .btn-primary {
+  min-height: 44px;
+  padding: 0 20px;
+}
+
+/* Members */
+.gd-members {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gd-section-title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.gd-member-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gd-member {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.gd-member__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Join-to-post prompt (non-members) */
+.gd-join-prompt {
+  padding: 20px 24px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+.gd-join-prompt p { margin: 0; }
+
+@media (max-width: 768px) {
+  .group-detail { padding: 16px 0 64px; }
+  .gd-card { padding: 20px; }
+}
+
+@media (max-width: 360px) {
+  .gd-title { font-size: 20px; }
+  .gd-icon { width: 48px; height: 48px; font-size: 20px; }
+}

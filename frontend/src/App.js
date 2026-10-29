@@ -12,6 +12,7 @@ const Events = React.lazy(() => import("./pages/Events/Events"));
 const EventDetail = React.lazy(() => import("./pages/Events/EventDetail"));
 const Chat = React.lazy(() => import("./pages/Chats/Chats"));
 const Groups = React.lazy(() => import("./pages/Groups/Groups"));
+const GroupDetail = React.lazy(() => import("./pages/Groups/GroupDetail"));
 const Files = React.lazy(() => import("./pages/Files/Files"));
 const Login = React.lazy(() => import("./pages/Auth/Login/Login"));
 const Signup = React.lazy(() => import("./pages/Auth/Signup/Signup"));
@@ -60,6 +61,7 @@ function App() {
         <Route path={routes.eventDetail} element={protectedPage(EventDetail)} />
         <Route path={routes.chat} element={protectedPage(Chat)} />
         <Route path={routes.groups} element={protectedPage(Groups)} />
+        <Route path={routes.groupDetail} element={protectedPage(GroupDetail)} />
         <Route path={routes.files} element={protectedPage(Files)} />
         <Route path={routes.profile} element={protectedPage(Profile)} />
         <Route path={routes.settings} element={protectedPage(Settings)} />

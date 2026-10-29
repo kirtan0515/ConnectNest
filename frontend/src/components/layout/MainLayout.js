@@ -8,7 +8,10 @@ const DARK_ROUTES = ["/dashboard", "/events", "/groups", "/chat", "/files", "/pr
 
 const MainLayout = ({ children }) => {
   const { pathname } = useLocation();
-  const isDark = DARK_ROUTES.includes(pathname) || pathname.startsWith("/events/");
+  const isDark =
+    DARK_ROUTES.includes(pathname) ||
+    pathname.startsWith("/events/") ||
+    pathname.startsWith("/groups/");
 
   return (
     <div className={`main-layout${isDark ? " main-layout--dark" : ""}`}>

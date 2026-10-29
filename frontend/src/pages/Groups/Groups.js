@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../../api/client";
 import { listMyGroups } from "../../services/groupServices";
 import "./Groups.css";
 
 const Groups = () => {
+  const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
   const [joined, setJoined] = useState(() => new Set());
   const [showCreate, setShowCreate] = useState(false);
@@ -109,8 +111,16 @@ const Groups = () => {
         )}
         {groups.map((group) => {
           const isMember = joined.has(group.groupId);
+          const open = () => navigate(`/groups/${group.groupId}`);
           return (
-            <div key={group.groupId} className="group-card card">
+            <div
+              key={group.groupId}
+              className="group-card card"
+              role="button"
+              tabIndex={0}
+              onClick={open}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && open()}
+            >
               <div className="group-card__icon">{group.name[0].toUpperCase()}</div>
               <div className="group-card__info">
                 <div className="group-card__name">{group.name}</div>
@@ -124,7 +134,10 @@ const Groups = () => {
               <button
                 className={isMember ? "btn-ghost" : "btn-outline"}
                 style={{ fontSize: 13, padding: "6px 16px" }}
-                onClick={() => !isMember && handleJoin(group)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!isMember) handleJoin(group);
+                }}
                 disabled={isMember}
               >
                 {isMember ? "Joined" : "Join"}

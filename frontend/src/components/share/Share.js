@@ -4,7 +4,7 @@ import { useAuth } from "../../auth/AuthContext";
 import { api, uploadFile } from "../../api/client";
 import "./share.css";
 
-export default function Share({ onPosted }) {
+export default function Share({ onPosted, groupId }) {
   const { user } = useAuth();
   const [content, setContent] = useState("");
   const [file, setFile] = useState(null);
@@ -48,7 +48,11 @@ export default function Share({ onPosted }) {
     }
 
     try {
-      await api.post("/posts", { content, imageKey });
+      await api.post("/posts", {
+        content,
+        imageKey,
+        ...(groupId ? { groupId } : {}),
+      });
       setContent("");
       removeFile();
       setFeedback("Posted!");

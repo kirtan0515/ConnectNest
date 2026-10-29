@@ -289,6 +289,9 @@ export class ApiStack extends Stack {
     const createGroup = makeFn("CreateGroupFn", "handlers/groups/createGroup.ts", {
       GROUPS_TABLE: tables.groups.tableName,
     });
+    const getGroup = makeFn("GetGroupFn", "handlers/groups/getGroup.ts", {
+      GROUPS_TABLE: tables.groups.tableName,
+    });
     const joinGroup = makeFn("JoinGroupFn", "handlers/groups/joinGroup.ts", {
       GROUPS_TABLE: tables.groups.tableName,
       GROUP_MEMBERS_TABLE: tables.groupMembers.tableName,
@@ -367,6 +370,7 @@ export class ApiStack extends Stack {
 
     tables.groups.grantReadData(listGroups);
     tables.groups.grantReadWriteData(createGroup);
+    tables.groups.grantReadData(getGroup);
     tables.groups.grantReadData(joinGroup);
     tables.groupMembers.grantReadWriteData(joinGroup);
     tables.groups.grantReadData(listMyGroups);
@@ -470,6 +474,7 @@ export class ApiStack extends Stack {
     // Groups
     route(HttpMethod.GET, "/groups", listGroups);
     route(HttpMethod.POST, "/groups", createGroup);
+    route(HttpMethod.GET, "/groups/{groupId}", getGroup);
     route(HttpMethod.POST, "/groups/{groupId}/join", joinGroup);
     route(HttpMethod.GET, "/groups/{groupId}/members", listMembers);
     route(HttpMethod.GET, "/me/groups", listMyGroups);

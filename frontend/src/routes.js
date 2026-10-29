@@ -13,6 +13,7 @@ const routes = {
   eventDetail: "/events/:eventId",
   chat: "/chat",
   groups: "/groups",
+  groupDetail: "/groups/:groupId",
   files: "/files",
   profile: "/profile", // ✅ Add this line
   settings: "/settings",

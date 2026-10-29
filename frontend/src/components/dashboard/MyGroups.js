@@ -40,7 +40,7 @@ const MyGroups = () => {
       ) : (
         <ul className="my-groups__list">
           {groups.map((g, i) => (
-            <li key={g.groupId} className="my-groups__item" onClick={() => navigate("/groups")}>
+            <li key={g.groupId} className="my-groups__item" onClick={() => navigate(`/groups/${g.groupId}`)}>
               <div
                 className="my-groups__icon"
                 style={{ background: `var(--group-${(i % 4) + 1})` }}
