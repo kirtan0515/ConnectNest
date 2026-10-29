@@ -4,7 +4,7 @@ import DashboardNavbar from "./DashboardNavbar";
 import AppFooter from "./AppFooter";
 import "./MainLayout.css";
 
-const DARK_ROUTES = ["/dashboard", "/events", "/groups", "/chat", "/files", "/profile", "/settings"];
+const DARK_ROUTES = ["/dashboard", "/activity", "/events", "/groups", "/chat", "/files", "/profile", "/settings"];
 
 const MainLayout = ({ children }) => {
   const { pathname } = useLocation();

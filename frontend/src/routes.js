@@ -9,6 +9,7 @@ const routes = {
   terms: "/terms",
   privacy: "/privacy",
   dashboard: "/dashboard",
+  activity: "/activity",
   events: "/events",
   eventDetail: "/events/:eventId",
   chat: "/chat",

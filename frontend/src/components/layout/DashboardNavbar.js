@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
+import { Activity } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
 import logo from "../../assets/connectnest-logo.png";
 import "./DashboardNavbar.css";
@@ -33,6 +34,10 @@ export default function DashboardNavbar() {
           <NavLink to="/dashboard" className={({ isActive }) => "dash-nav-item" + (isActive ? " active" : "")}>
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
             <span>Home</span>
+          </NavLink>
+          <NavLink to="/activity" className={({ isActive }) => "dash-nav-item" + (isActive ? " active" : "")}>
+            <Activity size={22} strokeWidth={1.75} aria-hidden="true" />
+            <span>Activity</span>
           </NavLink>
           <NavLink to="/events" className={({ isActive }) => "dash-nav-item" + (isActive ? " active" : "")}>
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>

@@ -308,6 +308,13 @@ export class ApiStack extends Stack {
       GROUP_MEMBERS_TABLE: tables.groupMembers.tableName,
     });
 
+    // Activity — read-only cross-entity aggregator for the central dashboard.
+    const getActivity = makeFn("GetActivityFn", "handlers/activity/getActivity.ts", {
+      EVENTS_TABLE: tables.events.tableName,
+      POSTS_TABLE: tables.posts.tableName,
+      GROUPS_TABLE: tables.groups.tableName,
+    });
+
     // Uploads (presigned URL)
     const getUploadUrl = makeFn(
       "GetUploadUrlFn",
@@ -376,6 +383,11 @@ export class ApiStack extends Stack {
     tables.groups.grantReadData(listMyGroups);
     tables.groupMembers.grantReadData(listMyGroups);
     tables.groupMembers.grantReadData(listMembers);
+
+    // Activity aggregator — least-privilege read on the three source tables.
+    tables.events.grantReadData(getActivity);
+    tables.posts.grantReadData(getActivity);
+    tables.groups.grantReadData(getActivity);
 
     uploadsBucket.grantPut(getUploadUrl);
     uploadsBucket.grantRead(getUploadUrl);
@@ -478,6 +490,9 @@ export class ApiStack extends Stack {
     route(HttpMethod.POST, "/groups/{groupId}/join", joinGroup);
     route(HttpMethod.GET, "/groups/{groupId}/members", listMembers);
     route(HttpMethod.GET, "/me/groups", listMyGroups);
+
+    // Activity (central dashboard aggregator)
+    route(HttpMethod.GET, "/activity", getActivity);
 
     // Uploads
     route(HttpMethod.POST, "/uploads/presign", getUploadUrl);

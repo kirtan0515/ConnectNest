@@ -8,6 +8,7 @@ import routes from "./routes";
 // Lazy imports of pages/components
 const Home = React.lazy(() => import("./pages/Home/Home"));
 const Dashboard = React.lazy(() => import("./pages/Dashboard/Dashboard"));
+const Activity = React.lazy(() => import("./pages/Activity/Activity"));
 const Events = React.lazy(() => import("./pages/Events/Events"));
 const EventDetail = React.lazy(() => import("./pages/Events/EventDetail"));
 const Chat = React.lazy(() => import("./pages/Chats/Chats"));
@@ -57,6 +58,7 @@ function App() {
 
         {/* Protected Routes */}
         <Route path={routes.dashboard} element={protectedPage(Dashboard)} />
+        <Route path={routes.activity} element={protectedPage(Activity)} />
         <Route path={routes.events} element={protectedPage(Events)} />
         <Route path={routes.eventDetail} element={protectedPage(EventDetail)} />
         <Route path={routes.chat} element={protectedPage(Chat)} />
