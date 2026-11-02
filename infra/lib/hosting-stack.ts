@@ -62,6 +62,8 @@ export interface HostingStackProps extends StackProps {
  * the whole app. WAF for CloudFront must be CLOUDFRONT scope in us-east-1.
  */
 export class HostingStack extends Stack {
+  public readonly distribution: Distribution;
+
   constructor(scope: Construct, id: string, props: HostingStackProps) {
     super(scope, id, props);
 
@@ -191,7 +193,7 @@ export class HostingStack extends Stack {
       },
     });
 
-    const distribution = new Distribution(this, "Cdn", {
+    const distribution = this.distribution = new Distribution(this, "Cdn", {
       ...aliasProps,
       defaultBehavior: {
         origin: S3BucketOrigin.withOriginAccessControl(siteBucket),

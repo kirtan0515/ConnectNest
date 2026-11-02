@@ -18,7 +18,7 @@
 
   <rect width="1600" height="1110" fill="#ffffff"/>
   <text x="20" y="26" font-size="19" font-weight="700" fill="#232F3E">ConnectNest · AWS architecture</text>
-  <text x="20" y="44" font-size="12" fill="#545B64">Fully serverless, defined as code with the AWS CDK (8 stacks), deployed in us-east-1. Solid = live today; dashed grey = planned.</text>
+  <text x="20" y="44" font-size="12" fill="#545B64">Fully serverless, defined as code with the AWS CDK (9 stacks), deployed in us-east-1. Solid = live today; dashed grey = planned.</text>
 
   <g transform="translate(0,28)">
     <!-- AWS cloud boundary -->
@@ -104,13 +104,13 @@
     <text x="397" y="730" class="s">OAuth</text>
     <text x="700" y="560" class="s" style="display:none"></text>
     <!-- BOTTOM ROW -->
-    <g transform="translate(270,700)"><rect width="72" height="72" rx="8" fill="#DD344C"/><text x="36" y="43" class="t">COG</text><text x="36" y="92" class="l">Cognito</text><text x="36" y="106" class="s">Google · Microsoft · MFA</text></g>
+    <g transform="translate(270,700)"><rect width="72" height="72" rx="8" fill="#DD344C"/><text x="36" y="43" class="t">COG</text><text x="36" y="92" class="l">Cognito</text><text x="36" y="106" class="s">Google · Microsoft</text><text x="36" y="120" class="s">Authenticator-app MFA</text></g>
     <g transform="translate(450,700)"><rect width="72" height="72" rx="8" fill="#DD344C"/><text x="36" y="43" class="t">SM</text><text x="36" y="92" class="l">Secrets Manager</text><text x="36" y="106" class="s">OAuth secrets</text></g>
     <g transform="translate(630,700)"><rect width="72" height="72" rx="8" fill="#DD344C"/><text x="36" y="43" class="t">SES</text><text x="36" y="92" class="l">Simple Email Service</text><text x="36" y="106" class="s">Branded verification email</text></g>
     <g transform="translate(810,700)"><rect width="72" height="72" rx="8" fill="#E7157B"/><text x="36" y="43" class="t">CT</text><text x="36" y="92" class="l">CloudTrail</text><text x="36" y="106" class="s">Audit trail</text></g>
     <g transform="translate(990,700)"><rect width="72" height="72" rx="8" fill="#DD344C"/><text x="36" y="43" class="t">GD</text><text x="36" y="92" class="l">GuardDuty</text><text x="36" y="106" class="s">Threat detection</text></g>
     <g transform="translate(1170,700)"><rect width="72" height="72" rx="8" fill="#DD344C"/><text x="36" y="43" class="t">IAM</text><text x="36" y="92" class="l">IAM</text><text x="36" y="106" class="s">Least privilege per Lambda</text></g>
-    <g transform="translate(1350,700)"><rect width="72" height="72" rx="8" fill="#E7157B"/><text x="36" y="43" class="t">CW</text><text x="36" y="92" class="l">CloudWatch</text><text x="36" y="106" class="s">Logs and metrics</text></g>
+    <g transform="translate(1350,700)"><rect width="72" height="72" rx="8" fill="#E7157B"/><text x="36" y="43" class="t">CW</text><text x="36" y="92" class="l">CloudWatch</text><text x="36" y="106" class="s">Logs · metrics · alarms</text><text x="36" y="120" class="s">SNS email alerts</text></g>
 
     <!-- Step numbers -->
     <g><circle cx="178" cy="276" r="11" fill="#232F3E"/><text x="178" y="280" class="n">1</text></g>
@@ -131,11 +131,11 @@
   <text x="493" y="999" class="l" style="stroke:none">Notifications</text>
   <text x="493" y="1017" class="s" style="stroke:none">RSVP and event reminders</text>
   <rect x="597" y="975" width="184" height="58" rx="8" fill="#fff" stroke="#8a8f98" stroke-width="1.4" stroke-dasharray="5 4"/>
-  <text x="689" y="999" class="l" style="stroke:none">Alarms and dashboards</text>
-  <text x="689" y="1017" class="s" style="stroke:none">CloudWatch · SNS alerts</text>
+  <text x="689" y="999" class="l" style="stroke:none">Dashboards and logs</text>
+  <text x="689" y="1017" class="s" style="stroke:none">CloudWatch views · access logs</text>
   <rect x="793" y="975" width="184" height="58" rx="8" fill="#fff" stroke="#8a8f98" stroke-width="1.4" stroke-dasharray="5 4"/>
-  <text x="885" y="999" class="l" style="stroke:none">MFA enrollment UI</text>
-  <text x="885" y="1017" class="s" style="stroke:none">Cognito TOTP already enabled</text>
+  <text x="885" y="999" class="l" style="stroke:none">Org Microsoft sign-in</text>
+  <text x="885" y="1017" class="s" style="stroke:none">Needs university tenant approval</text>
   <rect x="989" y="975" width="184" height="58" rx="8" fill="#fff" stroke="#8a8f98" stroke-width="1.4" stroke-dasharray="5 4"/>
   <text x="1081" y="999" class="l" style="stroke:none">Encryption and network</text>
   <text x="1081" y="1017" class="s" style="stroke:none">KMS keys · VPC endpoints</text>

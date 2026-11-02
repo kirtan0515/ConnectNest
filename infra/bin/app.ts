@@ -10,6 +10,7 @@ import { HostingStack } from "../lib/hosting-stack";
 import { SecurityStack } from "../lib/security-stack";
 import { EmailStack } from "../lib/email-stack";
 import { DnsStack } from "../lib/dns-stack";
+import { MonitoringStack } from "../lib/monitoring-stack";
 
 const app = new App();
 
@@ -79,12 +80,23 @@ const siteDomains = siteDomainsCtx
       .map((s) => s.trim())
       .filter(Boolean)
   : undefined;
-new HostingStack(app, "ConnectNest-Hosting", {
+const hosting = new HostingStack(app, "ConnectNest-Hosting", {
   env: { account: env.account, region: "us-east-1" },
   crossRegionReferences: true,
   apiDomain: api.apiDomain,
   spaSourcePath: fs.existsSync(spaBuild) ? spaBuild : undefined,
   domainNames: siteDomains,
+});
+
+// CloudWatch alarms (CloudFront 5xx, WAF blocks, API 5xx, Lambda errors) that
+// email the owner. Pass the address at deploy time so it never lives in git:
+//   npx cdk deploy ConnectNest-Monitoring -c alertEmail=you@example.com
+new MonitoringStack(app, "ConnectNest-Monitoring", {
+  env: { account: env.account, region: "us-east-1" },
+  distribution: hosting.distribution,
+  httpApi: api.httpApi,
+  webAclName: "connectnest-cdn-waf",
+  alertEmail: app.node.tryGetContext("alertEmail") as string | undefined,
 });
 
 app.synth();

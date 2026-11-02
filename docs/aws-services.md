@@ -1,7 +1,7 @@
 # ConnectNest — AWS Services (what, why, how)
 
 A study sheet for the midterm Q&A. Every service below is actually deployed in
-AWS account us-east-1, defined as code with the AWS CDK across **8 stacks**
+AWS account us-east-1, defined as code with the AWS CDK across **9 stacks**
 (Data, Auth, Api, Hosting, Security, Email, Dns, Realtime). The app is live at
 **https://connectnestapp.com**.
 
@@ -130,10 +130,12 @@ AWS account us-east-1, defined as code with the AWS CDK across **8 stacks**
 - **Why:** Debug and observe the system (used to find the Lambda-bundle crash and
   the CSP/CORS bugs during testing).
 - **How:** Every Lambda auto-logs to CloudWatch; logs are read to diagnose issues.
+  Four alarms (CloudFront 5xx rate, WAF blocked requests, HTTP API 5xx, Lambda
+  errors) publish to an SNS topic that emails the owner, in `ConnectNest-Monitoring`.
 
 ---
 
-## The 8 CDK stacks (separation of concerns)
+## The 9 CDK stacks (separation of concerns)
 
 | Stack | Owns |
 |---|---|
@@ -142,6 +144,7 @@ AWS account us-east-1, defined as code with the AWS CDK across **8 stacks**
 | `ConnectNest-Api` | HTTP API, JWT authorizer, Lambda handlers, S3 uploads, Rekognition moderation, IAM |
 | `ConnectNest-Hosting` | CloudFront + private S3 SPA (OAC), WAF, ACM cert, `/api` routing |
 | `ConnectNest-Security` | CloudTrail + GuardDuty |
+| `ConnectNest-Monitoring` | CloudWatch alarms + SNS email alerts |
 | `ConnectNest-Email` | SES domain identity + DKIM |
 | `ConnectNest-Dns` | Route 53 hosted zone (apex ALIAS to CloudFront, DKIM/SPF/ACM records) |
 | `ConnectNest-Realtime` | WebSocket API + Connections table + connect/disconnect/broadcast Lambdas |
@@ -153,12 +156,12 @@ AWS account us-east-1, defined as code with the AWS CDK across **8 stacks**
 - **"Why serverless?"** → Scales to zero, costs cents at this scale, nothing to
   patch, all reproducible as code.
 - **"Is it secure?"** → Defense-in-depth: JWT on every route, least-privilege IAM,
-  WAF at the edge, content moderation, optional MFA, CloudTrail audit + GuardDuty
+  WAF at the edge, content moderation, self-service authenticator-app MFA, security headers, CloudWatch alarms, CloudTrail audit + GuardDuty
   detection. (Never say "unhackable.")
 - **"How does real-time work?"** → API Gateway WebSocket API; a broadcast Lambda
   pushes new posts/events to connected clients. Polling is the documented fallback.
 - **"What would you change for production scale?"** → DynamoDB provisioned capacity
-  + autoscaling, caching, CloudFront logging/alarms, and the KMS customer-managed
+  + autoscaling, caching, CloudFront access logging, and the KMS customer-managed
   keys + VPC pieces deliberately deferred (documented conscious decisions).
 - **"What was hardest?"** → WebSocket auth (token verified as a query param in a
   Lambda authorizer, since browsers can't send an auth header on a socket), and

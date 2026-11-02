@@ -13,7 +13,7 @@ Built as a Harrisburg University senior capstone project (Project II).
 ## What this project demonstrates
 
 - **Cloud architecture as code.** The whole platform (CDN, WAF, API, compute,
-  data, auth, email, DNS, audit) is defined in AWS CDK across eight stacks and
+  data, auth, email, DNS, audit) is defined in AWS CDK across nine stacks and
   deploys with one command.
 - **Serverless design.** Lambda, API Gateway, DynamoDB, and S3, with one table
   per entity, access-pattern-driven indexes, and a least-privilege IAM role per
@@ -41,7 +41,7 @@ Built as a Harrisburg University senior capstone project (Project II).
   new groups.
 - **Real-time updates:** new posts and events are pushed to connected clients
   over an API Gateway WebSocket API.
-- **Sign-in:** email and password, Google, and Microsoft, with optional TOTP MFA
+- **Sign-in:** email and password, Google, and Microsoft, with optional authenticator-app MFA that users turn on in Settings
   enabled on the user pool.
 - **Trust and safety:** server-side text moderation and automatic image scanning
   with Amazon Rekognition.
@@ -62,18 +62,19 @@ How a request flows (numbers match the diagram):
 6. Images upload to a private S3 bucket through a presigned URL; a Lambda sends them to Rekognition and deletes unsafe ones.
 7. Real-time: the browser keeps a WebSocket connection (authenticated with its Cognito token). When a post or event is created, the write Lambda pushes it to connected clients.
 
-Sign-in runs through Cognito (email, Google, Microsoft). SES sends the branded verification email. CloudTrail, GuardDuty, IAM, and CloudWatch cover audit, threat detection, permissions, and logs.
+Sign-in runs through Cognito (email, Google, Microsoft). SES sends the branded verification email. CloudTrail, GuardDuty, IAM, and CloudWatch cover audit, threat detection, permissions, and logs, and CloudWatch alarms email the owner on error spikes or unusual WAF blocking.
 
 | CDK stack | Contents |
 |---|---|
 | `ConnectNest-Data` | DynamoDB tables and indexes |
 | `ConnectNest-Auth` | Cognito user pool, Hosted UI, Google and Microsoft providers, MFA, custom-message email trigger |
 | `ConnectNest-Api` | HTTP API, JWT authorizer, Lambda handlers, uploads bucket, image moderation, scheduled purge |
-| `ConnectNest-Hosting` | CloudFront, private S3 SPA bucket, WAF, ACM certificate |
+| `ConnectNest-Hosting` | CloudFront, private S3 SPA bucket, WAF, ACM certificate, security response headers |
 | `ConnectNest-Realtime` | WebSocket API, connections table, connect/disconnect/authorizer Lambdas |
 | `ConnectNest-Email` | SES domain identity with DKIM |
 | `ConnectNest-Dns` | Route 53 hosted zone and records |
 | `ConnectNest-Security` | CloudTrail and GuardDuty |
+| `ConnectNest-Monitoring` | CloudWatch alarms (CloudFront 5xx, WAF blocks, API 5xx, Lambda errors) with SNS email alerts |
 
 More detail: [docs/architecture.md](docs/architecture.md),
 [docs/data-model.md](docs/data-model.md), and
@@ -86,7 +87,7 @@ connectnest/
 ├── infra/       AWS CDK app (TypeScript): bin/app.ts composes the stacks in lib/
 ├── backend/     Lambda handlers (Node ESM, AWS SDK v3) and shared helpers
 │   └── handlers/  profiles, events, posts, groups, activity, files, auth, realtime
-├── frontend/    React SPA (Create React App)
+├── frontend/    React SPA (Vite)
 │   └── src/       auth/, api/, realtime/, pages/, components/, styles/
 ├── docs/        architecture and data-model documentation
 └── package.json root scripts (esbuild is used to bundle Lambdas)
@@ -154,7 +155,14 @@ the stack outputs into the frontend env files, then build and publish the SPA:
 (cd infra && npx cdk deploy ConnectNest-Hosting)
 ```
 
-Run the frontend locally with `cd frontend && npm start`.
+Run the frontend locally with `cd frontend && npm run dev` (Vite, http://localhost:3000).
+
+To receive alarm emails, pass an address when deploying the monitoring stack
+(it is a deploy-time value, so it never lands in the repository):
+
+```bash
+(cd infra && npx cdk deploy ConnectNest-Monitoring -c alertEmail=you@example.com)
+```
 
 ### Tear down
 
@@ -224,13 +232,13 @@ ConnectNest uses defense in depth. No single control is treated as sufficient.
 
 Implemented: authentication, profiles, events and RSVP, posts with likes and
 comments, groups with member-gated posting, image upload and display with
-moderation, the activity view, real-time push, and the production deployment.
+moderation, the activity view, real-time push, self-service MFA, CloudWatch
+alarms, and the production deployment.
 
 Known gaps and planned work:
 
 - Personalized recommendations are not built yet.
 - Comment editing and deletion are not built yet.
-- MFA is enabled on the user pool, but there is no in-app enrollment screen yet.
 - There is no automated UI or unit test suite. The backend is covered by the
   scripted smoke test described above.
 - Microsoft sign-in works for personal Microsoft accounts. Organizational
