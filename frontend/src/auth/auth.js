@@ -90,7 +90,12 @@ export function confirmForgotPassword({ email, code, newPassword }) {
   });
 }
 
-/** Sign in; resolves with the CognitoUserSession. */
+/**
+ * Sign in. Resolves with:
+ *   { session }                      - signed in
+ *   { mfaRequired: true, user }      - password accepted, authenticator-app code needed;
+ *                                      pass `user` to completeMfaSignIn().
+ */
 export function signIn({ email, password }) {
   return new Promise((resolve, reject) => {
     const user = new CognitoUser({ Username: email, Pool: getUserPool() });
@@ -99,12 +104,91 @@ export function signIn({ email, password }) {
       Password: password,
     });
     user.authenticateUser(details, {
-      onSuccess: (session) => resolve(session),
+      onSuccess: (session) => resolve({ session }),
       onFailure: (err) => reject(err),
+      totpRequired: () => resolve({ mfaRequired: true, user }),
+      mfaRequired: () =>
+        reject(new Error("This account uses an unsupported verification method.")),
       // If the pool ever requires a new password, surface a clear error.
       newPasswordRequired: () =>
         reject(new Error("A new password is required for this account.")),
     });
+  });
+}
+
+/** Finish a sign-in that asked for an authenticator-app code. */
+export function completeMfaSignIn(user, code) {
+  return new Promise((resolve, reject) => {
+    user.sendMFACode(
+      String(code).trim(),
+      {
+        onSuccess: (session) => resolve({ session }),
+        onFailure: (err) => reject(err),
+      },
+      "SOFTWARE_TOKEN_MFA"
+    );
+  });
+}
+
+/** Resolve the signed-in CognitoUser with a live session (needed for MFA calls). */
+async function currentUserWithSession() {
+  await getSession();
+  return getUserPool().getCurrentUser();
+}
+
+/** True when the signed-in user has authenticator-app MFA turned on. */
+export async function getMfaEnabled() {
+  const user = await currentUserWithSession();
+  return new Promise((resolve, reject) => {
+    user.getUserData(
+      (err, data) => {
+        if (err) return reject(err);
+        const list = (data && data.UserMFASettingList) || [];
+        resolve(list.includes("SOFTWARE_TOKEN_MFA"));
+      },
+      { bypassCache: true }
+    );
+  });
+}
+
+/** Begin MFA enrollment. Resolves with the shared secret for the authenticator app. */
+export async function startMfaEnrollment() {
+  const user = await currentUserWithSession();
+  return new Promise((resolve, reject) => {
+    user.associateSoftwareToken({
+      associateSecretCode: (secret) => resolve(secret),
+      onFailure: (err) => reject(err),
+    });
+  });
+}
+
+/** Verify the first 6-digit code and switch MFA on as the preferred method. */
+export async function confirmMfaEnrollment(code) {
+  const user = await currentUserWithSession();
+  await new Promise((resolve, reject) => {
+    user.verifySoftwareToken(String(code).trim(), "ConnectNest", {
+      onSuccess: () => resolve(),
+      onFailure: (err) => reject(err),
+    });
+  });
+  await new Promise((resolve, reject) => {
+    user.setUserMfaPreference(
+      null,
+      { PreferredMfa: true, Enabled: true },
+      (err, result) => (err ? reject(err) : resolve(result))
+    );
+  });
+}
+
+/** Turn authenticator-app MFA off for the signed-in user. */
+export async function disableMfa() {
+  const user = await currentUserWithSession();
+  return new Promise((resolve, reject) => {
+    user.setUserMfaPreference(
+      null,
+      { PreferredMfa: false, Enabled: false },
+      (err, result) => (err ? reject(err) : resolve(result))
+    );
   });
 }
 
@@ -163,5 +247,8 @@ export async function getUserInfo() {
     userId: payload.sub,
     email: payload.email || "",
     name: payload.name || payload.email || "",
+    // Google/Microsoft accounts sign in through their own provider, so
+    // ConnectNest-level MFA does not apply to them.
+    federated: Array.isArray(payload.identities) && payload.identities.length > 0,
   };
 }

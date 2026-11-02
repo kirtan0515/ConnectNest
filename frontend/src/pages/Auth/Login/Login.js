@@ -17,13 +17,17 @@ function friendlyError(err) {
     return "Please verify your email first — check for the code we sent.";
   if (name === "UserNotFoundException")
     return "We couldn't find an account with that email.";
+  if (name === "CodeMismatchException" || name === "EnableSoftwareTokenMFAException")
+    return "That code didn't work. Check your authenticator app and try again.";
+  if (name === "ExpiredCodeException")
+    return "That code expired. Log in again to get a fresh one.";
   if (/network|failed to fetch/i.test(msg))
     return "Network trouble. Check your connection and try again.";
   return msg || "Something went wrong. Please try again.";
 }
 
 const Login = () => {
-  const { isAuthenticated, signIn } = useAuth();
+  const { isAuthenticated, signIn, completeMfaSignIn } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -31,6 +35,8 @@ const Login = () => {
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [mfaUser, setMfaUser] = useState(null); // set when a 6-digit code is needed
+  const [mfaCode, setMfaCode] = useState("");
 
   useEffect(() => {
     if (isAuthenticated) navigate("/dashboard");
@@ -39,6 +45,23 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (busy) return;
+    if (mfaUser) {
+      if (!/^\d{6}$/.test(mfaCode.trim())) {
+        setError("Enter the 6-digit code from your authenticator app.");
+        return;
+      }
+      setError("");
+      setBusy(true);
+      try {
+        await completeMfaSignIn(mfaUser, mfaCode);
+        navigate("/dashboard");
+      } catch (err) {
+        setError(friendlyError(err));
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
     if (!email.trim() || !password) {
       setError("Enter your university email and password to log in.");
       return;
@@ -50,7 +73,11 @@ const Login = () => {
     setError("");
     setBusy(true);
     try {
-      await signIn({ email: email.trim(), password });
+      const result = await signIn({ email: email.trim(), password });
+      if (result && result.mfaRequired) {
+        setMfaUser(result.mfaUser);
+        return;
+      }
       navigate("/dashboard");
     } catch (err) {
       setError(friendlyError(err));
@@ -84,12 +111,36 @@ const Login = () => {
           </div>
 
           <div className="auth__head">
-            <h1 className="cn-head auth__title">Log in</h1>
+            <h1 className="cn-head auth__title">{mfaUser ? "Check your authenticator" : "Log in"}</h1>
             <p className="auth__subtitle">
-              Use the university email you signed up with.
+              {mfaUser
+                ? "Enter the 6-digit code from your authenticator app."
+                : "Use the university email you signed up with."}
             </p>
           </div>
 
+          {mfaUser ? (
+            <div className="auth__fields">
+              <label className="cn-label" htmlFor="login-mfa">
+                Authentication code
+                <input
+                  id="login-mfa"
+                  className="cn-input"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                  placeholder="123456"
+                  autoFocus
+                  value={mfaCode}
+                  onChange={(e) => {
+                    setMfaCode(e.target.value.replace(/\D/g, ""));
+                    setError("");
+                  }}
+                />
+              </label>
+            </div>
+          ) : (
           <div className="auth__fields">
             <label className="cn-label" htmlFor="login-email">
               University email
@@ -135,7 +186,7 @@ const Login = () => {
               </span>
             </label>
           </div>
-
+          )}
           {error && (
             <p className="cn-alert cn-alert--error" role="alert">{error}</p>
           )}
@@ -145,10 +196,10 @@ const Login = () => {
             className="cn-btn cn-btn--primary auth__submit"
             disabled={busy}
           >
-            {busy ? "Logging in…" : "Log in"}
+            {busy ? (mfaUser ? "Verifying…" : "Logging in…") : mfaUser ? "Verify" : "Log in"}
           </button>
 
-          <SocialButtons />
+          {!mfaUser && <SocialButtons />}
 
           <p className="auth__switch">
             New to ConnectNest? <Link to="/signup">Create an account</Link>

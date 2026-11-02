@@ -54,8 +54,19 @@ export function AuthProvider({ children }) {
 
   const signIn = useCallback(
     async (credentials) => {
-      await auth.signIn(credentials);
+      const result = await auth.signIn(credentials);
+      // Password accepted but an authenticator-app code is still needed.
+      if (result.mfaRequired) return { mfaRequired: true, mfaUser: result.user };
       await reactivateIfNeeded(); // logging in restores a deactivated/pending account
+      return refresh();
+    },
+    [refresh]
+  );
+
+  const completeMfaSignIn = useCallback(
+    async (mfaUser, code) => {
+      await auth.completeMfaSignIn(mfaUser, code);
+      await reactivateIfNeeded();
       return refresh();
     },
     [refresh]
@@ -72,6 +83,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!user,
     refresh,
     signIn,
+    completeMfaSignIn,
     signOut,
     signUp: auth.signUp,
     confirmSignUp: auth.confirmSignUp,

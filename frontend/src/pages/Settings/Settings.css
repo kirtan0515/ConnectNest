@@ -101,3 +101,23 @@
 .settings__btn--danger { background: #e5484d; color: #ffffff; }
 .settings__btn--danger:hover:not(:disabled) { background: #cc3a3f; }
 .settings__btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* Two-step verification */
+.settings__btn--primary { background: var(--brand); color: #1a1a2e; }
+.settings__btn--primary:hover:not(:disabled) { background: #ff8c4d; }
+.settings__btn--ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+.settings__btn--ghost:hover:not(:disabled) { background: var(--surface-2); }
+.settings__mfa { display: flex; flex-direction: column; gap: 14px; }
+.settings__qr { background: #fff; padding: 8px; border-radius: 10px; align-self: flex-start; }
+.settings__hint { font-size: 14px !important; color: var(--text-muted) !important; }
+.settings__secret {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  word-break: break-all;
+}
+.settings__row { display: flex; gap: 10px; flex-wrap: wrap; }
