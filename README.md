@@ -50,20 +50,19 @@ Built as a Harrisburg University senior capstone project (Project II).
 
 ## Architecture
 
-```
-Users -> CloudFront (HTTPS) + AWS WAF
-         |- default  -> S3 (private, Origin Access Control): React SPA
-         '- /api/*   -> API Gateway (HTTP API v2, Cognito JWT authorizer)
-                          -> Lambda (Node.js 22) -> DynamoDB (one table per entity)
-                                                 -> S3 uploads -> Rekognition
+![ConnectNest AWS architecture](docs/images/architecture.png)
 
-Real-time: API Gateway WebSocket API -> Lambda -> connections table
-Identity:  Amazon Cognito (email/password, Google, Microsoft, optional MFA)
-Email:     Amazon SES (branded verification email from the project domain)
-Security:  CloudTrail (audit), GuardDuty (threat detection), Secrets Manager,
-           least-privilege IAM role per Lambda
-DNS / TLS: Route 53 and ACM
-```
+How a request flows (numbers match the diagram):
+
+1. The browser resolves `connectnestapp.com` in Route 53 and reaches CloudFront over HTTPS (ACM certificate), filtered by AWS WAF.
+2. CloudFront serves the React app from a private S3 bucket (Origin Access Control).
+3. Calls to `/api/*` are forwarded to API Gateway (HTTP API).
+4. A Cognito JWT authorizer validates the token, then the matching Lambda runs.
+5. The Lambda reads and writes DynamoDB (one table per entity).
+6. Images upload to a private S3 bucket through a presigned URL; a Lambda sends them to Rekognition and deletes unsafe ones.
+7. Real-time: the browser keeps a WebSocket connection (authenticated with its Cognito token). When a post or event is created, the write Lambda pushes it to connected clients.
+
+Sign-in runs through Cognito (email, Google, Microsoft). SES sends the branded verification email. CloudTrail, GuardDuty, IAM, and CloudWatch cover audit, threat detection, permissions, and logs.
 
 | CDK stack | Contents |
 |---|---|
