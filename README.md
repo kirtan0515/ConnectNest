@@ -8,6 +8,27 @@ Live site: **https://connectnestapp.com**
 
 Built as a Harrisburg University senior capstone project (Project II).
 
+![ConnectNest landing page](docs/images/landing.png)
+
+## What this project demonstrates
+
+- **Cloud architecture as code.** The whole platform (CDN, WAF, API, compute,
+  data, auth, email, DNS, audit) is defined in AWS CDK across eight stacks and
+  deploys with one command.
+- **Serverless design.** Lambda, API Gateway, DynamoDB, and S3, with one table
+  per entity, access-pattern-driven indexes, and a least-privilege IAM role per
+  function.
+- **Authentication and authorization.** Cognito with Google and Microsoft
+  federation, JWT authorizers on every route, a token-verifying Lambda
+  authorizer for WebSockets, and server-side membership checks. User identity
+  always comes from the verified token.
+- **Real-time features.** An API Gateway WebSocket API with a broadcast path
+  from the write Lambdas to connected clients.
+- **Trust and safety.** Text moderation plus Rekognition image scanning.
+- **Production concerns.** Custom domain with TLS, branded transactional email
+  with DKIM, audit logging, threat detection, and secrets kept out of source
+  control.
+
 ## Features
 
 - **Profiles:** major, interests, bio, avatar.
@@ -170,6 +191,20 @@ identity always comes from the verified token, never from the request body.
 | POST | `/uploads/presign` | Presigned image upload |
 | GET | `/uploads/url` | Presigned image download URL |
 
+## Testing
+
+`scripts/smoke-test.py` invokes the deployed Lambda handlers with a synthetic
+authenticated event and checks the main flows: events and RSVP, posts, likes,
+comments, groups, the activity digest, profiles, content moderation, and upload
+URLs (22 checks). It needs the AWS CLI configured for the target account and
+writes a few test records, so run it against a development or demo stack.
+
+```bash
+python3 scripts/smoke-test.py
+```
+
+There is no automated browser or unit-test suite yet.
+
 ## Security
 
 ConnectNest uses defense in depth. No single control is treated as sufficient.
@@ -197,7 +232,16 @@ Known gaps and planned work:
 - Personalized recommendations are not built yet.
 - Comment editing and deletion are not built yet.
 - MFA is enabled on the user pool, but there is no in-app enrollment screen yet.
-- There is no automated UI test suite. The backend was verified with scripted
-  end-to-end calls against the deployed API.
+- There is no automated UI or unit test suite. The backend is covered by the
+  scripted smoke test described above.
 - Microsoft sign-in works for personal Microsoft accounts. Organizational
   accounts require tenant approval from the institution.
+
+## Credits and license
+
+Code is released under the [MIT License](LICENSE).
+
+The Harrisburg skyline photo on the landing page is by Jeffrey Hayes, licensed
+CC BY 2.0, via Wikimedia Commons. The other campus photos are used for this
+academic project and remain the property of their respective owners; they are
+not covered by the MIT license.

@@ -14,7 +14,9 @@
 @keyframes cnRise { from { transform: translateY(105%); } to { transform: none; } }
 @keyframes cnFade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes cnPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-.cn-mask { display: block; overflow: hidden; padding-bottom: 0.06em; }
+/* The mask clips the rise animation; extra bottom padding (cancelled by a
+   negative margin so layout is unchanged) keeps descenders (g, p, y) visible. */
+.cn-mask { display: block; overflow: hidden; padding-bottom: 0.22em; margin-bottom: -0.22em; }
 .cn-rise { display: block; animation: cnRise 1.1s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
 .cn-fade { animation: cnFade 1s ease 0.9s both; }
 .cn-live { animation: cnPulse 2.4s ease-in-out infinite; }
