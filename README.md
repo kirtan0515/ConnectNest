@@ -1,184 +1,203 @@
 # ConnectNest
 
-A serverless campus engagement platform on AWS. A React SPA on an explicit,
-Infrastructure-as-Code backend: **Cognito + API Gateway (HTTP API) + Lambda +
-DynamoDB**, fronted by **CloudFront + AWS WAF**, all defined with the **AWS CDK**.
+ConnectNest is a campus engagement platform that connects students with events,
+groups, and each other. It is a React single-page app on a fully serverless AWS
+backend, with all infrastructure defined as code using the AWS CDK.
 
-This project deliberately uses explicit CDK rather than a managed abstraction
-(it was migrated off AWS Amplify) so the cloud architecture is visible,
-reviewable, and reproducible.
+Live site: **https://connectnestapp.com**
+
+Built as a Harrisburg University senior capstone project (Project II).
+
+## Features
+
+- **Profiles:** major, interests, bio, avatar.
+- **Events:** create, browse, edit, delete, RSVP, and attendee lists.
+- **Groups:** create and join groups, a group detail page with member list and
+  its own feed. Posting to a group is restricted to members, enforced on the
+  server.
+- **Social feed:** posts with likes and comments, plus image attachments.
+- **Activity view:** a campus-wide digest of upcoming events, recent posts, and
+  new groups.
+- **Real-time updates:** new posts and events are pushed to connected clients
+  over an API Gateway WebSocket API.
+- **Sign-in:** email and password, Google, and Microsoft, with optional TOTP MFA
+  enabled on the user pool.
+- **Trust and safety:** server-side text moderation and automatic image scanning
+  with Amazon Rekognition.
+- **Account lifecycle:** deactivate, delete with a grace period, and a scheduled
+  purge, with an audit log.
+
+## Architecture
+
+```
+Users -> CloudFront (HTTPS) + AWS WAF
+         |- default  -> S3 (private, Origin Access Control): React SPA
+         '- /api/*   -> API Gateway (HTTP API v2, Cognito JWT authorizer)
+                          -> Lambda (Node.js 22) -> DynamoDB (one table per entity)
+                                                 -> S3 uploads -> Rekognition
+
+Real-time: API Gateway WebSocket API -> Lambda -> connections table
+Identity:  Amazon Cognito (email/password, Google, Microsoft, optional MFA)
+Email:     Amazon SES (branded verification email from the project domain)
+Security:  CloudTrail (audit), GuardDuty (threat detection), Secrets Manager,
+           least-privilege IAM role per Lambda
+DNS / TLS: Route 53 and ACM
+```
+
+| CDK stack | Contents |
+|---|---|
+| `ConnectNest-Data` | DynamoDB tables and indexes |
+| `ConnectNest-Auth` | Cognito user pool, Hosted UI, Google and Microsoft providers, MFA, custom-message email trigger |
+| `ConnectNest-Api` | HTTP API, JWT authorizer, Lambda handlers, uploads bucket, image moderation, scheduled purge |
+| `ConnectNest-Hosting` | CloudFront, private S3 SPA bucket, WAF, ACM certificate |
+| `ConnectNest-Realtime` | WebSocket API, connections table, connect/disconnect/authorizer Lambdas |
+| `ConnectNest-Email` | SES domain identity with DKIM |
+| `ConnectNest-Dns` | Route 53 hosted zone and records |
+| `ConnectNest-Security` | CloudTrail and GuardDuty |
+
+More detail: [docs/architecture.md](docs/architecture.md),
+[docs/data-model.md](docs/data-model.md), and
+[docs/aws-services.md](docs/aws-services.md).
 
 ## Repository layout
 
 ```
 connectnest/
-├── package.json        root — esbuild for CDK Lambda bundling
-├── infra/              AWS CDK (TypeScript)
-│   ├── bin/app.ts      composes the stacks
-│   └── lib/
-│       ├── data-stack.ts      DynamoDB tables + GSIs
-│       ├── auth-stack.ts      Cognito user pool, Hosted UI, Google/Microsoft IdP, MFA
-│       ├── api-stack.ts       HTTP API + Lambdas + JWT authorizer + IAM + S3
-│       ├── hosting-stack.ts   CloudFront + S3 (OAC) SPA hosting + CloudFront WAF
-│       └── security-stack.ts  CloudTrail + GuardDuty (account-wide detection)
-├── backend/            Lambda handlers (Node 22 ESM, AWS SDK v3)
-│   ├── shared/         db.ts, http.ts, account.ts, moderation.ts
-│   └── handlers/       profiles, events, posts, groups, files
-├── frontend/           React SPA (Create React App)
-│   └── src/
-│       ├── auth/        Cognito wrapper (amazon-cognito-identity-js) + context
-│       ├── api/client.js  fetch wrapper with Cognito token
-│       └── config.js    reads REACT_APP_* env vars
-└── docs/               architecture.md, data-model.md
+├── infra/       AWS CDK app (TypeScript): bin/app.ts composes the stacks in lib/
+├── backend/     Lambda handlers (Node ESM, AWS SDK v3) and shared helpers
+│   └── handlers/  profiles, events, posts, groups, activity, files, auth, realtime
+├── frontend/    React SPA (Create React App)
+│   └── src/       auth/, api/, realtime/, pages/, components/, styles/
+├── docs/        architecture and data-model documentation
+└── package.json root scripts (esbuild is used to bundle Lambdas)
 ```
 
-## Architecture
+## Getting started
 
-```
-Users → CloudFront (HTTPS) + AWS WAF
-      ├─ default →  S3 (private, OAC) — the React SPA
-      └─ /api/*  →  API Gateway (HTTP API v2, Cognito JWT authorizer)
-                 →  Lambda (per-feature handlers)
-                 →  DynamoDB (one table per entity)
-                 +  S3 (presigned uploads → Rekognition image moderation)
+### Prerequisites
 
-Auth: Amazon Cognito (email/password + Google/Microsoft via Hosted UI, optional MFA)
-```
+- Node.js 20 or later
+- An AWS account with the AWS CLI configured (`aws configure`)
+- Docker is not required. Lambda bundling runs locally with esbuild.
 
-- Authentication is delegated to **Amazon Cognito** (no hand-rolled JWT), with
-  email/password plus **Google** and **Microsoft** social login via the Hosted
-  UI OAuth flow, and **optional TOTP MFA**.
-- Every protected route is guarded by a **Cognito JWT authorizer**.
-- Each Lambda gets only the DynamoDB/S3 permissions it needs (least privilege).
-- User identity always comes from the **verified JWT claims**, never the request body.
-- Public traffic is served through **CloudFront with an AWS WAF WebACL** (managed
-  rule sets + rate limiting); the S3 origin is private (Origin Access Control).
-
-See [docs/architecture.md](docs/architecture.md) and
-[docs/data-model.md](docs/data-model.md).
-
-## Prerequisites
-
-- Node.js 20+ (Lambdas run on the Node 22 runtime)
-- An AWS account and the AWS CLI configured (`aws configure`) for deploying
-- Docker is **not** required — Lambda bundling runs locally via esbuild
-
-## Install
-
-Each package installs independently:
+### Install
 
 ```bash
-npm install                 # root (esbuild)
+npm install
 (cd backend  && npm install)
 (cd infra    && npm install)
 (cd frontend && npm install)
 ```
 
-## Verify locally (no AWS resources created)
+### Configuration
+
+Environment-specific values and secrets are passed to the CDK through
+`infra/cdk.context.json`, which is gitignored and must never be committed. Copy
+the template and fill in your own values:
 
 ```bash
-(cd backend && npx tsc --noEmit)        # typecheck Lambda handlers
-(cd infra   && npx tsc --noEmit)        # typecheck CDK
-(cd infra   && npx cdk synth)           # synthesize CloudFormation + bundle Lambdas
-(cd frontend && CI=true npm run build)  # compile the SPA
+cp infra/cdk.context.example.json infra/cdk.context.json
 ```
 
-## Deploy
+It covers the Google and Microsoft OAuth credentials, the site domain, and the
+allowed callback, logout, upload, and CORS origins. The Google client secret is
+stored in AWS Secrets Manager at deploy time and referenced dynamically.
 
-Deploying creates real (near-free-tier) AWS resources that bill until destroyed.
+For the frontend, copy `frontend/.env.example` to `frontend/.env` (and
+`frontend/.env.production` for production builds) and set the Cognito pool ID,
+client ID, Hosted UI domain, API URL, and WebSocket URL from your stack outputs.
 
-Secrets and per-environment values (Google/Microsoft OAuth credentials, callback
-URLs, allowed CORS origins) are supplied via CDK context in `infra/cdk.context.json`
-(gitignored) — never committed. The Google OAuth client secret is stored in
-**AWS Secrets Manager** and referenced dynamically, not baked into the template.
+### Verify without deploying
+
+```bash
+(cd backend  && npx tsc --noEmit)
+(cd infra    && npx tsc --noEmit && npx cdk synth)
+(cd frontend && npm run build)
+```
+
+### Deploy
+
+Deploying creates real AWS resources that incur (small) charges until destroyed.
 
 ```bash
 cd infra
-npx cdk bootstrap        # one-time per account/region
-npx cdk deploy --all     # note the UserPoolId, UserPoolClientId, ApiUrl outputs
+npx cdk bootstrap          # one time per account and region
+npx cdk deploy --all
 ```
 
-The stacks deploy in dependency order: `Data` → `Auth` → `Api` → `Hosting`,
-with `Security` independent.
-
-Wire the outputs into the frontend (`frontend/.env`, see `frontend/.env.example`):
-
-```
-REACT_APP_AWS_REGION=us-east-1
-REACT_APP_USER_POOL_ID=...
-REACT_APP_USER_POOL_CLIENT_ID=...
-REACT_APP_HOSTED_UI_DOMAIN=...
-REACT_APP_API_URL=https://xxxx.execute-api.us-east-1.amazonaws.com
-```
-
-The production build (`frontend/.env.production`) leaves `REACT_APP_API_URL`
-blank so the SPA calls the same-origin `/api` path, which CloudFront routes to
-the HTTP API (no CORS in production).
-
-Build and publish the SPA to CloudFront:
+The Email stack must be deployed first, and its DKIM records added to your DNS,
+before `ConnectNest-Auth` can send mail through SES. After the first deploy, put
+the stack outputs into the frontend env files, then build and publish the SPA:
 
 ```bash
 (cd frontend && npm run build)
-(cd infra && npx cdk deploy ConnectNest-Hosting)   # uploads SPA + invalidates CDN
+(cd infra && npx cdk deploy ConnectNest-Hosting)
 ```
 
-Run the frontend locally:
+Run the frontend locally with `cd frontend && npm start`.
 
-```bash
-cd frontend && npm start   # http://localhost:3000
-```
-
-## Tear down
+### Tear down
 
 ```bash
 cd infra && npx cdk destroy --all
 ```
 
-## Security
-
-ConnectNest is built with defense-in-depth (see the handoff notes for the full
-solution-architect writeup):
-
-- **Edge**: CloudFront + AWS WAF (Common Rule Set, Known Bad Inputs, rate limit).
-- **Auth**: Cognito JWT authorizer on every protected route; optional TOTP MFA;
-  short token lifetimes; `preventUserExistenceErrors`.
-- **Secrets**: Google OAuth secret in AWS Secrets Manager (dynamic reference).
-- **Detection**: AWS CloudTrail (multi-region audit) + Amazon GuardDuty.
-- **Storage**: private S3 buckets (BLOCK_ALL public access, SSE), presigned
-  uploads constrained to an image allowlist and size cap.
-- **Trust & safety**: server-side text block-list moderation on posts/comments/
-  events/groups; Amazon Rekognition auto-moderation of uploaded images.
-- **CORS**: locked to the known frontend origins (not `*`).
-- **Account lifecycle**: deactivate / soft-delete with grace period / scheduled
-  purge, with an audit log.
-
 ## API
 
-All routes require a Cognito JWT (`Authorization: Bearer <idToken>`).
+All routes require a Cognito JWT (`Authorization: Bearer <idToken>`). The user
+identity always comes from the verified token, never from the request body.
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET/PUT | `/profiles/me` | Get/update the current user's profile |
+| GET, PUT | `/profiles/me` | Get or update the current profile |
 | GET | `/profiles/{userId}` | Get a user's profile |
-| GET/POST | `/events` | List / create events |
-| GET/PUT/DELETE | `/events/{eventId}` | Get / owner-update / owner-delete an event |
-| POST | `/events/{eventId}/rsvp` | RSVP to an event (or cancel) |
-| GET | `/events/{eventId}/rsvps` | List attendees for an event |
-| GET | `/me/rsvps` | Events the current user has RSVP'd to |
-| GET/POST | `/posts` | List / create posts (`?groupId=` filters) |
-| DELETE | `/posts/{postId}` | Author-delete a post |
+| POST | `/account/deactivate`, `/account/reactivate`, `/account/delete` | Account lifecycle |
+| GET, POST | `/events` | List or create events |
+| GET, PUT, DELETE | `/events/{eventId}` | Get, update, or delete an event (owner only for writes) |
+| POST | `/events/{eventId}/rsvp` | RSVP or cancel |
+| GET | `/events/{eventId}/rsvps` | Attendee list |
+| GET | `/me/rsvps` | Events the current user RSVP'd to |
+| GET, POST | `/posts` | List posts (`?groupId=` filters) or create a post |
+| DELETE | `/posts/{postId}` | Delete own post |
 | POST | `/posts/{postId}/like` | Toggle like |
-| GET/POST | `/posts/{postId}/comments` | List / add comments |
-| GET/POST | `/groups` | List / create groups |
+| GET, POST | `/posts/{postId}/comments` | List or add comments |
+| GET, POST | `/groups` | List or create groups |
+| GET | `/groups/{groupId}` | Get one group |
 | POST | `/groups/{groupId}/join` | Join a group |
-| POST | `/uploads/presign` | Get a presigned S3 upload URL |
+| GET | `/groups/{groupId}/members` | List group members |
+| GET | `/me/groups` | Groups the current user belongs to |
+| GET | `/activity` | Campus activity digest |
+| POST | `/uploads/presign` | Presigned image upload |
+| GET | `/uploads/url` | Presigned image download URL |
 
-## Known follow-ups
+## Security
 
-- Group authorization: enforce GroupMembers membership checks on group-scoped
-  actions, plus a "my memberships" query so joined groups persist across sessions.
-- S3 read endpoints (presigned GET) for displaying uploaded avatars/images.
-- Comment delete/edit.
-- Central activity dashboard and a recommendations feed.
-- Real-time updates (currently polling).
-- Finish Microsoft/Azure social login (button wired; needs Azure app credentials).
+ConnectNest uses defense in depth. No single control is treated as sufficient.
+
+- CloudFront with AWS WAF managed rules and rate limiting at the edge.
+- A Cognito JWT authorizer on every API route; the WebSocket `$connect` route
+  verifies the Cognito token in a Lambda authorizer.
+- Least-privilege IAM, one role per Lambda.
+- Private S3 buckets (public access blocked, encrypted). Uploads use short-lived
+  presigned URLs restricted to an image allowlist and a size cap.
+- Group-scoped writes verify membership on the server.
+- Text moderation on user content and Rekognition scanning of uploaded images.
+- CloudTrail audit logging and GuardDuty threat detection.
+- OAuth secrets live in AWS Secrets Manager and the gitignored CDK context, never
+  in the repository or the frontend bundle.
+
+## Project status
+
+Implemented: authentication, profiles, events and RSVP, posts with likes and
+comments, groups with member-gated posting, image upload and display with
+moderation, the activity view, real-time push, and the production deployment.
+
+Known gaps and planned work:
+
+- Personalized recommendations are not built yet.
+- Comment editing and deletion are not built yet.
+- MFA is enabled on the user pool, but there is no in-app enrollment screen yet.
+- There is no automated UI test suite. The backend was verified with scripted
+  end-to-end calls against the deployed API.
+- Microsoft sign-in works for personal Microsoft accounts. Organizational
+  accounts require tenant approval from the institution.

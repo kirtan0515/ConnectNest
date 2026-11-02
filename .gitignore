@@ -41,3 +41,12 @@ yarn-error.log*
 
 # internal handoff / working notes (not for the repo)
 HANDOFF.md
+
+# local tooling / working notes (not part of the project source)
+.agents/
+.kiro/
+.worktrees/
+frontend/.env.production
+docs/advisor-update.md
+docs/midterm-presentation.md
+*.pdf

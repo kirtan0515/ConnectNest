@@ -38,7 +38,7 @@ us-east-1. The app is live at **https://connectnestapp.com**.
    Auth:  Amazon Cognito (email/password + Google + Microsoft via Hosted UI,
           optional TOTP MFA). Branded email via Amazon SES (connectnestapp.com).
 
-   Real-time (in progress): API Gateway WebSocket API pushes post.created /
+   Real-time: API Gateway WebSocket API pushes post.created /
           event.created events to connected clients (no page refresh).
 
    Account-wide security: CloudTrail (audit) + GuardDuty (threat detection).
@@ -55,7 +55,7 @@ us-east-1. The app is live at **https://connectnestapp.com**.
 | `ConnectNest-Security` | CloudTrail (multi-region audit trail → private S3) + GuardDuty detector |
 | `ConnectNest-Email` | Amazon SES domain identity (connectnestapp.com) with Easy DKIM |
 | `ConnectNest-Dns` | Route 53 public hosted zone for connectnestapp.com (apex ALIAS → CloudFront, DKIM/SPF/ACM records) |
-| `ConnectNest-Realtime` *(in progress)* | API Gateway WebSocket API ($connect JWT authorizer, $disconnect, $default), Connections DynamoDB table; createPost/createEvent broadcast new items |
+| `ConnectNest-Realtime` | API Gateway WebSocket API ($connect JWT authorizer, $disconnect, $default), Connections DynamoDB table; createPost/createEvent broadcast new items |
 
 ## Services
 
@@ -68,7 +68,7 @@ us-east-1. The app is live at **https://connectnestapp.com**.
 | Auth | Amazon Cognito | Sign-up/in, tokens, Google + Microsoft federation, optional TOTP MFA |
 | Email | Amazon SES | Branded transactional email (verification / password reset) from the domain |
 | API | API Gateway (HTTP API v2) | Public REST entry; validates the Cognito JWT before routing |
-| Real-time | API Gateway (WebSocket API) | Push post/event updates to connected clients *(in progress)* |
+| Real-time | API Gateway (WebSocket API) | Push post/event updates to connected clients |
 | Compute | AWS Lambda (Node 22, ARM64, ESM) | Stateless business logic per feature |
 | Data | Amazon DynamoDB | Profiles, events, RSVPs, posts, comments, likes, groups, members, audit log, connections |
 | Storage | Amazon S3 | User image uploads via presigned POST (image allowlist + size cap) |
@@ -119,6 +119,18 @@ deactivated or pending-deletion account.
   at the API base (same-origin `/api` in production via CloudFront).
 - In production the SPA calls the API same-origin through CloudFront's `/api/*`
   behavior, so there is no CORS and no cross-origin exposure.
-- Real-time: a WebSocket client (in progress) connects with the Cognito id token
+- Real-time: a WebSocket client connects with the Cognito id token
   and applies pushed post/event updates live; it degrades gracefully to
   fetch-on-load if the socket is unavailable.
+
+## Group and activity endpoints
+
+- `GET /groups/{groupId}` returns a single group (read-only Lambda with read
+  access to the Groups table only). The group detail page pairs it with
+  `GET /groups/{groupId}/members` and `GET /posts?groupId=` to render a group's
+  own feed. Posting into a group is still gated server-side on GroupMembers
+  membership.
+- `GET /activity` is a read-only aggregator Lambda that scans Events, Posts, and
+  Groups in parallel and returns upcoming events (soonest first), the newest
+  posts, and the newest groups in one response, so the Activity page needs a
+  single request.
