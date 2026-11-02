@@ -19,7 +19,9 @@ How a request flows (numbers match the diagram):
 6. Images upload to a private S3 bucket through a presigned URL; a Lambda sends them to Rekognition and deletes unsafe ones.
 7. Real-time: the browser keeps a WebSocket connection (authenticated with its Cognito token). When a post or event is created, the write Lambda pushes it to connected clients.
 
-Sign-in runs through Cognito (email, Google, Microsoft). SES sends the branded verification email. CloudTrail, GuardDuty, IAM, and CloudWatch cover audit, threat detection, permissions, and logs.
+Sign-in runs through Cognito (email, Google, Microsoft; OAuth secrets in Secrets Manager). A Cognito custom-message trigger Lambda builds the branded verification email, which SES sends. A CloudFront Function rewrites `/api/*` paths before they reach API Gateway. An EventBridge rule runs a daily Lambda that permanently deletes accounts past their 30-day deletion window. CloudTrail, GuardDuty, IAM, and CloudWatch cover audit, threat detection, permissions, and logs.
+
+The dashed "Planned / future" row in the diagram lists work that is not deployed yet: recommendations, notifications, alarms and dashboards, an MFA enrollment screen (MFA is already enabled at the Cognito pool), KMS keys and VPC endpoints, CI/CD, and automated tests.
 
 ## High-level diagram (text version)
 
