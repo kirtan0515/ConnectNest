@@ -19,6 +19,9 @@ import {
   OriginRequestPolicy,
   OriginProtocolPolicy,
   CachedMethods,
+  ResponseHeadersPolicy,
+  HeadersFrameOption,
+  HeadersReferrerPolicy,
 } from "aws-cdk-lib/aws-cloudfront";
 import { S3BucketOrigin, HttpOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
 import {
@@ -160,12 +163,41 @@ export class HostingStack extends Stack {
       ? { domainNames: props.domainNames, certificate }
       : {};
 
+    // Browser security headers on every response. The CSP stays in the
+    // index.html meta tag; these cover what a meta tag cannot (HSTS, framing).
+    const securityHeaders = new ResponseHeadersPolicy(this, "SecurityHeaders", {
+      securityHeadersBehavior: {
+        strictTransportSecurity: {
+          accessControlMaxAge: Duration.days(365),
+          includeSubdomains: true,
+          preload: false,
+          override: true,
+        },
+        contentTypeOptions: { override: true },
+        frameOptions: { frameOption: HeadersFrameOption.DENY, override: true },
+        referrerPolicy: {
+          referrerPolicy: HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
+          override: true,
+        },
+      },
+      customHeadersBehavior: {
+        customHeaders: [
+          {
+            header: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), payment=()",
+            override: true,
+          },
+        ],
+      },
+    });
+
     const distribution = new Distribution(this, "Cdn", {
       ...aliasProps,
       defaultBehavior: {
         origin: S3BucketOrigin.withOriginAccessControl(siteBucket),
         viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         cachePolicy: CachePolicy.CACHING_OPTIMIZED,
+        responseHeadersPolicy: securityHeaders,
       },
       additionalBehaviors: {
         "/api/*": {
