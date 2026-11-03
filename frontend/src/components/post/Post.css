@@ -205,3 +205,37 @@
   color: var(--text-secondary);
   word-break: break-word;
 }
+
+/* Delete control — only shown on the signed-in user's own comments.
+   Stays faint until the comment row is hovered or the button is focused. */
+.post__comment {
+  position: relative;
+}
+.post__comment-delete {
+  margin-left: auto;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted, #8aa);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.post__comment:hover .post__comment-delete,
+.post__comment-delete:focus-visible {
+  opacity: 1;
+}
+.post__comment-delete:hover {
+  background: rgba(229, 72, 77, 0.12);
+  color: #e5484d;
+}
+.post__comment-delete:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}

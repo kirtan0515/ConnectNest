@@ -21,7 +21,7 @@ How a request flows (numbers match the diagram):
 
 Sign-in runs through Cognito (email, Google, Microsoft; OAuth secrets in Secrets Manager). A Cognito custom-message trigger Lambda builds the branded verification email, which SES sends. A CloudFront Function rewrites `/api/*` paths before they reach API Gateway. An EventBridge rule runs a daily Lambda that permanently deletes accounts past their 30-day deletion window. CloudTrail, GuardDuty, IAM, and CloudWatch cover audit, threat detection, permissions, and logs. CloudWatch alarms on CloudFront 5xx, WAF blocks, API 5xx and Lambda errors notify the owner through SNS email. Users can turn on authenticator-app MFA from Settings.
 
-The dashed "Planned / future" row in the diagram lists work that is not deployed yet: recommendations, notifications, a CloudWatch dashboard and access logging, KMS keys and VPC endpoints, CI/CD, automated tests, and organizational Microsoft sign-in.
+The dashed "Planned / future" row in the diagram lists work that is not deployed yet: notifications, a CloudWatch dashboard and access logging, KMS keys and VPC endpoints, CI/CD, automated tests, and organizational Microsoft sign-in.
 
 ## High-level diagram (text version)
 

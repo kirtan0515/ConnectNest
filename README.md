@@ -36,7 +36,8 @@ Built as a Harrisburg University senior capstone project (Project II).
 - **Groups:** create and join groups, a group detail page with member list and
   its own feed. Posting to a group is restricted to members, enforced on the
   server.
-- **Social feed:** posts with likes and comments, plus image attachments.
+- **Social feed:** posts with likes and comments (delete your own), plus image attachments.
+- **Recommendations:** an explainable "recommended for you" list of upcoming events.
 - **Activity view:** a campus-wide digest of upcoming events, recent posts, and
   new groups.
 - **Real-time updates:** new posts and events are pushed to connected clients
@@ -185,10 +186,12 @@ identity always comes from the verified token, never from the request body.
 | POST | `/events/{eventId}/rsvp` | RSVP or cancel |
 | GET | `/events/{eventId}/rsvps` | Attendee list |
 | GET | `/me/rsvps` | Events the current user RSVP'd to |
+| GET | `/me/recommendations` | Suggested upcoming events, each with reasons |
 | GET, POST | `/posts` | List posts (`?groupId=` filters) or create a post |
 | DELETE | `/posts/{postId}` | Delete own post |
 | POST | `/posts/{postId}/like` | Toggle like |
 | GET, POST | `/posts/{postId}/comments` | List or add comments |
+| DELETE | `/posts/{postId}/comments/{commentId}` | Delete own comment |
 | GET, POST | `/groups` | List or create groups |
 | GET | `/groups/{groupId}` | Get one group |
 | POST | `/groups/{groupId}/join` | Join a group |
@@ -231,14 +234,13 @@ ConnectNest uses defense in depth. No single control is treated as sufficient.
 ## Project status
 
 Implemented: authentication, profiles, events and RSVP, posts with likes and
-comments, groups with member-gated posting, image upload and display with
-moderation, the activity view, real-time push, self-service MFA, CloudWatch
-alarms, and the production deployment.
+comments (author delete) and event recommendations, groups with member-gated
+posting, image upload and display with moderation, the activity view, real-time
+push, self-service MFA, CloudWatch alarms, and the production deployment.
 
 Known gaps and planned work:
 
-- Personalized recommendations are not built yet.
-- Comment editing and deletion are not built yet.
+- Comments can be deleted by their author; editing is not built yet.
 - There is no automated UI or unit test suite. The backend is covered by the
   scripted smoke test described above.
 - Microsoft sign-in works for personal Microsoft accounts. Organizational

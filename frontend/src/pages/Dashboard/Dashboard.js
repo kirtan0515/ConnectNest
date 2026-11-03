@@ -6,6 +6,7 @@ import Share from "../../components/share/Share";
 import Posts from "../../components/post/Post";
 import EventFeed from "../Events/EventFeed";
 import MyGroups from "../../components/dashboard/MyGroups";
+import Recommendations from "../../components/dashboard/Recommendations";
 import CampusNetwork from "../../components/dashboard/CampusNetwork";
 import ConnectorGlyph from "../../components/dashboard/ConnectorGlyph";
 import "./Dashboard.css";
@@ -73,6 +74,10 @@ const Dashboard = () => {
       <div className="cn-rail">
         <section className="cn-groups">
           <MyGroups />
+        </section>
+
+        <section className="cn-recommendations">
+          <Recommendations />
         </section>
 
         <section className="cn-events card sidebar-section" id="cn-events" tabIndex={-1} aria-labelledby="cn-events-title">

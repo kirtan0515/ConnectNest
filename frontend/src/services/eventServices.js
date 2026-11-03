@@ -33,3 +33,19 @@ export const listMyRsvps = async () => {
   const res = await api.get("/me/rsvps");
   return res?.items ?? [];
 };
+
+// --- Week 11: recommendations ---
+/**
+ * Events suggested for the current user, each with a `reasons` array and a
+ * `score`. `personalized` is false for users with no history yet.
+ * Returns { items, personalized }.
+ */
+export const getRecommendations = async () => {
+  const res = await api.get("/me/recommendations");
+  return { items: res?.items ?? [], personalized: !!res?.personalized };
+};
+
+// --- Comments: delete ---
+/** Delete one of the current user's own comments on a post. */
+export const deleteComment = async (postId, commentId) =>
+  api.del(`/posts/${postId}/comments/${commentId}`);

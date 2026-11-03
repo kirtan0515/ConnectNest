@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import moment from "moment";
-import { Heart, MessageCircle, Share2, SendHorizontal } from "lucide-react";
+import { Heart, MessageCircle, Share2, SendHorizontal, Trash2 } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
 import { api } from "../../api/client";
 import { toggleLike } from "./postLikeUtils";
@@ -110,6 +110,18 @@ function PostItem({ post }) {
     }
   };
 
+  const deleteComment = async (commentId) => {
+    // Optimistic remove; restore the list if the request fails.
+    const prev = comments;
+    setComments((cs) => cs.filter((c) => c.commentId !== commentId));
+    try {
+      await api.del(`/posts/${post.postId}/comments/${commentId}`);
+    } catch (err) {
+      console.error("Delete comment error:", err);
+      setComments(prev);
+    }
+  };
+
   const myName =
     user?.name || (user?.email ? user.email.split("@")[0] : null) || "U";
 
@@ -210,6 +222,17 @@ function PostItem({ post }) {
                 <span className="post__comment-author">{c.authorName}</span>
                 <span className="post__comment-text">{c.content}</span>
               </div>
+              {user?.userId && c.authorId === user.userId && (
+                <button
+                  type="button"
+                  className="post__comment-delete"
+                  onClick={() => deleteComment(c.commentId)}
+                  aria-label="Delete comment"
+                  title="Delete comment"
+                >
+                  <Trash2 size={14} strokeWidth={1.75} aria-hidden="true" />
+                </button>
+              )}
             </div>
           ))}
         </div>

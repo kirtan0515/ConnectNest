@@ -25,14 +25,29 @@ PASS = FAIL = 0
 CLAIMS = {"sub": "smoke-test", "name": "Smoke Test", "email": "smoke@example.com"}
 
 
+_ALL_FUNCTIONS = None
+
+
+def _all_functions():
+    """All deployed Lambda names, fetched once (list-functions is paginated, so
+    a server-side `contains(...)|[0]` query can return a per-page result and
+    miss matches once the account has enough functions)."""
+    global _ALL_FUNCTIONS
+    if _ALL_FUNCTIONS is None:
+        r = subprocess.run(
+            ["aws", "lambda", "list-functions",
+             "--query", "Functions[].FunctionName", "--output", "json"],
+            capture_output=True, text=True)
+        _ALL_FUNCTIONS = json.loads(r.stdout or "[]")
+    return _ALL_FUNCTIONS
+
+
 def fn(substr):
     """Find the deployed Lambda whose name contains `substr`."""
-    r = subprocess.run(
-        ["aws", "lambda", "list-functions", "--query",
-         f"Functions[?contains(FunctionName,'{substr}')].FunctionName|[0]",
-         "--output", "text"],
-        capture_output=True, text=True)
-    return r.stdout.strip()
+    for name in _all_functions():
+        if substr in name:
+            return name
+    return ""
 
 
 def event(body=None, path=None):
@@ -95,8 +110,17 @@ r = check("create post", invoke(fn("CreatePostFn"), event(body={"content": "Smok
 pid = body_id(r, "postId")
 check("list posts", invoke(fn("ListPostsFn"), event()), "200")
 check("toggle like", invoke(fn("ToggleLikeFn"), event(body={}, path={"postId": pid})))
-check("create comment", invoke(fn("CreateCommentFn"), event(body={"content": "nice"}, path={"postId": pid})))
+r = check("create comment", invoke(fn("CreateCommentFn"), event(body={"content": "nice"}, path={"postId": pid})))
+cid = body_id(r, "commentId")
 check("list comments", invoke(fn("ListCommentsFn"), event(path={"postId": pid})), "200")
+check("delete comment (author)",
+      invoke(fn("DeleteCommentFn"), event(path={"postId": pid, "commentId": cid})), "204")
+check("delete comment (non-author forbidden)",
+      invoke(fn("DeleteCommentFn"),
+             json.dumps({"requestContext": {"authorizer": {"jwt": {"claims":
+                 {"sub": "smoke-other", "name": "Other"}}}},
+                 "pathParameters": {"postId": pid, "commentId": "missing#x"}})),
+      "403")
 
 # Groups
 r = check("create group", invoke(fn("CreateGroupFn"), event(body={"name": "Smoke Club", "description": "demo"})), "201")
@@ -106,6 +130,9 @@ check("get group", invoke(fn("GetGroupFn"), event(path={"groupId": gid})), "200"
 check("join group", invoke(fn("JoinGroupFn"), event(body={}, path={"groupId": gid})))
 check("my groups", invoke(fn("ListMyGroupsFn"), event()), "200")
 check("group members", invoke(fn("ListMembersFn"), event(path={"groupId": gid})), "200")
+
+# Recommendations
+check("recommendations", invoke(fn("GetRecommendationsFn"), event()), "200")
 
 # Activity, profiles
 check("activity digest", invoke(fn("GetActivityFn"), event()), "200")

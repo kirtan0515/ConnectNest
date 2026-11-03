@@ -125,8 +125,8 @@
   <rect class="grp" x="190" y="940" width="1390" height="110" rx="6"/>
   <text x="205" y="962" class="g">Planned / future (not deployed)</text>
   <rect x="205" y="975" width="184" height="58" rx="8" fill="#fff" stroke="#8a8f98" stroke-width="1.4" stroke-dasharray="5 4"/>
-  <text x="297" y="999" class="l" style="stroke:none">Recommendations</text>
-  <text x="297" y="1017" class="s" style="stroke:none">Week 11 · suggested events</text>
+  <text x="297" y="999" class="l" style="stroke:none">Comment editing</text>
+  <text x="297" y="1017" class="s" style="stroke:none">Edit posted comments</text>
   <rect x="401" y="975" width="184" height="58" rx="8" fill="#fff" stroke="#8a8f98" stroke-width="1.4" stroke-dasharray="5 4"/>
   <text x="493" y="999" class="l" style="stroke:none">Notifications</text>
   <text x="493" y="1017" class="s" style="stroke:none">RSVP and event reminders</text>

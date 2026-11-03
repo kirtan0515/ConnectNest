@@ -255,6 +255,15 @@ export class ApiStack extends Stack {
       EVENTS_TABLE: tables.events.tableName,
       RSVPS_TABLE: tables.rsvps.tableName,
     });
+    const getRecommendations = makeFn(
+      "GetRecommendationsFn",
+      "handlers/events/getRecommendations.ts",
+      {
+        EVENTS_TABLE: tables.events.tableName,
+        RSVPS_TABLE: tables.rsvps.tableName,
+        GROUP_MEMBERS_TABLE: tables.groupMembers.tableName,
+      }
+    );
 
     // Posts / likes / comments
     const listPosts = makeFn("ListPostsFn", "handlers/posts/listPosts.ts", {
@@ -279,6 +288,11 @@ export class ApiStack extends Stack {
     const createComment = makeFn(
       "CreateCommentFn",
       "handlers/posts/createComment.ts",
+      { COMMENTS_TABLE: tables.comments.tableName }
+    );
+    const deleteComment = makeFn(
+      "DeleteCommentFn",
+      "handlers/posts/deleteComment.ts",
       { COMMENTS_TABLE: tables.comments.tableName }
     );
 
@@ -365,6 +379,9 @@ export class ApiStack extends Stack {
     tables.rsvps.grantReadData(listAttendees);
     tables.events.grantReadData(listMyRsvps);
     tables.rsvps.grantReadData(listMyRsvps);
+    tables.events.grantReadData(getRecommendations);
+    tables.rsvps.grantReadData(getRecommendations);
+    tables.groupMembers.grantReadData(getRecommendations);
 
     tables.posts.grantReadData(listPosts);
     tables.posts.grantReadWriteData(createPost);
@@ -374,6 +391,7 @@ export class ApiStack extends Stack {
     tables.postLikes.grantReadWriteData(toggleLike);
     tables.comments.grantReadData(listComments);
     tables.comments.grantReadWriteData(createComment);
+    tables.comments.grantReadWriteData(deleteComment);
 
     tables.groups.grantReadData(listGroups);
     tables.groups.grantReadWriteData(createGroup);
@@ -474,6 +492,7 @@ export class ApiStack extends Stack {
     route(HttpMethod.POST, "/events/{eventId}/rsvp", rsvpToEvent);
     route(HttpMethod.GET, "/events/{eventId}/rsvps", listAttendees);
     route(HttpMethod.GET, "/me/rsvps", listMyRsvps);
+    route(HttpMethod.GET, "/me/recommendations", getRecommendations);
 
     // Posts / likes / comments
     route(HttpMethod.GET, "/posts", listPosts);
@@ -482,6 +501,11 @@ export class ApiStack extends Stack {
     route(HttpMethod.POST, "/posts/{postId}/like", toggleLike);
     route(HttpMethod.GET, "/posts/{postId}/comments", listComments);
     route(HttpMethod.POST, "/posts/{postId}/comments", createComment);
+    route(
+      HttpMethod.DELETE,
+      "/posts/{postId}/comments/{commentId}",
+      deleteComment
+    );
 
     // Groups
     route(HttpMethod.GET, "/groups", listGroups);
