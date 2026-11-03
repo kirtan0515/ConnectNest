@@ -40,6 +40,11 @@ jobs:
           npm ci
           CI=false npm run build
 
+      # Root deps include esbuild, which CDK spawns (from the repo root) to
+      # bundle the Lambda handlers. Without it, bundling falls back to Docker.
+      - name: Install root deps (esbuild for bundling)
+        run: npm ci
+
       - name: Install infra deps
         working-directory: infra
         run: npm ci
