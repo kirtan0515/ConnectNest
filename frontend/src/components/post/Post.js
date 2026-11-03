@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import moment from "moment";
-import { Heart, MessageCircle, Share2, SendHorizontal, Trash2 } from "lucide-react";
+import { Heart, MessageCircle, Share2, SendHorizontal, Trash2, Pencil } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
 import { api } from "../../api/client";
 import { toggleLike } from "./postLikeUtils";
@@ -122,6 +122,34 @@ function PostItem({ post }) {
     }
   };
 
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState("");
+
+  const startEdit = (c) => {
+    setEditingId(c.commentId);
+    setEditText(c.content);
+  };
+
+  const saveEdit = async (commentId) => {
+    const text = editText.trim();
+    if (!text) return;
+    const prev = comments;
+    setComments((cs) =>
+      cs.map((c) =>
+        c.commentId === commentId ? { ...c, content: text, editedAt: "now" } : c
+      )
+    );
+    setEditingId(null);
+    try {
+      await api.put(`/posts/${post.postId}/comments/${commentId}`, {
+        content: text,
+      });
+    } catch (err) {
+      console.error("Edit comment error:", err);
+      setComments(prev); // restore on failure
+    }
+  };
+
   const myName =
     user?.name || (user?.email ? user.email.split("@")[0] : null) || "U";
 
@@ -218,21 +246,65 @@ function PostItem({ post }) {
                 src={`https://ui-avatars.com/api/?name=${encodeURIComponent(c.authorName || "U")}&background=random&size=64`}
                 alt={c.authorName}
               />
-              <div className="post__comment-bubble">
-                <span className="post__comment-author">{c.authorName}</span>
-                <span className="post__comment-text">{c.content}</span>
-              </div>
-              {user?.userId && c.authorId === user.userId && (
-                <button
-                  type="button"
-                  className="post__comment-delete"
-                  onClick={() => deleteComment(c.commentId)}
-                  aria-label="Delete comment"
-                  title="Delete comment"
-                >
-                  <Trash2 size={14} strokeWidth={1.75} aria-hidden="true" />
-                </button>
+              {editingId === c.commentId ? (
+                <div className="post__comment-edit">
+                  <input
+                    type="text"
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") saveEdit(c.commentId);
+                      if (e.key === "Escape") setEditingId(null);
+                    }}
+                    autoFocus
+                    aria-label="Edit comment"
+                  />
+                  <button type="button" onClick={() => saveEdit(c.commentId)}>
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="ghost"
+                    onClick={() => setEditingId(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="post__comment-bubble">
+                  <span className="post__comment-author">{c.authorName}</span>
+                  <span className="post__comment-text">
+                    {c.content}
+                    {c.editedAt && (
+                      <span className="post__comment-edited"> (edited)</span>
+                    )}
+                  </span>
+                </div>
               )}
+              {user?.userId &&
+                c.authorId === user.userId &&
+                editingId !== c.commentId && (
+                  <div className="post__comment-tools">
+                    <button
+                      type="button"
+                      className="post__comment-tool"
+                      onClick={() => startEdit(c)}
+                      aria-label="Edit comment"
+                      title="Edit comment"
+                    >
+                      <Pencil size={14} strokeWidth={1.75} aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      className="post__comment-tool"
+                      onClick={() => deleteComment(c.commentId)}
+                      aria-label="Delete comment"
+                      title="Delete comment"
+                    >
+                      <Trash2 size={14} strokeWidth={1.75} aria-hidden="true" />
+                    </button>
+                  </div>
+                )}
             </div>
           ))}
         </div>

@@ -6,9 +6,11 @@ import {
   notFound,
   serverError,
   getUserId,
+  getName,
   pathParam,
   type ApiEvent,
 } from "../../shared/http.js";
+import { notify } from "../../shared/notifications.js";
 
 const GROUPS_TABLE = process.env.GROUPS_TABLE!;
 const MEMBERS_TABLE = process.env.GROUP_MEMBERS_TABLE!;
@@ -39,6 +41,16 @@ export const handler = async (event: ApiEvent) => {
         },
       })
     );
+
+    const actorName = getName(event) ?? "Someone";
+    await notify({
+      recipientId: String(group.Item.ownerId ?? ""),
+      actorId: userId,
+      actorName,
+      type: "group.join",
+      message: `${actorName} joined your group "${group.Item.name ?? "group"}"`,
+      link: `/groups/${groupId}`,
+    });
 
     return ok({ groupId, userId, joined: true });
   } catch (err) {

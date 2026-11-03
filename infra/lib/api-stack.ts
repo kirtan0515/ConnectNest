@@ -50,6 +50,7 @@ export interface ApiStackProps extends StackProps {
     groups: Table;
     groupMembers: Table;
     auditLog: Table;
+    notifications: Table;
   };
   /**
    * Optional realtime wiring. When present, createPost/createEvent gain the
@@ -245,6 +246,7 @@ export class ApiStack extends Stack {
     const rsvpToEvent = makeFn("RsvpToEventFn", "handlers/events/rsvpToEvent.ts", {
       EVENTS_TABLE: tables.events.tableName,
       RSVPS_TABLE: tables.rsvps.tableName,
+      NOTIFICATIONS_TABLE: tables.notifications.tableName,
     });
     const listAttendees = makeFn(
       "ListAttendeesFn",
@@ -265,6 +267,18 @@ export class ApiStack extends Stack {
       }
     );
 
+    // Notifications
+    const listNotifications = makeFn(
+      "ListNotificationsFn",
+      "handlers/notifications/listNotifications.ts",
+      { NOTIFICATIONS_TABLE: tables.notifications.tableName }
+    );
+    const markNotificationsRead = makeFn(
+      "MarkNotificationsReadFn",
+      "handlers/notifications/markRead.ts",
+      { NOTIFICATIONS_TABLE: tables.notifications.tableName }
+    );
+
     // Posts / likes / comments
     const listPosts = makeFn("ListPostsFn", "handlers/posts/listPosts.ts", {
       POSTS_TABLE: tables.posts.tableName,
@@ -279,6 +293,7 @@ export class ApiStack extends Stack {
     const toggleLike = makeFn("ToggleLikeFn", "handlers/posts/toggleLike.ts", {
       POSTS_TABLE: tables.posts.tableName,
       POST_LIKES_TABLE: tables.postLikes.tableName,
+      NOTIFICATIONS_TABLE: tables.notifications.tableName,
     });
     const listComments = makeFn(
       "ListCommentsFn",
@@ -288,11 +303,20 @@ export class ApiStack extends Stack {
     const createComment = makeFn(
       "CreateCommentFn",
       "handlers/posts/createComment.ts",
-      { COMMENTS_TABLE: tables.comments.tableName }
+      {
+        COMMENTS_TABLE: tables.comments.tableName,
+        POSTS_TABLE: tables.posts.tableName,
+        NOTIFICATIONS_TABLE: tables.notifications.tableName,
+      }
     );
     const deleteComment = makeFn(
       "DeleteCommentFn",
       "handlers/posts/deleteComment.ts",
+      { COMMENTS_TABLE: tables.comments.tableName }
+    );
+    const updateComment = makeFn(
+      "UpdateCommentFn",
+      "handlers/posts/updateComment.ts",
       { COMMENTS_TABLE: tables.comments.tableName }
     );
 
@@ -309,6 +333,7 @@ export class ApiStack extends Stack {
     const joinGroup = makeFn("JoinGroupFn", "handlers/groups/joinGroup.ts", {
       GROUPS_TABLE: tables.groups.tableName,
       GROUP_MEMBERS_TABLE: tables.groupMembers.tableName,
+      NOTIFICATIONS_TABLE: tables.notifications.tableName,
     });
     const listMyGroups = makeFn(
       "ListMyGroupsFn",
@@ -376,6 +401,7 @@ export class ApiStack extends Stack {
     tables.events.grantReadWriteData(deleteEvent);
     tables.events.grantReadData(rsvpToEvent);
     tables.rsvps.grantReadWriteData(rsvpToEvent);
+    tables.notifications.grantWriteData(rsvpToEvent);
     tables.rsvps.grantReadData(listAttendees);
     tables.events.grantReadData(listMyRsvps);
     tables.rsvps.grantReadData(listMyRsvps);
@@ -389,15 +415,24 @@ export class ApiStack extends Stack {
     tables.posts.grantReadWriteData(deletePost);
     tables.posts.grantReadWriteData(toggleLike);
     tables.postLikes.grantReadWriteData(toggleLike);
+    tables.notifications.grantWriteData(toggleLike);
     tables.comments.grantReadData(listComments);
     tables.comments.grantReadWriteData(createComment);
+    tables.posts.grantReadData(createComment);
+    tables.notifications.grantWriteData(createComment);
     tables.comments.grantReadWriteData(deleteComment);
+    tables.comments.grantReadWriteData(updateComment);
+
+    // Notifications: list/mark-read own rows.
+    tables.notifications.grantReadWriteData(listNotifications);
+    tables.notifications.grantReadWriteData(markNotificationsRead);
 
     tables.groups.grantReadData(listGroups);
     tables.groups.grantReadWriteData(createGroup);
     tables.groups.grantReadData(getGroup);
     tables.groups.grantReadData(joinGroup);
     tables.groupMembers.grantReadWriteData(joinGroup);
+    tables.notifications.grantWriteData(joinGroup);
     tables.groups.grantReadData(listMyGroups);
     tables.groupMembers.grantReadData(listMyGroups);
     tables.groupMembers.grantReadData(listMembers);
@@ -420,18 +455,23 @@ export class ApiStack extends Stack {
       const { connectionsTable, webSocketApi, managementEndpoint } =
         props.realtime;
 
-      createPost.addEnvironment("CONNECTIONS_TABLE", connectionsTable.tableName);
-      createPost.addEnvironment("WS_MANAGEMENT_ENDPOINT", managementEndpoint);
-      createEvent.addEnvironment(
-        "CONNECTIONS_TABLE",
-        connectionsTable.tableName
-      );
-      createEvent.addEnvironment("WS_MANAGEMENT_ENDPOINT", managementEndpoint);
-
-      connectionsTable.grantReadWriteData(createPost);
-      connectionsTable.grantReadWriteData(createEvent);
-      webSocketApi.grantManageConnections(createPost);
-      webSocketApi.grantManageConnections(createEvent);
+      // createPost/createEvent broadcast the new item; the notification
+      // producers (rsvp, comment, like, join) push "notification.created" to
+      // the recipient over the same WebSocket fan-out.
+      const broadcasters = [
+        createPost,
+        createEvent,
+        rsvpToEvent,
+        createComment,
+        toggleLike,
+        joinGroup,
+      ];
+      for (const fn of broadcasters) {
+        fn.addEnvironment("CONNECTIONS_TABLE", connectionsTable.tableName);
+        fn.addEnvironment("WS_MANAGEMENT_ENDPOINT", managementEndpoint);
+        connectionsTable.grantReadWriteData(fn);
+        webSocketApi.grantManageConnections(fn);
+      }
     }
 
     // ---- Image moderation: S3 ObjectCreated -> Rekognition -> delete if unsafe ----
@@ -493,6 +533,9 @@ export class ApiStack extends Stack {
     route(HttpMethod.GET, "/events/{eventId}/rsvps", listAttendees);
     route(HttpMethod.GET, "/me/rsvps", listMyRsvps);
     route(HttpMethod.GET, "/me/recommendations", getRecommendations);
+    // Notifications
+    route(HttpMethod.GET, "/me/notifications", listNotifications);
+    route(HttpMethod.POST, "/me/notifications/read", markNotificationsRead);
 
     // Posts / likes / comments
     route(HttpMethod.GET, "/posts", listPosts);
@@ -501,6 +544,11 @@ export class ApiStack extends Stack {
     route(HttpMethod.POST, "/posts/{postId}/like", toggleLike);
     route(HttpMethod.GET, "/posts/{postId}/comments", listComments);
     route(HttpMethod.POST, "/posts/{postId}/comments", createComment);
+    route(
+      HttpMethod.PUT,
+      "/posts/{postId}/comments/{commentId}",
+      updateComment
+    );
     route(
       HttpMethod.DELETE,
       "/posts/{postId}/comments/{commentId}",

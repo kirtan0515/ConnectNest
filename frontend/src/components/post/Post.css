@@ -206,14 +206,24 @@
   word-break: break-word;
 }
 
-/* Delete control — only shown on the signed-in user's own comments.
-   Stays faint until the comment row is hovered or the button is focused. */
+/* Edit/delete controls — only shown on the signed-in user's own comments.
+   Stay faint until the comment row is hovered or a button is focused. */
 .post__comment {
   position: relative;
 }
-.post__comment-delete {
+.post__comment-tools {
   margin-left: auto;
   align-self: center;
+  display: inline-flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.post__comment:hover .post__comment-tools,
+.post__comment-tools:focus-within {
+  opacity: 1;
+}
+.post__comment-tool {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -224,18 +234,59 @@
   background: transparent;
   color: var(--text-muted, #8aa);
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
-.post__comment:hover .post__comment-delete,
-.post__comment-delete:focus-visible {
-  opacity: 1;
+.post__comment-tool:hover {
+  background: rgba(255, 159, 104, 0.14);
+  color: var(--brand, #ff9f68);
 }
-.post__comment-delete:hover {
+.post__comment-tool:last-child:hover {
   background: rgba(229, 72, 77, 0.12);
   color: #e5484d;
 }
-.post__comment-delete:focus-visible {
+.post__comment-tool:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
+}
+.post__comment-edited {
+  color: var(--text-muted, #8aa);
+  font-size: 11px;
+}
+.post__comment-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.post__comment-edit input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg, #0d2a2c);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+.post__comment-edit input:focus {
+  outline: none;
+  border-color: var(--brand);
+}
+.post__comment-edit button {
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--brand, #ff9f68);
+  color: #1a1a2e;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.post__comment-edit button.ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
 }

@@ -11,6 +11,7 @@ import {
   pathParam,
   type ApiEvent,
 } from "../../shared/http.js";
+import { notify } from "../../shared/notifications.js";
 
 const EVENTS_TABLE = process.env.EVENTS_TABLE!;
 const RSVPS_TABLE = process.env.RSVPS_TABLE!;
@@ -59,6 +60,16 @@ export const handler = async (event: ApiEvent) => {
         },
       })
     );
+
+    const actorName = getName(event) ?? "Someone";
+    await notify({
+      recipientId: String(existing.Item.ownerId ?? ""),
+      actorId: userId,
+      actorName,
+      type: "event.rsvp",
+      message: `${actorName} is ${status} to your event "${existing.Item.title ?? "event"}"`,
+      link: `/events/${eventId}`,
+    });
 
     return ok({ eventId, userId, rsvped: true, status });
   } catch (err) {

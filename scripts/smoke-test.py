@@ -113,6 +113,8 @@ check("toggle like", invoke(fn("ToggleLikeFn"), event(body={}, path={"postId": p
 r = check("create comment", invoke(fn("CreateCommentFn"), event(body={"content": "nice"}, path={"postId": pid})))
 cid = body_id(r, "commentId")
 check("list comments", invoke(fn("ListCommentsFn"), event(path={"postId": pid})), "200")
+check("edit comment (author)",
+      invoke(fn("UpdateCommentFn"), event(body={"content": "edited"}, path={"postId": pid, "commentId": cid})), "200")
 check("delete comment (author)",
       invoke(fn("DeleteCommentFn"), event(path={"postId": pid, "commentId": cid})), "204")
 check("delete comment (non-author forbidden)",
@@ -133,6 +135,10 @@ check("group members", invoke(fn("ListMembersFn"), event(path={"groupId": gid}))
 
 # Recommendations
 check("recommendations", invoke(fn("GetRecommendationsFn"), event()), "200")
+
+# Notifications
+check("list notifications", invoke(fn("ListNotificationsFn"), event()), "200")
+check("mark notifications read", invoke(fn("MarkNotificationsReadFn"), event(body={})), "200")
 
 # Activity, profiles
 check("activity digest", invoke(fn("GetActivityFn"), event()), "200")

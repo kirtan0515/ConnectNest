@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { ddb } from "../../shared/db.js";
 import {
   created,
@@ -12,8 +12,10 @@ import {
   type ApiEvent,
 } from "../../shared/http.js";
 import { moderateText } from "../../shared/moderation.js";
+import { notify } from "../../shared/notifications.js";
 
 const TABLE = process.env.COMMENTS_TABLE!;
+const POSTS_TABLE = process.env.POSTS_TABLE!;
 
 interface CommentInput {
   content?: string;
@@ -45,6 +47,27 @@ export const handler = async (event: ApiEvent) => {
     };
 
     await ddb.send(new PutCommand({ TableName: TABLE, Item: item }));
+
+    // Notify the post author (best-effort; never blocks the comment).
+    try {
+      const post = await ddb.send(
+        new GetCommand({ TableName: POSTS_TABLE, Key: { postId } })
+      );
+      if (post.Item) {
+        const actorName = getName(event) ?? "Someone";
+        await notify({
+          recipientId: String(post.Item.authorId ?? ""),
+          actorId: authorId,
+          actorName,
+          type: "post.comment",
+          message: `${actorName} commented on your post`,
+          link: "/dashboard",
+        });
+      }
+    } catch (e) {
+      console.error("createComment notify lookup error", e);
+    }
+
     return created(item);
   } catch (err) {
     console.error("createComment error", err);

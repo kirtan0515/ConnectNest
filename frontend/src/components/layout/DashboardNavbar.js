@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { Activity } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
+import NotificationBell from "./NotificationBell";
 import logo from "../../assets/connectnest-logo.png";
 import "./DashboardNavbar.css";
 
@@ -57,8 +58,9 @@ export default function DashboardNavbar() {
           </NavLink>
         </nav>
 
-        {/* Right: avatar menu */}
+        {/* Right: notifications + avatar menu */}
         <div className="dash-navbar__right">
+          <NotificationBell />
           <button className="dash-avatar-btn" onClick={() => setMenuOpen((o) => !o)}>
             {pictureUrl
               ? <img src={pictureUrl} alt={displayName} className="avatar" style={{ width: 36, height: 36 }} />

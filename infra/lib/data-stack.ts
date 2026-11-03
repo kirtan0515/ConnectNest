@@ -26,6 +26,7 @@ export class DataStack extends Stack {
   public readonly groupsTable: Table;
   public readonly groupMembersTable: Table;
   public readonly auditLogTable: Table;
+  public readonly notificationsTable: Table;
 
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
@@ -124,6 +125,16 @@ export class DataStack extends Stack {
     this.auditLogTable = new Table(this, "AuditLogTable", {
       partitionKey: { name: "userId", type: AttributeType.STRING },
       sortKey: { name: "ts", type: AttributeType.STRING },
+      ...common,
+    });
+
+    // Notifications: PK userId (recipient), SK notificationId ("<ts>#<uuid>" so
+    // a Query returns newest-last and stays unique). Each row records who did
+    // what on which entity, plus a read flag. Old rows expire via `ttl`.
+    this.notificationsTable = new Table(this, "NotificationsTable", {
+      partitionKey: { name: "userId", type: AttributeType.STRING },
+      sortKey: { name: "notificationId", type: AttributeType.STRING },
+      timeToLiveAttribute: "ttl",
       ...common,
     });
   }

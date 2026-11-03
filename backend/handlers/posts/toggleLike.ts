@@ -10,9 +10,11 @@ import {
   badRequest,
   serverError,
   getUserId,
+  getName,
   pathParam,
   type ApiEvent,
 } from "../../shared/http.js";
+import { notify } from "../../shared/notifications.js";
 
 const POSTS_TABLE = process.env.POSTS_TABLE!;
 const LIKES_TABLE = process.env.POST_LIKES_TABLE!;
@@ -63,6 +65,29 @@ export const handler = async (event: ApiEvent) => {
     );
 
     const likeCount = Math.max(0, Number(res.Attributes?.likeCount ?? 0));
+
+    // Notify the post author on a new like only (not on unlike).
+    if (liked) {
+      try {
+        const post = await ddb.send(
+          new GetCommand({ TableName: POSTS_TABLE, Key: { postId } })
+        );
+        if (post.Item) {
+          const actorName = getName(event) ?? "Someone";
+          await notify({
+            recipientId: String(post.Item.authorId ?? ""),
+            actorId: userId,
+            actorName,
+            type: "post.like",
+            message: `${actorName} liked your post`,
+            link: "/dashboard",
+          });
+        }
+      } catch (e) {
+        console.error("toggleLike notify lookup error", e);
+      }
+    }
+
     return ok({ postId, liked, likeCount });
   } catch (err) {
     console.error("toggleLike error", err);
