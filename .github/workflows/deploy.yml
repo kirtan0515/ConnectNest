@@ -41,8 +41,13 @@ jobs:
           CI=false npm run build
 
       # Root deps include esbuild, which CDK spawns (from the repo root) to
-      # bundle the Lambda handlers. Without it, bundling falls back to Docker.
+      # bundle the Lambda handlers; backend deps provide the handlers' runtime
+      # imports. Without them, bundling fails or falls back to Docker.
       - name: Install root deps (esbuild for bundling)
+        run: npm ci
+
+      - name: Install backend deps (handler imports)
+        working-directory: backend
         run: npm ci
 
       - name: Install infra deps

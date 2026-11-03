@@ -59,9 +59,12 @@ jobs:
           cache: npm
           cache-dependency-path: infra/package-lock.json
       # CDK bundles the Lambda handlers with esbuild, spawning it from the repo
-      # root, so esbuild must resolve there. Install root deps (which include
-      # esbuild) in addition to the infra deps.
+      # root. esbuild must resolve there (root deps) and the handlers' runtime
+      # imports must resolve too (backend deps).
       - name: Install root deps (esbuild for bundling)
+        run: npm ci
+      - name: Install backend deps (handler imports)
+        working-directory: backend
         run: npm ci
       - name: Install infra deps
         working-directory: infra
