@@ -20,4 +20,9 @@ export default defineConfig({
     sourcemap: false,
   },
   server: { port: 3000 },
+  test: {
+    environment: "jsdom",
+    globals: true,
+    include: ["src/**/*.{test,spec}.{js,jsx}"],
+  },
 });

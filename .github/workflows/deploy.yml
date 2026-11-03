@@ -1,0 +1,55 @@
+name: Deploy
+
+# Manual deploy of the whole stack to AWS. This is deliberately NOT automatic:
+# deploys touch live infrastructure, so a human triggers them from the Actions
+# tab ("Run workflow").
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   AWS_ROLE_ARN   IAM role to assume via GitHub OIDC (preferred), OR
+#   AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY for an IAM user.
+# This file is wired for the OIDC role path; swap the configure-credentials step
+# if you use static keys.
+on:
+  workflow_dispatch:
+    inputs:
+      stacks:
+        description: "Stacks to deploy (space-separated, or --all)"
+        required: true
+        default: "--all"
+
+permissions:
+  id-token: write # for AWS OIDC
+  contents: read
+
+jobs:
+  deploy:
+    name: cdk deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # Build the SPA first so ConnectNest-Hosting ships the latest frontend.
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          CI=false npm run build
+
+      - name: Install infra deps
+        working-directory: infra
+        run: npm ci
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: CDK deploy
+        working-directory: infra
+        run: npx cdk deploy ${{ github.event.inputs.stacks }} --require-approval never

@@ -8,8 +8,11 @@
     "deploy": "npm --prefix infra run deploy",
     "destroy": "npm --prefix infra run destroy",
     "backend:check": "npm --prefix backend run typecheck",
+    "backend:test": "npm --prefix backend test",
+    "infra:check": "npm --prefix infra run typecheck",
     "frontend:start": "npm --prefix frontend start",
-    "frontend:build": "npm --prefix frontend run build"
+    "frontend:build": "npm --prefix frontend run build",
+    "frontend:test": "npm --prefix frontend test"
   },
   "devDependencies": {
     "esbuild": "^0.24.0"

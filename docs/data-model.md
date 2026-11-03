@@ -10,12 +10,13 @@ switch to `RETAIN` for production data).
 | Events | `eventId` (UUID) | — | `byOwner` (ownerId, createdAt) | title, description, location, startsAt, ownerId, ownerName, imageKey, createdAt |
 | RSVPs | `eventId` | `userId` | `byUser` (userId, eventId) | status (going/interested) |
 | Posts | `postId` (UUID) | — | `byGroup` (groupId, createdAt) | authorId, authorName, content, groupId, imageKey, likeCount, createdAt |
-| Comments | `postId` | `commentId` | — | authorId, authorName, content, createdAt |
+| Comments | `postId` | `commentId` | — | authorId, authorName, content, createdAt, editedAt |
 | PostLikes | `postId` | `userId` | — | createdAt (prevents double-likes) |
 | Groups | `groupId` (UUID) | — | — | name, description, ownerId, memberCount, createdAt |
 | GroupMembers | `groupId` | `userId` | `byUser` (userId, groupId) | role (member/admin), joinedAt |
 | AuditLog | `userId` | `timestamp` | — | action (deactivate/delete/reactivate/purge), detail, createdAt |
 | Connections | `connectionId` | — | — | userId, ttl (auto-expire stale WebSocket connections) |
+| Notifications | `userId` (recipient) | `notificationId` (`<ts>#<uuid>`) | — | type, actorId, actorName, message, link, read, createdAt, ttl (90-day expiry) |
 
 The AuditLog table (account lifecycle) and Connections table (real-time
 WebSocket push) live in `ConnectNest-Data` and `ConnectNest-Realtime`

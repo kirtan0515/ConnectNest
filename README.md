@@ -203,17 +203,37 @@ identity always comes from the verified token, never from the request body.
 
 ## Testing
 
-`scripts/smoke-test.py` invokes the deployed Lambda handlers with a synthetic
-authenticated event and checks the main flows: events and RSVP, posts, likes,
-comments, groups, the activity digest, profiles, content moderation, and upload
-URLs (22 checks). It needs the AWS CLI configured for the target account and
-writes a few test records, so run it against a development or demo stack.
+Unit tests (run locally and in CI, no AWS needed):
+
+```bash
+(cd backend && npm test)    # moderation + recommendation scoring
+(cd frontend && npm test)   # API client + components (Vitest + jsdom)
+```
+
+End-to-end smoke test against a deployed stack: `scripts/smoke-test.py` invokes
+the deployed Lambda handlers with a synthetic authenticated event and checks the
+main flows: events and RSVP, posts, likes, comments (edit + delete),
+recommendations, notifications, groups, the activity digest, profiles, content
+moderation, and upload URLs (28 checks). It needs the AWS CLI configured for the
+target account and writes a few test records, so run it against a development or
+demo stack.
 
 ```bash
 python3 scripts/smoke-test.py
 ```
 
-There is no automated browser or unit-test suite yet.
+## Continuous integration and deployment
+
+GitHub Actions runs on every push and pull request
+([.github/workflows/ci.yml](.github/workflows/ci.yml)): it type-checks the
+backend and infra, runs the backend and frontend unit tests, builds the SPA, and
+synthesizes the CDK templates. CI never touches AWS.
+
+Deployment is a separate, manually triggered workflow
+([.github/workflows/deploy.yml](.github/workflows/deploy.yml)) run from the
+Actions tab. It builds the SPA and runs `cdk deploy`, assuming an AWS role via
+GitHub OIDC (set the `AWS_ROLE_ARN` repository secret). Deploys stay manual on
+purpose, since they change live infrastructure.
 
 ## Security
 
@@ -234,17 +254,17 @@ ConnectNest uses defense in depth. No single control is treated as sufficient.
 ## Project status
 
 Implemented: authentication, profiles, events and RSVP, posts with likes and
-comments (author delete) and event recommendations, groups with member-gated
-posting, image upload and display with moderation, the activity view, real-time
-push, self-service MFA, CloudWatch alarms, and the production deployment.
+comments (author edit and delete), event recommendations, in-app notifications,
+groups with member-gated posting, image upload and display with moderation, the
+activity view, real-time push, self-service MFA, CloudWatch alarms, a CI
+pipeline with unit tests, and the production deployment.
 
 Known gaps and planned work:
 
-- Comments can be deleted by their author; editing is not built yet.
-- There is no automated UI or unit test suite. The backend is covered by the
-  scripted smoke test described above.
 - Microsoft sign-in works for personal Microsoft accounts. Organizational
   accounts require tenant approval from the institution.
+- Notifications and recommendations are rule-based; richer ranking (e.g. Amazon
+  Personalize) is a documented upgrade path.
 
 ## Credits and license
 
