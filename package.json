@@ -15,6 +15,6 @@
     "frontend:test": "npm --prefix frontend test"
   },
   "devDependencies": {
-    "esbuild": "^0.24.0"
+    "esbuild": "0.25.12"
   }
 }
