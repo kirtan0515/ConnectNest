@@ -259,12 +259,29 @@ groups with member-gated posting, image upload and display with moderation, the
 activity view, real-time push, self-service MFA, CloudWatch alarms, a CI
 pipeline with unit tests, and the production deployment.
 
-Known gaps and planned work:
+Real-time updates and in-app notifications are live over an API Gateway
+WebSocket API (new posts/events, plus RSVP, comment, like and group-join
+notifications). Delivering those beyond the app — browser push or email — is
+roadmap, not built.
 
-- Microsoft sign-in works for personal Microsoft accounts. Organizational
-  accounts require tenant approval from the institution.
-- Notifications and recommendations are rule-based; richer ranking (e.g. Amazon
-  Personalize) is a documented upgrade path.
+Roadmap:
+
+- **Canvas (LMS) integration** to auto-populate study groups from a student's
+  real course schedule. Highest-value institutional feature; needs Canvas
+  API/LTI credentials from the university.
+- **Organizational Microsoft sign-in** for `@harrisburgu.edu` identities. Needs
+  the app registered in the university's Microsoft Entra tenant.
+- **Push / email delivery** of notifications (in-app notifications already work).
+- **Feed caching** — the global feed reads via a DynamoDB Scan today; moving it
+  onto the existing GSIs with short CloudFront caching, then DAX/ElastiCache at
+  real traffic, controls latency and cost.
+- **Prerendered landing page** so first paint and SEO don't depend on JS (the
+  app itself stays a React SPA).
+- **Richer recommendation ranking** (e.g. Amazon Personalize); today's scoring is
+  transparent and rule-based.
+
+Handing the project off? See the
+[transition & operations plan](docs/transition-plan.md).
 
 ## Credits and license
 
