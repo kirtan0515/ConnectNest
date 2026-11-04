@@ -109,6 +109,27 @@ check("my rsvps", invoke(fn("ListMyRsvpsFn"), event()), "200")
 r = check("create post", invoke(fn("CreatePostFn"), event(body={"content": "Smoke test post"})), "201")
 pid = body_id(r, "postId")
 check("list posts", invoke(fn("ListPostsFn"), event()), "200")
+check("list posts by author",
+      invoke(fn("ListPostsFn"), json.dumps({"requestContext": {"authorizer": {"jwt": {"claims": CLAIMS}}},
+             "queryStringParameters": {"authorId": "smoke-test"}})), "200")
+# Open chat room: anyone may post; the message must NOT leak into the global feed.
+r = check("post to open chat room",
+          invoke(fn("CreatePostFn"), event(body={"content": "smoke chat msg", "groupId": "chat-general"})), "201")
+chat_id = body_id(r, "postId")
+feed = invoke(fn("ListPostsFn"), event())
+try:
+    leaked = "smoke chat msg" in json.loads(json.loads(feed)["body"])["items"].__str__()
+except Exception:
+    leaked = True
+if leaked:
+    print("FAIL  chat-room message leaked into the global feed")
+    FAIL += 1
+else:
+    print("PASS  chat-room message stays out of the global feed")
+    PASS += 1
+check("bad pagination token rejected",
+      invoke(fn("ListPostsFn"), json.dumps({"requestContext": {"authorizer": {"jwt": {"claims": CLAIMS}}},
+             "queryStringParameters": {"nextToken": "not-a-token"}})), "400")
 check("toggle like", invoke(fn("ToggleLikeFn"), event(body={}, path={"postId": pid})))
 r = check("create comment", invoke(fn("CreateCommentFn"), event(body={"content": "nice"}, path={"postId": pid})))
 cid = body_id(r, "commentId")

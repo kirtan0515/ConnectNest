@@ -149,7 +149,7 @@ deactivated or pending-deletion account.
   `GET /groups/{groupId}/members` and `GET /posts?groupId=` to render a group's
   own feed. Posting into a group is still gated server-side on GroupMembers
   membership.
-- `GET /activity` is a read-only aggregator Lambda that scans Events, Posts, and
-  Groups in parallel and returns upcoming events (soonest first), the newest
-  posts, and the newest groups in one response, so the Activity page needs a
-  single request.
+- `GET /activity` is a read-only aggregator Lambda that reads Events and Groups
+  (paginated scans) and queries the newest global posts via the `byGroup` index,
+  in parallel. It returns upcoming events (soonest first), the newest posts, and
+  the newest groups in one response, so the Activity page needs a single request.

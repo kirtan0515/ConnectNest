@@ -187,7 +187,7 @@ identity always comes from the verified token, never from the request body.
 | GET | `/events/{eventId}/rsvps` | Attendee list |
 | GET | `/me/rsvps` | Events the current user RSVP'd to |
 | GET | `/me/recommendations` | Suggested upcoming events, each with reasons |
-| GET, POST | `/posts` | List posts (`?groupId=` filters) or create a post |
+| GET, POST | `/posts` | List posts (global feed; `?groupId=`, `?authorId=`, `?limit=`, `?nextToken=`) or create a post |
 | DELETE | `/posts/{postId}` | Delete own post |
 | POST | `/posts/{postId}/like` | Toggle like |
 | GET, POST | `/posts/{postId}/comments` | List or add comments |
@@ -214,7 +214,7 @@ End-to-end smoke test against a deployed stack: `scripts/smoke-test.py` invokes
 the deployed Lambda handlers with a synthetic authenticated event and checks the
 main flows: events and RSVP, posts, likes, comments (edit + delete),
 recommendations, notifications, groups, the activity digest, profiles, content
-moderation, and upload URLs (28 checks). It needs the AWS CLI configured for the
+moderation, pagination, and upload URLs (32 checks). It needs the AWS CLI configured for the
 target account and writes a few test records, so run it against a development or
 demo stack.
 
@@ -272,9 +272,11 @@ Roadmap:
 - **Organizational Microsoft sign-in** for `@harrisburgu.edu` identities. Needs
   the app registered in the university's Microsoft Entra tenant.
 - **Push / email delivery** of notifications (in-app notifications already work).
-- **Feed caching** — the global feed reads via a DynamoDB Scan today; moving it
-  onto the existing GSIs with short CloudFront caching, then DAX/ElastiCache at
-  real traffic, controls latency and cost.
+- **Event and group indexes** — the events and groups lists are paginated
+  scans; date/status indexes (and DAX/ElastiCache at real traffic) are the next
+  step. The posts feed is already an indexed, paginated Query. CloudFront caching
+  of API responses is deliberately not used: a cache hit would skip the Cognito
+  authorizer.
 - **Prerendered landing page** so first paint and SEO don't depend on JS (the
   app itself stays a React SPA).
 - **Richer recommendation ranking** (e.g. Amazon Personalize); today's scoring is

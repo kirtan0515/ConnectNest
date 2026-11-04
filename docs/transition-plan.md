@@ -116,7 +116,7 @@ Actions tab.
 
 ### Health check
 ```bash
-python3 scripts/smoke-test.py     # 28 checks against the deployed stack
+python3 scripts/smoke-test.py     # 32 checks against the deployed stack
 ```
 
 ---
@@ -177,9 +177,10 @@ tracks real usage:
   for uploads, and CloudFront egress.
 
 At capstone/demo traffic this is a small monthly figure. Before heavy adoption,
-revisit the global-feed reads (today a DynamoDB Scan) — moving them onto the
-existing GSIs and adding short CloudFront caching on read endpoints controls both
-latency and cost before reaching for DAX or ElastiCache.
+revisit the events and groups lists (paginated scans today) and consider date/
+status indexes before reaching for DAX or ElastiCache. The posts feed is already
+an indexed, paginated Query. Do not cache authenticated API responses at
+CloudFront: a cache hit would bypass the Cognito authorizer.
 
 ---
 

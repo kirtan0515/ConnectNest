@@ -12,6 +12,7 @@ import {
 import { moderateText } from "../../shared/moderation.js";
 
 const TABLE = process.env.GROUPS_TABLE!;
+const MEMBERS_TABLE = process.env.GROUP_MEMBERS_TABLE!;
 
 interface GroupInput {
   name?: string;
@@ -42,6 +43,19 @@ export const handler = async (event: ApiEvent) => {
     };
 
     await ddb.send(new PutCommand({ TableName: TABLE, Item: item }));
+    // The creator is the first member (this is what memberCount: 1 means). Without
+    // this row they could not post in their own group or see it under "My groups".
+    await ddb.send(
+      new PutCommand({
+        TableName: MEMBERS_TABLE,
+        Item: {
+          groupId: item.groupId,
+          userId: ownerId,
+          role: "admin",
+          joinedAt: item.createdAt,
+        },
+      })
+    );
     return created(item);
   } catch (err) {
     console.error("createGroup error", err);

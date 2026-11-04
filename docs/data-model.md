@@ -9,7 +9,7 @@ switch to `RETAIN` for production data).
 | Profiles | `userId` (Cognito sub) | — | — | email, name, major, interests[], bio, avatarKey, updatedAt |
 | Events | `eventId` (UUID) | — | `byOwner` (ownerId, createdAt) | title, description, location, startsAt, ownerId, ownerName, imageKey, createdAt |
 | RSVPs | `eventId` | `userId` | `byUser` (userId, eventId) | status (going/interested) |
-| Posts | `postId` (UUID) | — | `byGroup` (groupId, createdAt) | authorId, authorName, content, groupId, imageKey, likeCount, createdAt |
+| Posts | `postId` (UUID) | — | `byGroup` (groupId, createdAt), `byAuthor` (authorId, createdAt) | authorId, authorName, content, groupId, imageKey, likeCount, createdAt |
 | Comments | `postId` | `commentId` | — | authorId, authorName, content, createdAt, editedAt |
 | PostLikes | `postId` | `userId` | — | createdAt (prevents double-likes) |
 | Groups | `groupId` (UUID) | — | — | name, description, ownerId, memberCount, createdAt |
@@ -27,8 +27,12 @@ respectively.
 - **Profile by user** — `GetItem` on Profiles by `userId`.
 - **Events (feed)** — `Scan` Events, sorted by `createdAt` (demo scale). Owner's
   events via the `byOwner` GSI.
-- **Posts (global feed)** — `Scan` Posts. Group/chat posts via the `byGroup` GSI
-  (`groupId` = a group id, `"global"`, or `"chat-general"` for the chat room).
+- **Posts (global feed)** — `Query` the `byGroup` GSI with `groupId = "global"`,
+  newest first, paginated (`limit` up to 100, opaque `nextToken`). Group posts and
+  the chat room use the same index with their own `groupId` (a group id, or
+  `"chat-general"`), so they never appear in the main feed. A user's own posts
+  come from the `byAuthor` GSI. "Events" and "groups" lists still scan, but
+  follow `LastEvaluatedKey` so they don't truncate at 1 MB.
 - **Comments on a post** — `Query` Comments by `postId`.
 - **Like toggle** — check PostLikes (`postId`,`userId`); write/delete the like row
   and atomically `ADD` to Posts.likeCount.

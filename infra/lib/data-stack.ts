@@ -86,6 +86,14 @@ export class DataStack extends Stack {
       sortKey: { name: "createdAt", type: AttributeType.STRING },
       projectionType: ProjectionType.ALL,
     });
+    // byAuthor lets a profile page fetch one user's posts without reading the
+    // whole feed and filtering in the browser.
+    this.postsTable.addGlobalSecondaryIndex({
+      indexName: "byAuthor",
+      partitionKey: { name: "authorId", type: AttributeType.STRING },
+      sortKey: { name: "createdAt", type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
 
     // Comments: PK postId, SK commentId
     this.commentsTable = new Table(this, "CommentsTable", {

@@ -11,6 +11,8 @@ import "./Post.css";
 // posts prop: if provided, skip fetching (used by Profile page)
 export default function Posts({ posts: propPosts = null }) {
   const [posts, setPosts] = useState(propPosts || []);
+  const [nextToken, setNextToken] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     if (propPosts !== null) {
@@ -21,16 +23,40 @@ export default function Posts({ posts: propPosts = null }) {
       try {
         const res = await api.get("/posts");
         setPosts(res?.items || []);
+        setNextToken(res?.nextToken || null);
       } catch (err) {
         console.error("Error fetching posts:", err);
       }
     })();
   }, [propPosts]);
 
+  // Older posts: the feed loads the newest page; this appends the next one.
+  const loadMore = async () => {
+    if (!nextToken || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const res = await api.get(
+        `/posts?nextToken=${encodeURIComponent(nextToken)}`
+      );
+      const older = res?.items || [];
+      setPosts((prev) => {
+        const seen = new Set(prev.map((p) => p.postId));
+        return [...prev, ...older.filter((p) => !seen.has(p.postId))];
+      });
+      setNextToken(res?.nextToken || null);
+    } catch (err) {
+      console.error("Error loading more posts:", err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
   // Live inserts only when this component owns its data (Dashboard feed).
   // Profile passes propPosts and must never be mutated. De-dupe by postId.
   useRealtime("post.created", (item) => {
     if (propPosts !== null) return;
+    // Group posts and chat messages share the table but not the main feed.
+    if ((item.groupId || "global") !== "global") return;
     setPosts((prev) =>
       prev.some((p) => p.postId === item.postId) ? prev : [item, ...prev]
     );
@@ -46,6 +72,16 @@ export default function Posts({ posts: propPosts = null }) {
       {posts.map((post) => (
         <PostItem key={post.postId} post={post} />
       ))}
+      {propPosts === null && nextToken && (
+        <button
+          type="button"
+          className="posts__more"
+          onClick={loadMore}
+          disabled={loadingMore}
+        >
+          {loadingMore ? "Loading…" : "Load older posts"}
+        </button>
+      )}
     </div>
   );
 }

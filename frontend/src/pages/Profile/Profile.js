@@ -32,10 +32,10 @@ const Profile = () => {
         setBio(prof?.bio || "");
         setBioInput(prof?.bio || "");
 
-        const postRes = await api.get("/posts");
-        const posts = (postRes?.items || []).filter(
-          (p) => p.authorId === user?.userId
+        const postRes = await api.get(
+          `/posts?authorId=${encodeURIComponent(user.userId)}`
         );
+        const posts = postRes?.items || [];
         setUserPosts(
           posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         );

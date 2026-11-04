@@ -326,6 +326,7 @@ export class ApiStack extends Stack {
     });
     const createGroup = makeFn("CreateGroupFn", "handlers/groups/createGroup.ts", {
       GROUPS_TABLE: tables.groups.tableName,
+      GROUP_MEMBERS_TABLE: tables.groupMembers.tableName,
     });
     const getGroup = makeFn("GetGroupFn", "handlers/groups/getGroup.ts", {
       GROUPS_TABLE: tables.groups.tableName,
@@ -429,6 +430,7 @@ export class ApiStack extends Stack {
 
     tables.groups.grantReadData(listGroups);
     tables.groups.grantReadWriteData(createGroup);
+    tables.groupMembers.grantWriteData(createGroup);
     tables.groups.grantReadData(getGroup);
     tables.groups.grantReadData(joinGroup);
     tables.groupMembers.grantReadWriteData(joinGroup);

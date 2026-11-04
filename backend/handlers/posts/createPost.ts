@@ -13,6 +13,7 @@ import {
 } from "../../shared/http.js";
 import { broadcast } from "../../shared/broadcast.js";
 import { moderateText } from "../../shared/moderation.js";
+import { requiresMembership } from "../../shared/rooms.js";
 
 const TABLE = process.env.POSTS_TABLE!;
 const MEMBERS_TABLE = process.env.GROUP_MEMBERS_TABLE!;
@@ -38,9 +39,10 @@ export const handler = async (event: ApiEvent) => {
     if (!mod.allowed) return badRequest(mod.reason!);
 
     // Group-scoped posts require membership. Enforce only for a real group
-    // (not the "global" main feed). Identity comes from the verified JWT.
+    // (not an open room like the main feed or the Messages chat room). Identity
+    // comes from the verified JWT.
     const requestedGroupId = body.groupId?.trim();
-    if (requestedGroupId && requestedGroupId !== "global") {
+    if (requestedGroupId && requiresMembership(requestedGroupId)) {
       const member = await ddb.send(
         new GetCommand({
           TableName: MEMBERS_TABLE,

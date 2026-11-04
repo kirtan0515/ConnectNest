@@ -1,6 +1,7 @@
-import { QueryCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { ddb } from "../../shared/db.js";
 import { ok, serverError, getUserId, type ApiEvent } from "../../shared/http.js";
+import { scanAll } from "../../shared/scan.js";
 import { scoreEvents } from "./recommend.js";
 
 const EVENTS_TABLE = process.env.EVENTS_TABLE!;
@@ -27,8 +28,8 @@ export const handler = async (event: ApiEvent) => {
     const userId = getUserId(event);
 
     const [eventsRes, rsvpsRes, myRsvpsRes, myGroupsRes] = await Promise.all([
-      ddb.send(new ScanCommand({ TableName: EVENTS_TABLE })),
-      ddb.send(new ScanCommand({ TableName: RSVPS_TABLE })),
+      scanAll({ TableName: EVENTS_TABLE }),
+      scanAll({ TableName: RSVPS_TABLE }),
       ddb.send(
         new QueryCommand({
           TableName: RSVPS_TABLE,
@@ -49,8 +50,8 @@ export const handler = async (event: ApiEvent) => {
 
     const { items, personalized } = scoreEvents({
       userId,
-      events: eventsRes.Items ?? [],
-      allRsvps: rsvpsRes.Items ?? [],
+      events: eventsRes,
+      allRsvps: rsvpsRes,
       myRsvps: myRsvpsRes.Items ?? [],
       myGroupCount: (myGroupsRes.Items ?? []).length,
       now: Date.now(),
