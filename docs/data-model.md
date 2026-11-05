@@ -17,6 +17,9 @@ switch to `RETAIN` for production data).
 | AuditLog | `userId` | `timestamp` | — | action (deactivate/delete/reactivate/purge), detail, createdAt |
 | Connections | `connectionId` | — | — | userId, ttl (auto-expire stale WebSocket connections) |
 | Notifications | `userId` (recipient) | `notificationId` (`<ts>#<uuid>`) | — | type, actorId, actorName, message, link, read, createdAt, ttl (90-day expiry) |
+| Conversations | `conversationId` (`dm#<a>#<b>`) | — | — | participants, lastMessage, lastSenderId, lastMessageAt |
+| ConversationMembers | `userId` | `conversationId` | `byConversation` (conversationId) | otherUserId, lastMessageAt, lastReadAt |
+| Messages | `conversationId` | `messageId` (`<ts>#<uuid>`) | — | senderId, senderName, content, createdAt |
 
 The AuditLog table (account lifecycle) and Connections table (real-time
 WebSocket push) live in `ConnectNest-Data` and `ConnectNest-Realtime`

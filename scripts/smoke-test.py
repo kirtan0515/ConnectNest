@@ -154,6 +154,29 @@ check("join group", invoke(fn("JoinGroupFn"), event(body={}, path={"groupId": gi
 check("my groups", invoke(fn("ListMyGroupsFn"), event()), "200")
 check("group members", invoke(fn("ListMembersFn"), event(path={"groupId": gid})), "200")
 
+# Direct messaging
+# Recipient profile must exist and be active. upsert a second user "smoke-dm".
+invoke(fn("UpsertProfileFn"),
+       json.dumps({"requestContext": {"authorizer": {"jwt": {"claims":
+           {"sub": "smoke-dm", "name": "Smoke DM", "email": "dm@example.com"}}}},
+           "body": json.dumps({"name": "Smoke DM", "major": "CS", "interests": [], "bio": "x"})}))
+r = check("send direct message",
+          invoke(fn("SendMessageFn"), event(body={"to": "smoke-dm", "content": "hi there"})), "201")
+conv_id = body_id(r, "conversationId")
+check("send message to self rejected",
+      invoke(fn("SendMessageFn"), event(body={"to": "smoke-test", "content": "x"})), "400")
+check("list conversations", invoke(fn("ListConversationsFn"), event()), "200")
+check("get conversation messages",
+      invoke(fn("GetMessagesFn"), event(path={"conversationId": conv_id})), "200")
+# A non-participant must not read the thread.
+check("non-participant cannot read conversation",
+      invoke(fn("GetMessagesFn"),
+             json.dumps({"requestContext": {"authorizer": {"jwt": {"claims":
+                 {"sub": "smoke-outsider", "name": "Out"}}}},
+                 "pathParameters": {"conversationId": conv_id}})),
+      "403")
+check("user directory", invoke(fn("ListProfilesFn"), event()), "200")
+
 # Recommendations
 check("recommendations", invoke(fn("GetRecommendationsFn"), event()), "200")
 

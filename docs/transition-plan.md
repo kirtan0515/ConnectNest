@@ -116,7 +116,7 @@ Actions tab.
 
 ### Health check
 ```bash
-python3 scripts/smoke-test.py     # 32 checks against the deployed stack
+python3 scripts/smoke-test.py     # 38 checks against the deployed stack
 ```
 
 ---

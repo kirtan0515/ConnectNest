@@ -21,7 +21,7 @@ How a request flows (numbers match the diagram):
 
 Sign-in runs through Cognito (email, Google, Microsoft; OAuth secrets in Secrets Manager). A Cognito custom-message trigger Lambda builds the branded verification email, which SES sends. A CloudFront Function rewrites `/api/*` paths before they reach API Gateway. An EventBridge rule runs a daily Lambda that permanently deletes accounts past their 30-day deletion window. CloudTrail, GuardDuty, IAM, and CloudWatch cover audit, threat detection, permissions, and logs. CloudWatch alarms on CloudFront 5xx, WAF blocks, API 5xx and Lambda errors notify the owner through SNS email. Users can turn on authenticator-app MFA from Settings.
 
-In-app notifications are live: RSVPs, comments, likes and group joins create a notification for the entity owner and push it over the same WebSocket fan-out. The dashed "Planned / future" row in the diagram lists work that is not deployed yet: push and email delivery of notifications, direct messaging, a CloudWatch dashboard and access logging, KMS keys and VPC endpoints, organizational Microsoft sign-in, and richer recommendation ranking. Unit tests and a GitHub Actions CI pipeline are already in place.
+In-app notifications are live: RSVPs, comments, likes, group joins and direct messages create a notification for the recipient. Direct messaging (1:1) delivers each message to the two participants' open sockets via a targeted send over the WebSocket API (a `byUser` index on the connections table), not a global broadcast. The dashed "Planned / future" row in the diagram lists work that is not deployed yet: push and email delivery of notifications, direct messaging, a CloudWatch dashboard and access logging, KMS keys and VPC endpoints, organizational Microsoft sign-in, and richer recommendation ranking. Unit tests and a GitHub Actions CI pipeline are already in place.
 
 ## High-level diagram (text version)
 
@@ -89,7 +89,7 @@ In-app notifications are live: RSVPs, comments, likes and group joins create a n
 | API | API Gateway (HTTP API v2) | Public REST entry; validates the Cognito JWT before routing |
 | Real-time | API Gateway (WebSocket API) | Push post/event updates to connected clients |
 | Compute | AWS Lambda (Node 22, ARM64, ESM) | Stateless business logic per feature |
-| Data | Amazon DynamoDB | Profiles, events, RSVPs, posts, comments, likes, groups, members, audit log, connections, notifications |
+| Data | Amazon DynamoDB | Profiles, events, RSVPs, posts, comments, likes, groups, members, audit log, connections, notifications, conversations, messages |
 | Storage | Amazon S3 | User image uploads via presigned POST (image allowlist + size cap) |
 | Trust & Safety | Amazon Rekognition | Auto-moderates uploaded images (nudity/violence → deleted) |
 | Secrets | AWS Secrets Manager | Google OAuth client secret (dynamic reference, not in template) |

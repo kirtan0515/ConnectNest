@@ -51,6 +51,9 @@ export interface ApiStackProps extends StackProps {
     groupMembers: Table;
     auditLog: Table;
     notifications: Table;
+    conversations: Table;
+    conversationMembers: Table;
+    messages: Table;
   };
   /**
    * Optional realtime wiring. When present, createPost/createEvent gain the
@@ -279,6 +282,33 @@ export class ApiStack extends Stack {
       { NOTIFICATIONS_TABLE: tables.notifications.tableName }
     );
 
+    // Direct messaging
+    const dmEnv = {
+      CONVERSATIONS_TABLE: tables.conversations.tableName,
+      CONVERSATION_MEMBERS_TABLE: tables.conversationMembers.tableName,
+      MESSAGES_TABLE: tables.messages.tableName,
+    };
+    const sendMessage = makeFn("SendMessageFn", "handlers/messages/sendMessage.ts", {
+      ...dmEnv,
+      PROFILES_TABLE: tables.profiles.tableName,
+      NOTIFICATIONS_TABLE: tables.notifications.tableName,
+    });
+    const listConversations = makeFn(
+      "ListConversationsFn",
+      "handlers/messages/listConversations.ts",
+      {
+        CONVERSATION_MEMBERS_TABLE: tables.conversationMembers.tableName,
+        PROFILES_TABLE: tables.profiles.tableName,
+      }
+    );
+    const getMessages = makeFn("GetMessagesFn", "handlers/messages/getMessages.ts", {
+      MESSAGES_TABLE: tables.messages.tableName,
+      CONVERSATION_MEMBERS_TABLE: tables.conversationMembers.tableName,
+    });
+    const listProfiles = makeFn("ListProfilesFn", "handlers/profiles/listProfiles.ts", {
+      PROFILES_TABLE: tables.profiles.tableName,
+    });
+
     // Posts / likes / comments
     const listPosts = makeFn("ListPostsFn", "handlers/posts/listPosts.ts", {
       POSTS_TABLE: tables.posts.tableName,
@@ -428,6 +458,18 @@ export class ApiStack extends Stack {
     tables.notifications.grantReadWriteData(listNotifications);
     tables.notifications.grantReadWriteData(markNotificationsRead);
 
+    // Direct messaging
+    tables.conversations.grantReadWriteData(sendMessage);
+    tables.conversationMembers.grantReadWriteData(sendMessage);
+    tables.messages.grantReadWriteData(sendMessage);
+    tables.profiles.grantReadData(sendMessage);
+    tables.notifications.grantWriteData(sendMessage);
+    tables.conversationMembers.grantReadData(listConversations);
+    tables.profiles.grantReadData(listConversations);
+    tables.messages.grantReadData(getMessages);
+    tables.conversationMembers.grantReadWriteData(getMessages);
+    tables.profiles.grantReadData(listProfiles);
+
     tables.groups.grantReadData(listGroups);
     tables.groups.grantReadWriteData(createGroup);
     tables.groupMembers.grantWriteData(createGroup);
@@ -467,6 +509,7 @@ export class ApiStack extends Stack {
         createComment,
         toggleLike,
         joinGroup,
+        sendMessage,
       ];
       for (const fn of broadcasters) {
         fn.addEnvironment("CONNECTIONS_TABLE", connectionsTable.tableName);
@@ -516,6 +559,7 @@ export class ApiStack extends Stack {
     };
 
     // Profiles
+    route(HttpMethod.GET, "/profiles", listProfiles);
     route(HttpMethod.GET, "/profiles/me", getProfile);
     route(HttpMethod.GET, "/profiles/{userId}", getProfile);
     route(HttpMethod.PUT, "/profiles/me", upsertProfile);
@@ -538,6 +582,14 @@ export class ApiStack extends Stack {
     // Notifications
     route(HttpMethod.GET, "/me/notifications", listNotifications);
     route(HttpMethod.POST, "/me/notifications/read", markNotificationsRead);
+    // Direct messaging
+    route(HttpMethod.POST, "/messages", sendMessage);
+    route(HttpMethod.GET, "/me/conversations", listConversations);
+    route(
+      HttpMethod.GET,
+      "/me/conversations/{conversationId}/messages",
+      getMessages
+    );
 
     // Posts / likes / comments
     route(HttpMethod.GET, "/posts", listPosts);

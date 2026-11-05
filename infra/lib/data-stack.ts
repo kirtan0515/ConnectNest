@@ -27,6 +27,9 @@ export class DataStack extends Stack {
   public readonly groupMembersTable: Table;
   public readonly auditLogTable: Table;
   public readonly notificationsTable: Table;
+  public readonly conversationsTable: Table;
+  public readonly conversationMembersTable: Table;
+  public readonly messagesTable: Table;
 
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
@@ -143,6 +146,38 @@ export class DataStack extends Stack {
       partitionKey: { name: "userId", type: AttributeType.STRING },
       sortKey: { name: "notificationId", type: AttributeType.STRING },
       timeToLiveAttribute: "ttl",
+      ...common,
+    });
+
+    // ---- Direct messaging ----
+    // Conversations: PK conversationId. For a 1:1 chat the id is derived from the
+    // sorted pair of user ids ("dm#<a>#<b>"), so the same two people always map
+    // to one conversation. Holds participant ids + a denormalized last message.
+    this.conversationsTable = new Table(this, "ConversationsTable", {
+      partitionKey: { name: "conversationId", type: AttributeType.STRING },
+      ...common,
+    });
+
+    // ConversationMembers: PK userId, SK conversationId. One row per participant
+    // per conversation; `lastMessageAt` is kept here so "my conversations" sorts
+    // without reading the Conversations table, and `lastReadAt` drives unread.
+    // GSI byConversation lists a conversation's participants for fan-out.
+    this.conversationMembersTable = new Table(this, "ConversationMembersTable", {
+      partitionKey: { name: "userId", type: AttributeType.STRING },
+      sortKey: { name: "conversationId", type: AttributeType.STRING },
+      ...common,
+    });
+    this.conversationMembersTable.addGlobalSecondaryIndex({
+      indexName: "byConversation",
+      partitionKey: { name: "conversationId", type: AttributeType.STRING },
+      projectionType: ProjectionType.ALL,
+    });
+
+    // Messages: PK conversationId, SK messageId ("<ts>#<uuid>"), so a Query
+    // returns chronological order and stays unique.
+    this.messagesTable = new Table(this, "MessagesTable", {
+      partitionKey: { name: "conversationId", type: AttributeType.STRING },
+      sortKey: { name: "messageId", type: AttributeType.STRING },
       ...common,
     });
   }

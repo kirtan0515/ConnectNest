@@ -9,7 +9,8 @@ export type NotificationType =
   | "event.rsvp"
   | "post.comment"
   | "post.like"
-  | "group.join";
+  | "group.join"
+  | "message.new";
 
 export interface NotifyInput {
   /** Who receives the notification (the entity owner). */

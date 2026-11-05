@@ -12,6 +12,7 @@ import { NodejsFunction, OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
 import {
   AttributeType,
   BillingMode,
+  ProjectionType,
   Table,
 } from "aws-cdk-lib/aws-dynamodb";
 import { UserPool } from "aws-cdk-lib/aws-cognito";
@@ -85,6 +86,13 @@ export class RealtimeStack extends Stack {
       billingMode: BillingMode.PAY_PER_REQUEST,
       removalPolicy: RemovalPolicy.DESTROY,
       timeToLiveAttribute: "ttl",
+    });
+    // byUser lets a targeted send (e.g. a direct message) find just the
+    // recipient's open sockets instead of scanning every connection.
+    this.connectionsTable.addGlobalSecondaryIndex({
+      indexName: "byUser",
+      partitionKey: { name: "userId", type: AttributeType.STRING },
+      projectionType: ProjectionType.KEYS_ONLY,
     });
 
     // ---- Lambdas ----

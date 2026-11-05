@@ -187,6 +187,10 @@ identity always comes from the verified token, never from the request body.
 | GET | `/events/{eventId}/rsvps` | Attendee list |
 | GET | `/me/rsvps` | Events the current user RSVP'd to |
 | GET | `/me/recommendations` | Suggested upcoming events, each with reasons |
+| GET | `/profiles` | User directory (`?q=` name/major search) |
+| POST | `/messages` | Send a direct message (`{ to, content }`) |
+| GET | `/me/conversations` | The current user's DM threads |
+| GET | `/me/conversations/{conversationId}/messages` | Messages in a thread |
 | GET, POST | `/posts` | List posts (global feed; `?groupId=`, `?authorId=`, `?limit=`, `?nextToken=`) or create a post |
 | DELETE | `/posts/{postId}` | Delete own post |
 | POST | `/posts/{postId}/like` | Toggle like |
@@ -214,7 +218,7 @@ End-to-end smoke test against a deployed stack: `scripts/smoke-test.py` invokes
 the deployed Lambda handlers with a synthetic authenticated event and checks the
 main flows: events and RSVP, posts, likes, comments (edit + delete),
 recommendations, notifications, groups, the activity digest, profiles, content
-moderation, pagination, and upload URLs (32 checks). It needs the AWS CLI configured for the
+moderation, pagination, direct messaging, and upload URLs (38 checks). It needs the AWS CLI configured for the
 target account and writes a few test records, so run it against a development or
 demo stack.
 
@@ -256,7 +260,7 @@ ConnectNest uses defense in depth. No single control is treated as sufficient.
 Implemented: authentication, profiles, events and RSVP, posts with likes and
 comments (author edit and delete), event recommendations, in-app notifications,
 groups with member-gated posting, image upload and display with moderation, the
-activity view, real-time push, self-service MFA, CloudWatch alarms, a CI
+activity view, direct messaging, real-time push, self-service MFA, CloudWatch alarms, a CI
 pipeline with unit tests, and the production deployment.
 
 Real-time updates and in-app notifications are live over an API Gateway
@@ -272,6 +276,8 @@ Roadmap:
 - **Organizational Microsoft sign-in** for `@harrisburgu.edu` identities. Needs
   the app registered in the university's Microsoft Entra tenant.
 - **Push / email delivery** of notifications (in-app notifications already work).
+- **Group messaging** — direct 1:1 messaging is built; multi-person threads and
+  typing indicators are the next step.
 - **Event and group indexes** — the events and groups lists are paginated
   scans; date/status indexes (and DAX/ElastiCache at real traffic) are the next
   step. The posts feed is already an indexed, paginated Query. CloudFront caching

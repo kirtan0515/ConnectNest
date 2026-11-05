@@ -60,6 +60,9 @@ const api = new ApiStack(app, "ConnectNest-Api", {
     groupMembers: data.groupMembersTable,
     auditLog: data.auditLogTable,
     notifications: data.notificationsTable,
+    conversations: data.conversationsTable,
+    conversationMembers: data.conversationMembersTable,
+    messages: data.messagesTable,
   },
   realtime: {
     connectionsTable: realtime.connectionsTable,
