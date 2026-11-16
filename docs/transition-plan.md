@@ -62,7 +62,7 @@ references CDK resolves automatically.
 | `ConnectNest-Email` | SES domain identity with DKIM |
 | `ConnectNest-Dns` | Route 53 hosted zone (apex ALIAS to CloudFront, DKIM/SPF/ACM records) |
 | `ConnectNest-Security` | CloudTrail audit trail + GuardDuty |
-| `ConnectNest-Monitoring` | CloudWatch alarms (CloudFront 5xx, WAF blocks, API 5xx, Lambda errors) -> SNS email |
+| `ConnectNest-Monitoring` | CloudWatch alarms (CloudFront 5xx, sustained WAF blocks, WAF rate-limit trips, API 5xx, Lambda errors) -> SNS email |
 
 See [architecture.md](architecture.md), [aws-services.md](aws-services.md), and
 [data-model.md](data-model.md) for detail.

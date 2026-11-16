@@ -130,7 +130,7 @@ AWS account us-east-1, defined as code with the AWS CDK across **9 stacks**
 - **Why:** Debug and observe the system (used to find the Lambda-bundle crash and
   the CSP/CORS bugs during testing).
 - **How:** Every Lambda auto-logs to CloudWatch; logs are read to diagnose issues.
-  Four alarms (CloudFront 5xx rate, WAF blocked requests, HTTP API 5xx, Lambda
+  Five alarms (CloudFront 5xx rate, sustained WAF blocks, WAF rate-limit trips, HTTP API 5xx, Lambda
   errors) publish to an SNS topic that emails the owner, in `ConnectNest-Monitoring`.
 
 ---

@@ -41,9 +41,10 @@ export class MonitoringStack extends Stack {
     }
     const action = new SnsAction(topic);
 
+    // Email on ALARM only. "Back to OK" mails doubled the volume without telling
+    // you anything new; the alarm history in CloudWatch still records recoveries.
     const add = (alarm: Alarm) => {
       alarm.addAlarmAction(action);
-      alarm.addOkAction(action);
     };
 
     // 1. CloudFront: share of requests answered with a 5xx.
@@ -69,11 +70,14 @@ export class MonitoringStack extends Stack {
       })
     );
 
-    // 2. WAF: unusually many blocked requests (scanner, bot or abuse traffic).
+    // 2. WAF: a sustained burst of blocked requests. Blocks are the WAF working,
+    // and internet-wide scanners routinely trigger a few thousand in an hour, so
+    // this watches a 15-minute total and only fires on something bigger than that.
     add(
       new Alarm(this, "WafBlockedSpike", {
         alarmName: "connectnest-waf-blocked-requests",
-        alarmDescription: "The WAF blocked more than 100 requests in 5 minutes.",
+        alarmDescription:
+          "The WAF blocked more than 1,000 requests in 15 minutes (sustained scanning or abuse).",
         metric: new Metric({
           namespace: "AWS/WAFV2",
           metricName: "BlockedRequests",
@@ -83,9 +87,34 @@ export class MonitoringStack extends Stack {
             Rule: "ALL",
           },
           statistic: "Sum",
+          period: Duration.minutes(15),
+        }),
+        threshold: 1000,
+        evaluationPeriods: 1,
+        comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD,
+        treatMissingData: TreatMissingData.NOT_BREACHING,
+      })
+    );
+
+    // 2b. WAF per-IP rate limit tripped. The rule only blocks a source that sends
+    // more than 2,000 requests in 5 minutes, so any block here is a real flood
+    // from one address, not background scanning.
+    add(
+      new Alarm(this, "WafRateLimitTripped", {
+        alarmName: "connectnest-waf-rate-limit-tripped",
+        alarmDescription:
+          "The per-IP rate-limit rule blocked a source (one address exceeded 2,000 requests in 5 minutes).",
+        metric: new Metric({
+          namespace: "AWS/WAFV2",
+          metricName: "BlockedRequests",
+          dimensionsMap: {
+            WebACL: props.webAclName,
+            Rule: "rate-limit",
+          },
+          statistic: "Sum",
           period: Duration.minutes(5),
         }),
-        threshold: 100,
+        threshold: 0,
         evaluationPeriods: 1,
         comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD,
         treatMissingData: TreatMissingData.NOT_BREACHING,

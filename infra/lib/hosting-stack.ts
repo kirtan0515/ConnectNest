@@ -29,7 +29,12 @@ import {
   FunctionCode,
   FunctionEventType,
 } from "aws-cdk-lib/aws-cloudfront";
-import { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
+import { CfnWebACL, CfnLoggingConfiguration } from "aws-cdk-lib/aws-wafv2";
+import {
+  PolicyStatement,
+  ServicePrincipal,
+  Effect,
+} from "aws-cdk-lib/aws-iam";
 import {
   Certificate,
   CertificateValidation,
@@ -134,6 +139,76 @@ export class HostingStack extends Stack {
         },
       ],
     });
+
+    // ---- WAF request logging (blocked requests only) ----
+    // Lets us answer "what was blocked, from where" after an alarm. Only BLOCKed
+    // requests are kept, so ordinary students' traffic is never written down, and
+    // the authorization/cookie headers are redacted. Objects expire after 30 days.
+    // WAF requires the bucket name to start with "aws-waf-logs-".
+    const wafLogBucket = new Bucket(this, "WafLogBucket", {
+      bucketName: `aws-waf-logs-connectnest-${this.account}`,
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      encryption: BucketEncryption.S3_MANAGED,
+      enforceSSL: true,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      lifecycleRules: [{ expiration: Duration.days(30) }],
+    });
+    // Log delivery writes with this service principal; scope it to this account.
+    const logDeliveryConditions = {
+      StringEquals: { "aws:SourceAccount": this.account },
+      ArnLike: {
+        "aws:SourceArn": `arn:aws:logs:${this.region}:${this.account}:*`,
+      },
+    };
+    // Add to the bucket's own policy (enforceSSL/autoDeleteObjects already create
+    // one); a second BucketPolicy on the same bucket would conflict.
+    wafLogBucket.addToResourcePolicy(
+      new PolicyStatement({
+        sid: "AWSLogDeliveryWrite",
+        effect: Effect.ALLOW,
+        principals: [new ServicePrincipal("delivery.logs.amazonaws.com")],
+        actions: ["s3:PutObject"],
+        resources: [wafLogBucket.arnForObjects(`AWSLogs/${this.account}/*`)],
+        conditions: {
+          ...logDeliveryConditions,
+          StringEquals: {
+            ...logDeliveryConditions.StringEquals,
+            "s3:x-amz-acl": "bucket-owner-full-control",
+          },
+        },
+      })
+    );
+    wafLogBucket.addToResourcePolicy(
+      new PolicyStatement({
+        sid: "AWSLogDeliveryAclCheck",
+        effect: Effect.ALLOW,
+        principals: [new ServicePrincipal("delivery.logs.amazonaws.com")],
+        actions: ["s3:GetBucketAcl"],
+        resources: [wafLogBucket.bucketArn],
+        conditions: logDeliveryConditions,
+      })
+    );
+    const wafLogging = new CfnLoggingConfiguration(this, "WafLogging", {
+      resourceArn: webAcl.attrArn,
+      logDestinationConfigs: [wafLogBucket.bucketArn],
+      redactedFields: [
+        { singleHeader: { Name: "authorization" } },
+        { singleHeader: { Name: "cookie" } },
+      ],
+      loggingFilter: {
+        DefaultBehavior: "DROP",
+        Filters: [
+          {
+            Behavior: "KEEP",
+            Requirement: "MEETS_ANY",
+            Conditions: [{ ActionCondition: { Action: "BLOCK" } }],
+          },
+        ],
+      },
+    });
+    // The bucket policy must exist before WAF validates delivery to the bucket.
+    if (wafLogBucket.policy) wafLogging.node.addDependency(wafLogBucket.policy);
 
     // ---- API origin: forward /api/* to the HTTP API, stripping the prefix ----
     const apiOrigin = new HttpOrigin(props.apiDomain, {

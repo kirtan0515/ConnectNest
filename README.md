@@ -70,12 +70,12 @@ Sign-in runs through Cognito (email, Google, Microsoft). SES sends the branded v
 | `ConnectNest-Data` | DynamoDB tables and indexes |
 | `ConnectNest-Auth` | Cognito user pool, Hosted UI, Google and Microsoft providers, MFA, custom-message email trigger |
 | `ConnectNest-Api` | HTTP API, JWT authorizer, Lambda handlers, uploads bucket, image moderation, scheduled purge |
-| `ConnectNest-Hosting` | CloudFront, private S3 SPA bucket, WAF, ACM certificate, security response headers |
+| `ConnectNest-Hosting` | CloudFront, private S3 SPA bucket, WAF (with blocked-request logging), ACM certificate, security response headers |
 | `ConnectNest-Realtime` | WebSocket API, connections table, connect/disconnect/authorizer Lambdas |
 | `ConnectNest-Email` | SES domain identity with DKIM |
 | `ConnectNest-Dns` | Route 53 hosted zone and records |
 | `ConnectNest-Security` | CloudTrail and GuardDuty |
-| `ConnectNest-Monitoring` | CloudWatch alarms (CloudFront 5xx, WAF blocks, API 5xx, Lambda errors) with SNS email alerts |
+| `ConnectNest-Monitoring` | CloudWatch alarms (CloudFront 5xx, sustained WAF blocks, WAF rate-limit trips, API 5xx, Lambda errors) with SNS email alerts |
 
 More detail: [docs/architecture.md](docs/architecture.md),
 [docs/data-model.md](docs/data-model.md), and
