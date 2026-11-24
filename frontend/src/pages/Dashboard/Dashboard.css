@@ -236,11 +236,47 @@
   transition: background var(--transition), color var(--transition);
   text-align: left;
 }
-.quick-action-btn svg {
+/* Rounded-square icon tile used before the three rail section titles */
+.section-icon,
+.quick-action-btn__icon {
+  --tile: var(--group-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--tile);
+  background: color-mix(in srgb, var(--tile) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tile) 34%, transparent);
+}
+.section-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+}
+.section-icon svg {
+  width: 17px;
+  height: 17px;
+}
+.quick-action-btn__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  transition: background var(--transition), color var(--transition);
+}
+.quick-action-btn__icon svg {
   width: 18px;
   height: 18px;
-  flex-shrink: 0;
-  color: var(--brand);
+}
+.section-icon--coral, .quick-action-btn__icon--coral { --tile: var(--group-1); }
+.section-icon--sky,   .quick-action-btn__icon--sky   { --tile: var(--group-2); }
+.section-icon--lilac, .quick-action-btn__icon--lilac { --tile: var(--group-3); }
+.section-icon--lime,  .quick-action-btn__icon--lime  { --tile: var(--group-4); }
+.quick-action-btn:hover .quick-action-btn__icon {
+  background: var(--tile);
+  color: var(--on-accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .quick-action-btn__icon { transition: none; }
 }
 .quick-action-btn:hover {
   background: var(--brand-light);

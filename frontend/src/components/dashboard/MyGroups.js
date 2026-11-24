@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { listMyGroups } from "../../services/groupServices";
+import { UsersRound } from "lucide-react";
 import ConnectorGlyph from "./ConnectorGlyph";
 import "./MyGroups.css";
 
@@ -24,7 +25,9 @@ const MyGroups = () => {
     <div className="my-groups card">
       <div className="my-groups__header">
         <h2 className="section-title section-title--glyph" style={{ margin: 0 }}>
-          <ConnectorGlyph />
+          <span className="section-icon section-icon--sky" aria-hidden="true">
+            <UsersRound strokeWidth={1.75} />
+          </span>
           Groups
         </h2>
         <button className="btn-ghost" style={{ fontSize: 12 }} onClick={() => navigate("/groups")}>

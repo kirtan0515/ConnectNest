@@ -1,14 +1,13 @@
 import React from "react";
 import { useAuth } from "../../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { CalendarPlus, UsersRound, Upload } from "lucide-react";
+import { CalendarPlus, CalendarDays, UsersRound, Upload, Zap } from "lucide-react";
 import Share from "../../components/share/Share";
 import Posts from "../../components/post/Post";
 import EventFeed from "../Events/EventFeed";
 import MyGroups from "../../components/dashboard/MyGroups";
 import Recommendations from "../../components/dashboard/Recommendations";
 import CampusNetwork from "../../components/dashboard/CampusNetwork";
-import ConnectorGlyph from "../../components/dashboard/ConnectorGlyph";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -82,7 +81,9 @@ const Dashboard = () => {
 
         <section className="cn-events card sidebar-section" id="cn-events" tabIndex={-1} aria-labelledby="cn-events-title">
           <h2 id="cn-events-title" className="section-title section-title--glyph">
-            <ConnectorGlyph />
+            <span className="section-icon section-icon--coral" aria-hidden="true">
+              <CalendarDays strokeWidth={1.75} />
+            </span>
             Upcoming Events
           </h2>
           <EventFeed compact />
@@ -90,19 +91,21 @@ const Dashboard = () => {
 
         <section className="cn-actions card quick-actions" aria-labelledby="cn-actions-title">
           <h2 id="cn-actions-title" className="section-title section-title--glyph">
-            <ConnectorGlyph />
+            <span className="section-icon section-icon--lilac" aria-hidden="true">
+              <Zap strokeWidth={1.75} />
+            </span>
             Quick Actions
           </h2>
           <button className="quick-action-btn" onClick={() => navigate("/events")}>
-            <CalendarPlus strokeWidth={1.75} aria-hidden="true" />
+            <span className="quick-action-btn__icon quick-action-btn__icon--coral" aria-hidden="true"><CalendarPlus strokeWidth={1.75} /></span>
             Create Event
           </button>
           <button className="quick-action-btn" onClick={() => navigate("/groups")}>
-            <UsersRound strokeWidth={1.75} aria-hidden="true" />
+            <span className="quick-action-btn__icon quick-action-btn__icon--sky" aria-hidden="true"><UsersRound strokeWidth={1.75} /></span>
             Create Group
           </button>
           <button className="quick-action-btn" onClick={() => navigate("/files")}>
-            <Upload strokeWidth={1.75} aria-hidden="true" />
+            <span className="quick-action-btn__icon quick-action-btn__icon--lime" aria-hidden="true"><Upload strokeWidth={1.75} /></span>
             Upload File
           </button>
         </section>
