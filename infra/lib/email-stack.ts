@@ -136,6 +136,10 @@ export class EmailStack extends Stack {
         minify: true,
         target: "node22",
         externalModules: ["@aws-sdk/client-s3"],
+        // CJS dependencies call require("node:https") inside the ESM bundle;
+        // recreate require/__filename/__dirname (same banner as api-stack).
+        banner:
+          "import{createRequire as __cr}from'node:module';import{fileURLToPath as __ftu}from'node:url';import{dirname as __dn}from'node:path';const require=__cr(import.meta.url);const __filename=__ftu(import.meta.url);const __dirname=__dn(__filename);",
       },
     });
     // Least privilege: read only inbound objects; send only as the no-reply
@@ -144,7 +148,7 @@ export class EmailStack extends Stack {
     forwardFn.addToRolePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
-        actions: ["ses:SendEmail"],
+        actions: ["ses:SendEmail", "ses:SendRawEmail"],
         resources: [
           this.formatArn({
             service: "ses",
