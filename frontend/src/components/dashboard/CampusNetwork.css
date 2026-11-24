@@ -67,18 +67,6 @@
   gap: 6px;
 }
 
-.cn-hero__stat-num {
-  font-family: var(--font-head);
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--brand);
-}
-
-.cn-hero__stat-label {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
 .cn-hero__events-link {
   display: inline-flex;
   align-items: center;

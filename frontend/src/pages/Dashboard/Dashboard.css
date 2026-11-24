@@ -338,7 +338,7 @@
     position: static;
   }
 
-  .cn-hero     { order: 1; grid-column: 1 / -1; }
+  .cn-hero     { order: 1; grid-column: 1 / -1; align-self: stretch; }
   .cn-identity { order: 2; }
   .cn-composer { order: 3; }
   .cn-actions  { order: 4; }
