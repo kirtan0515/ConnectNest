@@ -6,6 +6,7 @@ import {
   AaaaRecord,
   CnameRecord,
   TxtRecord,
+  MxRecord,
   RecordTarget,
   IAliasRecordTarget,
   IRecordSet,
@@ -105,15 +106,24 @@ export class DnsStack extends Stack {
         "_876dbc4e36950ec8ea25a30ca0d994a3.wzccmgtwzk.acm-validations.aws.",
     });
 
-    // --- SPF TXT at apex, replicated verbatim ---
-    // This is Namecheap's email-forwarding SPF. Revisit after the nameserver
-    // cutover: if the user wants outbound/forwarding via SES it should become
-    // "v=spf1 include:amazonses.com ~all". Do NOT change it silently now —
-    // replicated as-is to avoid a mail regression during the migration.
+    // --- SPF TXT at apex ---
+    // Mail is sent only through SES (Cognito auth email and forwarded inbound
+    // copies, both from no-reply@). The old Namecheap forwarding include is
+    // gone because that service does not work with Route 53 nameservers.
     new TxtRecord(this, "Spf", {
       zone,
       ttl,
-      values: ["v=spf1 include:spf.efwd.registrar-servers.com ~all"],
+      values: ["v=spf1 include:amazonses.com ~all"],
+    });
+
+    // --- Inbound mail: SES email receiving (us-east-1) ---
+    // The receipt rule set that accepts this mail is in ConnectNest-Email.
+    new MxRecord(this, "InboundMx", {
+      zone,
+      ttl,
+      values: [
+        { priority: 10, hostName: "inbound-smtp.us-east-1.amazonaws.com" },
+      ],
     });
 
     // --- Outputs ---

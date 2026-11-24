@@ -19,7 +19,8 @@ AWS account us-east-1, defined as code with the AWS CDK across **9 stacks**
 - **Why:** Moved DNS off the registrar so the **apex domain** could point directly
   at CloudFront (a registrar can't CNAME a bare domain; Route 53's ALIAS can).
 - **How:** An ALIAS record maps `connectnestapp.com` → the CloudFront distribution.
-  Also holds the DKIM + cert-validation records for email/TLS.
+  Also holds the DKIM + cert-validation records for email/TLS, the SES SPF record
+  (`include:amazonses.com`) and the MX record for inbound mail.
 
 ### 2. AWS Certificate Manager (ACM) — TLS
 - **What:** Issues and auto-renews the SSL/TLS certificate.
@@ -92,6 +93,16 @@ AWS account us-east-1, defined as code with the AWS CDK across **9 stacks**
   6-digit code); SES sends it from `no-reply@connectnestapp.com`, DKIM-signed.
   Now in **production** access, so it reaches any address (not just verified ones).
 
+**Inbound mail (receiving):** an MX record (`10 inbound-smtp.us-east-1.amazonaws.com`)
+sends mail for the domain to SES. A receipt rule accepts only `support@` and
+`abuse@`, scans for spam and viruses, and stores the raw message in a private,
+encrypted, SSL-only S3 bucket (objects expire after **30 days**). A Lambda with
+read access to that prefix and send access only as `no-reply@connectnestapp.com`
+forwards it to the owner's inbox (address supplied as CDK context
+`inboundForwardTo`, never committed). The From header is rewritten and Reply-To
+is the original sender so SPF/DKIM/DMARC stay aligned. Messages flagged as
+spam or virus are stored but not forwarded.
+
 ### 11. AWS Secrets Manager — secrets
 - **What:** Encrypted secret storage.
 - **Why:** Keep the Google OAuth client secret out of the template and the repo.
@@ -145,8 +156,8 @@ AWS account us-east-1, defined as code with the AWS CDK across **9 stacks**
 | `ConnectNest-Hosting` | CloudFront + private S3 SPA (OAC), WAF, ACM cert, `/api` routing |
 | `ConnectNest-Security` | CloudTrail + GuardDuty |
 | `ConnectNest-Monitoring` | CloudWatch alarms + SNS email alerts |
-| `ConnectNest-Email` | SES domain identity + DKIM |
-| `ConnectNest-Dns` | Route 53 hosted zone (apex ALIAS to CloudFront, DKIM/SPF/ACM records) |
+| `ConnectNest-Email` | SES domain identity + DKIM, inbound receipt rules, mail bucket (30-day expiry), forwarding Lambda |
+| `ConnectNest-Dns` | Route 53 hosted zone (apex ALIAS to CloudFront, DKIM/SPF/ACM records, inbound MX) |
 | `ConnectNest-Realtime` | WebSocket API + Connections table + connect/disconnect/broadcast Lambdas |
 
 ---

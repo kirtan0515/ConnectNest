@@ -19,7 +19,7 @@ How a request flows (numbers match the diagram):
 6. Images upload to a private S3 bucket through a presigned URL; a Lambda sends them to Rekognition and deletes unsafe ones.
 7. Real-time: the browser keeps a WebSocket connection (authenticated with its Cognito token). When a post or event is created, the write Lambda pushes it to connected clients.
 
-Sign-in runs through Cognito (email, Google, Microsoft; OAuth secrets in Secrets Manager). A Cognito custom-message trigger Lambda builds the branded verification email, which SES sends. A CloudFront Function rewrites `/api/*` paths before they reach API Gateway. An EventBridge rule runs a daily Lambda that permanently deletes accounts past their 30-day deletion window. CloudTrail, GuardDuty, IAM, and CloudWatch cover audit, threat detection, permissions, and logs. CloudWatch alarms on CloudFront 5xx, sustained WAF blocking, WAF rate-limit trips, API 5xx and Lambda errors notify the owner through SNS email (alarm state only, no recovery emails). The WAF logs blocked requests only to a private S3 bucket, with authorization and cookie headers redacted and a 30-day expiry. Users can turn on authenticator-app MFA from Settings.
+Sign-in runs through Cognito (email, Google, Microsoft; OAuth secrets in Secrets Manager). A Cognito custom-message trigger Lambda builds the branded verification email, which SES sends. A CloudFront Function rewrites `/api/*` paths before they reach API Gateway. An EventBridge rule runs a daily Lambda that permanently deletes accounts past their 30-day deletion window. CloudTrail, GuardDuty, IAM, and CloudWatch cover audit, threat detection, permissions, and logs. CloudWatch alarms on CloudFront 5xx, sustained WAF blocking, WAF rate-limit trips, API 5xx and Lambda errors notify the owner through SNS email (alarm state only, no recovery emails). The WAF logs blocked requests only to a private S3 bucket, with authorization and cookie headers redacted and a 30-day expiry. Users can turn on authenticator-app MFA from Settings. Inbound mail to support@ and abuse@connectnestapp.com is received by SES (spam and virus scanning on), stored in a private, encrypted, SSL-only S3 bucket whose raw messages expire after 30 days, and forwarded by a least-privilege Lambda to the owner's inbox from no-reply@connectnestapp.com with Reply-To set to the original sender. The Route 53 zone holds the MX record for it.
 
 In-app notifications are live: RSVPs, comments, likes, group joins and direct messages create a notification for the recipient. Direct messaging (1:1) delivers each message to the two participants' open sockets via a targeted send over the WebSocket API (a `byUser` index on the connections table), not a global broadcast. The dashed "Planned / future" row in the diagram lists work that is not deployed yet: push and email delivery of notifications, direct messaging, a CloudWatch dashboard and access logging, KMS keys and VPC endpoints, organizational Microsoft sign-in, and richer recommendation ranking. Unit tests and a GitHub Actions CI pipeline are already in place.
 
@@ -72,8 +72,8 @@ In-app notifications are live: RSVPs, comments, likes, group joins and direct me
 | `ConnectNest-Hosting` | CloudFront + private S3 SPA (OAC), `/api/*` proxy behavior, CloudFront Function prefix strip, CLOUDFRONT-scoped WAF, ACM cert + apex/www aliases, security response headers (HSTS, nosniff, frame deny, referrer, permissions) |
 | `ConnectNest-Security` | CloudTrail (multi-region audit trail → private S3) + GuardDuty detector |
 | `ConnectNest-Monitoring` | CloudWatch alarms (CloudFront 5xx rate, WAF blocked requests > 1,000 / 15 min, WAF rate-limit tripped, HTTP API 5xx, Lambda errors) → SNS email topic |
-| `ConnectNest-Email` | Amazon SES domain identity (connectnestapp.com) with Easy DKIM |
-| `ConnectNest-Dns` | Route 53 public hosted zone for connectnestapp.com (apex ALIAS → CloudFront, DKIM/SPF/ACM records) |
+| `ConnectNest-Email` | Amazon SES domain identity (connectnestapp.com) with Easy DKIM; inbound receipt rule set (support@, abuse@), S3 bucket for raw mail (30-day expiry), forwarding Lambda (needs `-c inboundForwardTo=...`) |
+| `ConnectNest-Dns` | Route 53 public hosted zone for connectnestapp.com (apex ALIAS → CloudFront, DKIM/SPF/ACM records, inbound MX) |
 | `ConnectNest-Realtime` | API Gateway WebSocket API ($connect JWT authorizer, $disconnect, $default), Connections DynamoDB table; createPost/createEvent broadcast new items |
 
 ## Services
@@ -85,7 +85,7 @@ In-app notifications are live: RSVPs, comments, likes, group joins and direct me
 | TLS | AWS Certificate Manager | Certificate for connectnestapp.com / www |
 | Hosting | Amazon S3 (private, OAC) | React SPA static assets, reachable only via CloudFront |
 | Auth | Amazon Cognito | Sign-up/in, tokens, Google + Microsoft federation, optional TOTP MFA |
-| Email | Amazon SES | Branded transactional email (verification / password reset) from the domain |
+| Email | Amazon SES | Branded transactional email (verification / password reset) from the domain; inbound mail for support@ and abuse@ stored in S3 (30 days) and forwarded |
 | API | API Gateway (HTTP API v2) | Public REST entry; validates the Cognito JWT before routing |
 | Real-time | API Gateway (WebSocket API) | Push post/event updates to connected clients |
 | Compute | AWS Lambda (Node 22, ARM64, ESM) | Stateless business logic per feature |

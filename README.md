@@ -72,8 +72,8 @@ Sign-in runs through Cognito (email, Google, Microsoft). SES sends the branded v
 | `ConnectNest-Api` | HTTP API, JWT authorizer, Lambda handlers, uploads bucket, image moderation, scheduled purge |
 | `ConnectNest-Hosting` | CloudFront, private S3 SPA bucket, WAF (with blocked-request logging), ACM certificate, security response headers |
 | `ConnectNest-Realtime` | WebSocket API, connections table, connect/disconnect/authorizer Lambdas |
-| `ConnectNest-Email` | SES domain identity with DKIM |
-| `ConnectNest-Dns` | Route 53 hosted zone and records |
+| `ConnectNest-Email` | SES domain identity with DKIM, plus inbound mail: receipt rule for support@ and abuse@, private encrypted S3 bucket (raw messages expire after 30 days), forwarding Lambda |
+| `ConnectNest-Dns` | Route 53 hosted zone and records (including the inbound MX record and SES SPF) |
 | `ConnectNest-Security` | CloudTrail and GuardDuty |
 | `ConnectNest-Monitoring` | CloudWatch alarms (CloudFront 5xx, sustained WAF blocks, WAF rate-limit trips, API 5xx, Lambda errors) with SNS email alerts |
 
@@ -155,6 +155,17 @@ the stack outputs into the frontend env files, then build and publish the SPA:
 (cd frontend && npm run build)
 (cd infra && npx cdk deploy ConnectNest-Hosting)
 ```
+
+Inbound mail to `support@` and `abuse@connectnestapp.com` is received by SES,
+stored in S3 for 30 days and forwarded by a Lambda to the address you pass as
+CDK context. Without the context, synth works and the forwarder and receipt rule
+are skipped:
+```bash
+(cd infra && npx cdk deploy ConnectNest-Email ConnectNest-Dns -c inboundForwardTo=you@example.com)
+```
+Deploy `ConnectNest-Email` before `ConnectNest-Dns` so the rule set is active
+when the MX record goes live. Forwarded copies come from `no-reply@connectnestapp.com`
+with Reply-To set to the original sender.
 
 Run the frontend locally with `cd frontend && npm run dev` (Vite, http://localhost:3000).
 
