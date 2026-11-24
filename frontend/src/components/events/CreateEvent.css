@@ -36,6 +36,7 @@
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
+  min-height: 44px;
   font-size: 14px;
   font-family: inherit;
   background: var(--surface);
@@ -60,3 +61,9 @@
   font-weight: 600;
 }
 .event-form__submit:disabled { opacity: 0.6; cursor: default; }
+.event-form__input:focus-visible,
+.event-form__textarea:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+}
+.event-form__input:disabled { opacity: 0.6; }

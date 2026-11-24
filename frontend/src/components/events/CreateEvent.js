@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import { api } from "../../api/client";
+import { toStartsAtIso } from "../../pages/Events/calendarUtils";
 import "./CreateEvent.css";
 
-const CreateEvent = ({ onCreated }) => {
-  const [form, setForm] = useState({ title: "", description: "", date: "", location: "" });
+const toLocalToday = () => {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+};
+const CreateEvent = ({ onCreated, initialDate = "", heading = "Create Event" }) => {
+  const blank = { title: "", description: "", date: initialDate, time: "18:00", location: "" };
+  const [form, setForm] = useState(blank);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -22,10 +29,12 @@ const CreateEvent = ({ onCreated }) => {
       await api.post("/events", {
         title: form.title,
         description: form.description || "",
-        startsAt: form.date || new Date().toISOString().split("T")[0],
+        startsAt: form.date
+          ? toStartsAtIso(form.date, form.time)
+          : new Date().toISOString().split("T")[0],
         location: form.location || "",
       });
-      setForm({ title: "", description: "", date: "", location: "" });
+      setForm(blank);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
       if (onCreated) onCreated();
@@ -39,7 +48,7 @@ const CreateEvent = ({ onCreated }) => {
 
   return (
     <form className="event-form" onSubmit={handleSubmit}>
-      <h2 className="event-form__title">Create Event</h2>
+      <h2 className="event-form__title">{heading}</h2>
 
       {error && <div className="event-form__error">{error}</div>}
       {success && <div style={{ color: "var(--success)", fontSize: 13, fontWeight: 600 }}>✓ Event created!</div>}
@@ -51,6 +60,7 @@ const CreateEvent = ({ onCreated }) => {
         value={form.title}
         onChange={handleChange}
         placeholder="Event title *"
+        aria-label="Event title"
         required
       />
       <input
@@ -60,6 +70,7 @@ const CreateEvent = ({ onCreated }) => {
         value={form.location}
         onChange={handleChange}
         placeholder="Location"
+        aria-label="Location"
       />
       <input
         className="event-form__input"
@@ -67,7 +78,17 @@ const CreateEvent = ({ onCreated }) => {
         name="date"
         value={form.date}
         onChange={handleChange}
-        min={new Date().toISOString().split("T")[0]}
+        min={toLocalToday()}
+        aria-label="Event date"
+      />
+      <input
+        className="event-form__input"
+        type="time"
+        name="time"
+        value={form.time}
+        onChange={handleChange}
+        aria-label="Start time"
+        disabled={!form.date}
       />
       <textarea
         className="event-form__textarea"
@@ -75,6 +96,7 @@ const CreateEvent = ({ onCreated }) => {
         value={form.description}
         onChange={handleChange}
         placeholder="Event description"
+        aria-label="Event description"
         rows={3}
       />
       <button type="submit" className="btn-primary event-form__submit" disabled={loading}>

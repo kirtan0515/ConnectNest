@@ -48,19 +48,23 @@
 
 .events-page__grid {
   display: grid;
-  grid-template-columns: 380px 1fr;
+  grid-template-columns: minmax(0, 1fr) 340px;
   gap: 20px;
   align-items: start;
 }
 
-.events-page__create {
+.events-page__calendar { padding: 20px; min-width: 0; }
+.events-page__feed {
   position: sticky;
   top: calc(var(--navbar-h) + 24px);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
   .events-page__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
-  .events-page__create { position: static; }
+  .events-page__feed { position: static; }
+}
+@media (max-width: 640px) {
+  .events-page__calendar { padding: 12px 8px; }
 }
