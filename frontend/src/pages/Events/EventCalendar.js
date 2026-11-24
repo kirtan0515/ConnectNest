@@ -17,7 +17,7 @@ import {
 import "./EventCalendar.css";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const MAX_CHIPS = 2;
+const MAX_CHIPS = 1;
 
 const timeLabel = (event) =>
   hasTime(event.startsAt)
