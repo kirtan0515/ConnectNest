@@ -1,5 +1,6 @@
+/* No positioning here: the panel anchors to .dash-navbar__right so it lines
+   up with the avatar menu and stays on screen on narrow phones. */
 .notif {
-  position: relative;
   display: inline-flex;
 }
 .notif__btn {
@@ -12,16 +13,16 @@
   border: none;
   border-radius: 999px;
   background: transparent;
-  color: var(--text-secondary, #c3d9d4);
+  color: var(--dn-text-2, #c3d9d4);
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
 .notif__btn:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary, #eaf4f1);
+  color: var(--dn-text, #eaf4f1);
 }
 .notif__btn:focus-visible {
-  outline: 2px solid var(--brand, #ff9f68);
+  outline: 2px solid var(--dn-accent, #ff9f68);
   outline-offset: 2px;
 }
 .notif__badge {
@@ -32,40 +33,40 @@
   height: 17px;
   padding: 0 4px;
   border-radius: 999px;
-  background: #e5484d;
+  background: #b3261e;
   color: #fff;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 17px;
   text-align: center;
 }
 .notif__panel {
   position: absolute;
-  top: 52px;
+  top: calc(100% + 8px);
   right: 0;
   width: 320px;
   max-width: calc(100vw - 32px);
-  background: var(--surface, #12383a);
-  border: 1px solid var(--border, #2c5a5c);
+  background: var(--dn-surface, #12383a);
+  border: 1px solid var(--dn-hairline, #2a5557);
   border-radius: 14px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
   overflow: hidden;
-  z-index: 1000;
+  z-index: 200;
 }
 .notif__head {
   padding: 14px 16px;
   font-family: "Unbounded", system-ui, sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-primary, #eaf4f1);
-  border-bottom: 1px solid var(--border, #2c5a5c);
+  color: var(--dn-text, #eaf4f1);
+  border-bottom: 1px solid var(--dn-hairline, #2a5557);
 }
 .notif__empty {
   margin: 0;
   padding: 24px 16px;
   text-align: center;
   font-size: 13px;
-  color: var(--text-muted, #a3c0ba);
+  color: var(--dn-muted, #a3c0ba);
 }
 .notif__list {
   list-style: none;
@@ -98,10 +99,15 @@
 }
 .notif__msg {
   font-size: 13px;
-  color: var(--text-primary, #eaf4f1);
+  color: var(--dn-text, #eaf4f1);
   line-height: 1.4;
 }
 .notif__time {
   font-size: 11px;
-  color: var(--text-muted, #a3c0ba);
+  color: var(--dn-muted, #a3c0ba);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notif__btn,
+  .notif__item { transition: none; }
 }

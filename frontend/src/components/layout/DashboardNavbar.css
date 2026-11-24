@@ -83,6 +83,9 @@
 /* Right */
 .dash-navbar__right {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
   flex-shrink: 0;
 }
 
@@ -98,6 +101,10 @@
   transition: background 0.15s ease;
 }
 .dash-avatar-btn:hover { background: rgba(255, 255, 255, 0.06); }
+.dash-avatar-btn:focus-visible {
+  outline: 2px solid var(--dn-accent);
+  outline-offset: 2px;
+}
 
 .dash-avatar-initials {
   width: 36px;
@@ -202,6 +209,8 @@
 
   .dash-navbar__logo,
   .dash-navbar__right { flex-shrink: 0; }
+  /* Smaller wordmark so the bell + avatar pair fits inside 360px. */
+  .dash-navbar__logo img { height: 24px; }
 
   .dash-nav-item {
     padding: 8px 10px;
@@ -212,4 +221,10 @@
   .dash-dropdown {
     width: min(240px, calc(100vw - 24px));
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-nav-item,
+  .dash-avatar-btn,
+  .dash-dropdown__item { transition: none; }
 }
