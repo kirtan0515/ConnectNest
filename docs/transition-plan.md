@@ -116,7 +116,7 @@ Actions tab.
 
 ### Health check
 ```bash
-python3 scripts/smoke-test.py     # 38 checks against the deployed stack
+python3 scripts/e2e-test.py     # 38 checks against the deployed stack
 ```
 
 ---
@@ -196,5 +196,5 @@ CloudFront: a cache hit would bypass the Cognito authorizer.
 - **Account lifecycle:** deleted accounts have a 30-day grace window; a daily
   EventBridge-scheduled Lambda hard-deletes expired ones.
 - **Tests + CI:** backend and frontend unit tests run in GitHub Actions on every
-  push/PR, alongside a CDK synth. `scripts/smoke-test.py` is the end-to-end check
+  push/PR, alongside a CDK synth. `scripts/e2e-test.py` is the end-to-end check
   against a live stack.

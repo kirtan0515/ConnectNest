@@ -225,7 +225,7 @@ Unit tests (run locally and in CI, no AWS needed):
 (cd frontend && npm test)   # API client + components (Vitest + jsdom)
 ```
 
-End-to-end smoke test against a deployed stack: `scripts/smoke-test.py` invokes
+End-to-end test against a deployed stack: `scripts/e2e-test.py` invokes
 the deployed Lambda handlers with a synthetic authenticated event and checks the
 main flows: events and RSVP, posts, likes, comments (edit + delete),
 recommendations, notifications, groups, the activity digest, profiles, content
@@ -234,7 +234,7 @@ target account and writes a few test records, so run it against a development or
 demo stack.
 
 ```bash
-python3 scripts/smoke-test.py
+python3 scripts/e2e-test.py
 ```
 
 ## Continuous integration and deployment
