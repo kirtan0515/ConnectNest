@@ -5,6 +5,8 @@ import { api } from "../../../api/client";
 import AuthNetworkCanvas from "../../../components/canvas/AuthNetworkCanvas";
 import AuthNestAccent from "../../../components/auth/AuthNestAccent";
 import SocialButtons from "../../../components/auth/SocialButtons";
+import NonAffiliation from "../../../components/legal/NonAffiliation";
+import ConsentCheckbox, { CONSENT_ERROR } from "../../../components/legal/ConsentCheckbox";
 import logo from "../../../assets/connectnest-logo.png";
 import "./Signup.css";
 
@@ -51,6 +53,8 @@ const Signup = () => {
   const [error, setError] = useState("");
   const [resent, setResent] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const [consentError, setConsentError] = useState("");
 
   useEffect(() => {
     if (isAuthenticated && step !== "done") navigate("/dashboard");
@@ -81,11 +85,16 @@ const Signup = () => {
       return;
     }
     if (email.indexOf("@") < 1) {
-      setError("Enter your university email, like you@university.edu.");
+      setError("Enter a valid email address.");
       return;
     }
     if (!allMet) {
       setError("Your password needs to meet all four rules above.");
+      return;
+    }
+    if (!agreed) {
+      setError("");
+      setConsentError(CONSENT_ERROR);
       return;
     }
     setError("");
@@ -200,13 +209,13 @@ const Signup = () => {
             </div>
 
             <label className="cn-label" htmlFor="su-email">
-              University email
+              Email
               <input
                 id="su-email"
                 className="cn-input"
                 type="email"
                 autoComplete="email"
-                placeholder="you@university.edu"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setError(""); }}
               />
@@ -263,6 +272,14 @@ const Signup = () => {
                 ))}
               </div>
             </fieldset>
+
+            <NonAffiliation compact />
+            <ConsentCheckbox
+              idPrefix="su"
+              checked={agreed}
+              onChange={(v) => { setAgreed(v); if (v) setConsentError(""); }}
+              error={consentError}
+            />
 
             {error && (
               <p className="cn-alert cn-alert--error" role="alert">{error}</p>

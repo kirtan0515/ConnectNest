@@ -60,3 +60,7 @@
     gap: 10px;
   }
 }
+
+.app-footer__affil {
+  flex-basis: 100%;
+}

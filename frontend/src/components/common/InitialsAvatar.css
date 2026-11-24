@@ -1,0 +1,12 @@
+.initials-avatar {
+  flex: 0 0 auto;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #0d2a2c;
+  font-family: "Hanken Grotesk", system-ui, sans-serif;
+  font-weight: 600;
+  line-height: 1;
+  user-select: none;
+}

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import NonAffiliation from "../legal/NonAffiliation";
 import "./AppFooter.css";
 
 /**
@@ -17,10 +18,12 @@ export default function AppFooter() {
           <Link to="/about">About</Link>
           <Link to="/privacy">Privacy</Link>
           <Link to="/terms">Terms</Link>
+          <Link to="/terms#report">Report content</Link>
         </nav>
         <span className="app-footer__meta">
           &copy; {year} ConnectNest
         </span>
+        <NonAffiliation compact className="app-footer__affil" />
       </div>
     </footer>
   );

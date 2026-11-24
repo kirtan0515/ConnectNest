@@ -6,6 +6,7 @@ import { api } from "../../api/client";
 import { toggleLike } from "./postLikeUtils";
 import { useRealtime } from "../../realtime/useRealtime";
 import AuthImage from "../common/AuthImage";
+import InitialsAvatar from "../common/InitialsAvatar";
 import "./Post.css";
 
 // posts prop: if provided, skip fetching (used by Profile page)
@@ -193,11 +194,7 @@ function PostItem({ post }) {
     <div className="post card">
       {/* Header */}
       <div className="post__header">
-        <img
-          className="avatar post__avatar"
-          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random&size=80`}
-          alt={authorName}
-        />
+        <InitialsAvatar className="post__avatar" name={authorName} size={44} />
         <div className="post__meta">
           <div className="post__author">{authorName}</div>
           <div className="post__time">{moment(post.createdAt).fromNow()}</div>
@@ -252,12 +249,7 @@ function PostItem({ post }) {
       {showComments && (
         <div className="post__comments">
           <div className="post__comment-input">
-            <img
-              className="avatar"
-              style={{ width: 32, height: 32 }}
-              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(myName)}&background=random&size=64`}
-              alt=""
-            />
+            <InitialsAvatar name={myName} size={32} decorative />
             <input
               type="text"
               placeholder="Write a comment…"
@@ -276,12 +268,7 @@ function PostItem({ post }) {
           )}
           {comments.map((c) => (
             <div key={c.commentId} className="post__comment">
-              <img
-                className="avatar"
-                style={{ width: 32, height: 32 }}
-                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(c.authorName || "U")}&background=random&size=64`}
-                alt={c.authorName}
-              />
+              <InitialsAvatar name={c.authorName || "U"} size={32} />
               {editingId === c.commentId ? (
                 <div className="post__comment-edit">
                   <input

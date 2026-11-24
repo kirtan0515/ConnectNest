@@ -225,6 +225,10 @@ export class ApiStack extends Stack {
         GROUPS_TABLE: tables.groups.tableName,
         GROUP_MEMBERS_TABLE: tables.groupMembers.tableName,
         AUDIT_LOG_TABLE: tables.auditLog.tableName,
+        CONVERSATIONS_TABLE: tables.conversations.tableName,
+        CONVERSATION_MEMBERS_TABLE: tables.conversationMembers.tableName,
+        MESSAGES_TABLE: tables.messages.tableName,
+        UPLOADS_BUCKET: uploadsBucket.bucketName,
         USER_POOL_ID: userPool.userPoolId,
       },
       { timeoutSeconds: 120, memory: 512 }
@@ -418,6 +422,11 @@ export class ApiStack extends Stack {
     tables.groups.grantReadWriteData(purgeAccounts);
     tables.groupMembers.grantReadWriteData(purgeAccounts);
     tables.auditLog.grantWriteData(purgeAccounts);
+    tables.conversations.grantReadWriteData(purgeAccounts);
+    tables.conversationMembers.grantReadWriteData(purgeAccounts);
+    tables.messages.grantReadWriteData(purgeAccounts);
+    uploadsBucket.grantRead(purgeAccounts);
+    uploadsBucket.grantDelete(purgeAccounts);
     purgeAccounts.addToRolePolicy(
       new PolicyStatement({
         actions: ["cognito-idp:AdminDeleteUser"],

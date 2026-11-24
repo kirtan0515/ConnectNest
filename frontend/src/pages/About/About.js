@@ -1,10 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar";
+import NonAffiliation from "../../components/legal/NonAffiliation";
 import "./About.css";
 
 const STACK = [
-  { k: "Amazon Cognito", v: "Secure sign-up, login and email verification." },
+  { k: "Amazon Cognito", v: "Sign-up, login and email verification." },
   { k: "API Gateway", v: "A single HTTP API, guarded by a Cognito authorizer." },
   { k: "AWS Lambda", v: "Serverless functions run the business logic." },
   { k: "DynamoDB", v: "Fast, scalable storage — one table per entity." },
@@ -24,8 +25,8 @@ const About = () => {
             One place for everything happening on campus.
           </h1>
           <p className="about__lead">
-            ConnectNest is a campus engagement platform for students at
-            Harrisburg University. Events, groups, posts and messages live
+            ConnectNest is a campus engagement platform for university
+            students. Events, groups, posts and messages live
             together in one app, so it's easy to find your people and stay in
             the loop with campus life.
           </p>
@@ -37,7 +38,7 @@ const About = () => {
             Campus life gets scattered across group chats, flyers, email threads
             and word of mouth. ConnectNest brings it together: discover and RSVP
             to events, join clubs and interest groups, share posts, and message
-            peers, all in a single secure place built for students.
+            peers, all in one place built for students.
           </p>
         </section>
 
@@ -46,8 +47,8 @@ const About = () => {
           <p>
             ConnectNest is a serverless application, and its entire
             infrastructure is written explicitly as code. That means it is
-            reproducible, scalable, and secure by design, with every protected
-            request verified against the signed-in user.
+            reproducible and scalable, and every protected request is checked
+            against the signed-in user.
           </p>
           <dl className="about__stack">
             {STACK.map((s) => (
@@ -59,6 +60,14 @@ const About = () => {
           </dl>
         </section>
 
+        <section className="about__block">
+          <h2 className="cn-head">Who runs it</h2>
+          <NonAffiliation />
+          <p>
+            This is a demo hosted on a personal AWS account. See the{" "}
+            <Link to="/terms">Terms</Link> and <Link to="/privacy">Privacy Policy</Link>.
+          </p>
+        </section>
         <section className="about__cta">
           <h2 className="cn-head">Ready to connect with your campus?</h2>
           <div className="about__cta-actions">

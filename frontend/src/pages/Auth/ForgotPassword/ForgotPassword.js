@@ -95,13 +95,13 @@ const ForgotPassword = () => {
               </p>
             </div>
             <label className="cn-label" htmlFor="fp-email">
-              University email
+              Email
               <input
                 id="fp-email"
                 className="cn-input"
                 type="email"
                 autoComplete="email"
-                placeholder="you@university.edu"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setError(""); }}
               />

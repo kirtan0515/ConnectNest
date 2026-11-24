@@ -9,6 +9,7 @@ import harrisburgSkyline from "../../assets/harrisburg-skyline.jpg";
 import huBuilding from "../../assets/hu-building.jpg";
 import innovationLab from "../../assets/innovation-lab.jpg";
 import capitolInternships from "../../assets/capitol-internships.jpg";
+import NonAffiliation from "../../components/legal/NonAffiliation";
 import "./Home.css";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -114,7 +115,7 @@ const Home = () => {
           <div className="hero__row cn-fade">
             <p className="hero__sub">
               Connect with peers, join events, share ideas and grow your network,
-              all on a secure, student-first platform.
+              all on a student-first platform.
             </p>
             <div className="hero__actions">
               <Link to="/signup" className="cn-btn cn-btn--primary">Get started free</Link>
@@ -242,7 +243,12 @@ const Home = () => {
               <figcaption>
                 Downtown Harrisburg, PA — home of Harrisburg University.
                 <span className="gallery__credit">
-                  Photo: Jeffrey Hayes, CC BY 2.0, via Wikimedia Commons
+                  Photo by{" "}
+                  <a href="https://www.flickr.com/photos/192355779@N02/" target="_blank" rel="noopener noreferrer">Jeffrey Hayes</a>
+                  , <a href="https://commons.wikimedia.org/wiki/File:Harrisburg,_PA_Skyline_2021.jpg" target="_blank" rel="noopener noreferrer">source on Wikimedia Commons</a>
+                  , licensed under{" "}
+                  <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener noreferrer">CC BY 2.0</a>
+                  . Resized and cropped for display.
                 </span>
               </figcaption>
             </figure>
@@ -320,7 +326,7 @@ const Home = () => {
             <div className="home-footer__top">
               <div className="home-footer__brand">
                 <span className="home-footer__name">ConnectNest</span>
-                <span>Connecting campuses worldwide.</span>
+                <span>Connecting students on campus.</span>
               </div>
               <div className="home-footer__cols">
                 <nav aria-label="Explore">
@@ -340,9 +346,11 @@ const Home = () => {
                   <strong>Legal</strong>
                   <Link to="/terms">Terms &amp; Conditions</Link>
                   <Link to="/privacy">Privacy Policy</Link>
+                  <Link to="/terms#report">Report content</Link>
                 </nav>
               </div>
             </div>
+            <NonAffiliation compact className="home-footer__affil" />
             <p className="home-footer__copy">© 2026 ConnectNest. All rights reserved.</p>
           </footer>
         </div>

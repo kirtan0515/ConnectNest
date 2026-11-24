@@ -1,0 +1,11 @@
+.non-affil {
+  margin: 0;
+  font-family: "Hanken Grotesk", system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #c3d9d4; /* --text-2, 8:1 on --bg */
+}
+.non-affil--compact {
+  font-size: 13px;
+  color: #a3c0ba; /* --text-muted, 6:1 on --bg and --surface */
+}

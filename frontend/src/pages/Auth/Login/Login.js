@@ -143,13 +143,13 @@ const Login = () => {
           ) : (
           <div className="auth__fields">
             <label className="cn-label" htmlFor="login-email">
-              University email
+              Email
               <input
                 id="login-email"
                 className="cn-input"
                 type="email"
                 autoComplete="email"
-                placeholder="you@university.edu"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);

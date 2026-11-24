@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import "./SocialButtons.css";
 
@@ -53,6 +54,12 @@ const SocialButtons = ({ label = "or continue with" }) => {
           {busy === "microsoft" ? "Redirecting…" : "Microsoft"}
         </button>
       </div>
+      <p className="social__consent">
+        By continuing you confirm you are 18 or older and agree to the{" "}
+        <Link to="/terms" target="_blank" rel="noopener noreferrer">Terms</Link>
+        {" "}and{" "}
+        <Link to="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>.
+      </p>
     </div>
   );
 };

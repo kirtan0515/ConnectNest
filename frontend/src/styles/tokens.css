@@ -1,6 +1,21 @@
+/* Self-hosted variable fonts (latin). Licenses: public/fonts/OFL-*.txt */
+@font-face {
+  font-family: "Unbounded";
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url("/fonts/unbounded-latin-wght-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Hanken Grotesk";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/hanken-grotesk-latin-wght-normal.woff2") format("woff2");
+}
 /* ===== ConnectNest design tokens ===== */
 /* Deep pine-teal canvas with a warm coral accent. Fonts: Unbounded (headings),
-   Hanken Grotesk (body). Loaded via <link> in public/index.html. */
+   Hanken Grotesk (body). Self-hosted from public/fonts (SIL OFL 1.1). */
 
 /* Palette is scoped to .cn-scope so it never collides with the app's
    light-theme :root tokens in index.css. Landing + auth pages opt in via

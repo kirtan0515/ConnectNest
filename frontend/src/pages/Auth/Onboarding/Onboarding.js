@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthContext";
 import { api } from "../../../api/client";
 import AuthNetworkCanvas from "../../../components/canvas/AuthNetworkCanvas";
+import NonAffiliation from "../../../components/legal/NonAffiliation";
+import ConsentCheckbox, { CONSENT_ERROR } from "../../../components/legal/ConsentCheckbox";
 import logo from "../../../assets/connectnest-logo.png";
 import "../Signup/Signup.css";
 
@@ -34,6 +36,8 @@ const Onboarding = () => {
   const [picked, setPicked] = useState({});
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const [consentError, setConsentError] = useState("");
   const [checking, setChecking] = useState(true);
 
   // Prefill name from the provider; skip onboarding if a profile already exists.
@@ -72,6 +76,11 @@ const Onboarding = () => {
     if (busy) return;
     if (!name.trim()) {
       setError("Add your name so classmates can find you.");
+      return;
+    }
+    if (!agreed) {
+      setError("");
+      setConsentError(CONSENT_ERROR);
       return;
     }
     setError("");
@@ -162,6 +171,13 @@ const Onboarding = () => {
               </div>
             </fieldset>
 
+            <NonAffiliation compact />
+            <ConsentCheckbox
+              idPrefix="ob"
+              checked={agreed}
+              onChange={(v) => { setAgreed(v); if (v) setConsentError(""); }}
+              error={consentError}
+            />
             {error && <p className="cn-alert cn-alert--error" role="alert">{error}</p>}
 
             <button type="submit" className="cn-btn cn-btn--primary auth__submit" disabled={busy}>
