@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../auth/AuthContext";
 import { listMyGroups } from "../../services/groupServices";
@@ -32,6 +33,7 @@ const MAX_OUTER = 23; // cap so total nodes (incl. center) stays <= 24
 
 export default function CampusNetwork() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const canvasRef = useRef(null);
   const [groups, setGroups] = useState([]);
 
@@ -399,10 +401,13 @@ export default function CampusNetwork() {
         <h1 className="cn-hero__greeting">Your campus, {firstName}</h1>
         <ul className="cn-hero__stats">
           <li className="cn-hero__stat">
-            <span className="cn-hero__stat-num">{groupCount}</span>
-            <span className="cn-hero__stat-label">
-              {groupCount === 1 ? "group" : "groups"}
-            </span>
+            <button
+              type="button"
+              className="cn-hero__events-link"
+              onClick={() => navigate("/groups")}
+            >
+              Member of {groupCount} {groupCount === 1 ? "group" : "groups"}
+            </button>
           </li>
           <li className="cn-hero__stat">
             <button

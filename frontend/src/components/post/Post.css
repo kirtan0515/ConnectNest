@@ -56,14 +56,15 @@
 .post__image-wrap {
   width: 100%;
   background: var(--surface-2);
-  max-height: 480px;
-  overflow: hidden;
+  display: flex;
+  justify-content: center;
 }
 
 .post__image {
+  display: block;
   width: 100%;
   height: auto;
-  object-fit: cover;
+  object-fit: contain;
   transition: opacity 0.3s;
 }
 

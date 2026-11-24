@@ -326,6 +326,7 @@
     grid-template-rows: none;
     display: flex;
     flex-direction: column;
+    align-items: stretch;
   }
 
   /* Rail dissolves: its three children promote into the single-column grid
